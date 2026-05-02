@@ -33,8 +33,17 @@ export default function StolenMoments() {
     return true;
   });
 
+  const fab = !loading && (
+    <Link
+      to="/momen/baru"
+      className="fixed bottom-28 right-6 md:bottom-10 md:right-10 w-16 h-16 bg-gradient-to-br from-primary to-secondary text-on-primary rounded-full flex items-center justify-center shadow-[0_10px_25px_rgba(113,88,91,0.3)] hover:scale-110 transition-all active:scale-95 z-[60] group"
+    >
+      <span className="material-symbols-outlined text-3xl transition-transform group-hover:rotate-90">add</span>
+    </Link>
+  );
+
   return (
-    <MainLayout activePage="/momen">
+    <MainLayout activePage="/momen" fab={fab}>
       <div className="max-w-[1140px] mx-auto">
         {/* Header */}
         <div className="text-center mb-10 md:mb-16 flex flex-col items-center">
@@ -144,16 +153,6 @@ export default function StolenMoments() {
           </div>
         )}
 
-        {/* Floating Action Button */}
-        {!loading && (
-          <Link
-            to="/momen/baru"
-            className="fixed bottom-28 right-6 md:bottom-10 md:right-10 w-14 h-14 bg-gradient-to-br from-primary to-secondary text-on-primary rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform active:scale-95 z-50 group"
-          >
-            <span className="material-symbols-outlined text-3xl transition-transform group-hover:rotate-90">add</span>
-          </Link>
-        )}
-      </div>
     </MainLayout>
   );
 }
