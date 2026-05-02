@@ -140,7 +140,7 @@ export default function Dashboard() {
             {getRelationshipDuration()}
           </p>
           <div className="w-full max-w-lg mx-auto bg-primary-container/20 dark:bg-rose-900/10 rounded-3xl p-4 border border-primary/10">
-            <p className="text-xs font-semibold text-primary dark:text-rose-300 mb-2 tracking-widest uppercase">Menuju Anniversary 💍</p>
+            <p className="text-xs font-semibold text-primary dark:text-rose-300 mb-2 tracking-widest uppercase">Menuju Anniversary</p>
             <RelationshipTimer />
           </div>
         </section>
