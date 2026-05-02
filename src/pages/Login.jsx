@@ -35,11 +35,11 @@ export default function Login() {
           if (signUpErr.message.includes('User already registered')) {
             setError('Password yang kamu masukkan salah.');
           } else {
-            setError('Terjadi kesalahan saat masuk');
+            setError(`Gagal daftar: ${signUpErr.message}`);
           }
         }
       } else {
-        setError('Terjadi kesalahan saat masuk');
+        setError(`Gagal masuk: ${err.message}`);
       }
     } finally {
       setLoading(false);
