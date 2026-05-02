@@ -1,18 +1,12 @@
 import { Link } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { auth } from '../../lib/firebase';
 import { signOut } from 'firebase/auth';
 
-
-const navItems = [
-  { to: '/', label: 'Beranda', icon: 'home' },
-  { to: '/momen', label: 'Momen', icon: 'auto_awesome_motion' },
-  { to: '/harapan', label: 'Harapan', icon: 'favorite' },
-  { to: '/fakta', label: 'Profil', icon: 'person' },
-];
-
 export default function Navbar({ activePage = '/' }) {
   const { isDark, toggleTheme, isPoppins, toggleFont } = useTheme();
+  const { language, toggleLanguage, t } = useLanguage();
 
   const handleLogout = async () => {
     try {
@@ -22,6 +16,12 @@ export default function Navbar({ activePage = '/' }) {
     }
   };
 
+  const navItems = [
+    { to: '/', label: t('nav.dashboard'), icon: 'home' },
+    { to: '/momen', label: t('nav.moments'), icon: 'auto_awesome_motion' },
+    { to: '/harapan', label: t('nav.wishes'), icon: 'favorite' },
+    { to: '/fakta', label: t('nav.profile'), icon: 'person' },
+  ];
 
   return (
     <header className="fixed left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-screen-lg" style={{ top: 'calc(1rem + env(safe-area-inset-top, 0px))' }}>
@@ -51,6 +51,13 @@ export default function Navbar({ activePage = '/' }) {
         {/* Actions */}
         <div className="flex items-center gap-1">
           <button
+            onClick={toggleLanguage}
+            className="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-rose-400 dark:text-rose-300 hover:bg-white/30 dark:hover:bg-white/10 transition-colors duration-300 shrink-0 font-sans font-bold text-[10px] md:text-xs"
+            aria-label="Toggle language"
+          >
+            {language === 'id' ? 'ID' : 'EN'}
+          </button>
+          <button
             onClick={toggleFont}
             className="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-rose-400 dark:text-rose-300 hover:bg-white/30 dark:hover:bg-white/10 transition-colors duration-300 shrink-0 font-serif font-bold text-lg"
             aria-label="Toggle font"
@@ -69,7 +76,7 @@ export default function Navbar({ activePage = '/' }) {
           <button
             onClick={handleLogout}
             className="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-rose-400 dark:text-rose-300 hover:bg-white/30 dark:hover:bg-white/10 transition-colors duration-300 shrink-0"
-            aria-label="Keluar"
+            aria-label={t('common.logout')}
           >
             <span className="material-symbols-outlined text-[20px] md:text-[22px]">
               logout

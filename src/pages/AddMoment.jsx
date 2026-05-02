@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '../components/layout/MainLayout';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { createMoment } from '../services/momentService';
 
 export default function AddMoment() {
   const { user, coupleId } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [story, setStory] = useState('');
@@ -92,7 +94,7 @@ export default function AddMoment() {
   async function handleSubmit(e) {
     e.preventDefault();
     if (!title.trim()) {
-      setError('Judul momen wajib diisi');
+      setError(t('moments.error_title_required'));
       return;
     }
     setError('');
@@ -104,7 +106,7 @@ export default function AddMoment() {
           imageUrl = await compressImage(imageFile);
         } catch (e) {
           console.error("Compression error:", e);
-          throw new Error('Gagal memproses foto. Memorinya terlalu besar atau format tak didukung.');
+          throw new Error(t('moments.error_compress'));
         }
       }
       await createMoment(coupleId, user.uid, {
@@ -118,7 +120,7 @@ export default function AddMoment() {
       navigate('/momen');
     } catch (err) {
       console.error('Gagal menyimpan:', err);
-      setError(err.message || 'Gagal menyimpan momen');
+      setError(err.message || t('moments.error_save'));
     } finally {
       setLoading(false);
     }
@@ -128,8 +130,8 @@ export default function AddMoment() {
     <MainLayout activePage="/momen">
       <div className="max-w-[800px] mx-auto">
         <div className="text-center mb-10 md:mb-16">
-          <h1 className="font-serif text-3xl md:text-5xl text-primary dark:text-rose-300 mb-4 italic">Abadikan Kenangan Baru</h1>
-          <p className="text-lg text-on-surface-variant dark:text-zinc-400">Setiap detail bikin ceritanya jadi lengkap ✨</p>
+          <h1 className="font-serif text-3xl md:text-5xl text-primary dark:text-rose-300 mb-4 italic">{t('moments.add_title')}</h1>
+          <p className="text-lg text-on-surface-variant dark:text-zinc-400">{t('moments.add_subtitle')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8 md:space-y-12">
@@ -137,7 +139,7 @@ export default function AddMoment() {
           <section className="glass-panel rounded-2xl p-6 md:p-12">
             <div className="flex items-center gap-3 mb-8">
               <span className="material-symbols-outlined text-primary dark:text-rose-300 text-3xl">image</span>
-              <h2 className="font-serif text-2xl text-on-surface dark:text-[#ede0df]">Visualnya</h2>
+              <h2 className="font-serif text-2xl text-on-surface dark:text-[#ede0df]">{t('moments.visual_section')}</h2>
             </div>
             {imagePreview ? (
               <div className="relative rounded-2xl overflow-hidden mb-4">
@@ -156,7 +158,7 @@ export default function AddMoment() {
                 <div className="w-20 h-20 rounded-full bg-primary-container flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                   <span className="material-symbols-outlined text-primary text-4xl">add_photo_alternate</span>
                 </div>
-                <p className="text-base text-on-surface-variant dark:text-zinc-400 mb-2">Klik untuk pilih foto</p>
+                <p className="text-base text-on-surface-variant dark:text-zinc-400 mb-2">{t('moments.click_to_upload')}</p>
                 <p className="text-xs font-semibold text-outline dark:text-zinc-600">JPG, PNG, atau WebP</p>
               </label>
             )}
@@ -166,22 +168,22 @@ export default function AddMoment() {
           <section className="glass-panel rounded-2xl p-6 md:p-12 space-y-6 md:space-y-8">
             <div className="flex items-center gap-3 mb-4">
               <span className="material-symbols-outlined text-primary dark:text-rose-300 text-3xl">edit_note</span>
-              <h2 className="font-serif text-2xl text-on-surface dark:text-[#ede0df]">Detailnya</h2>
+              <h2 className="font-serif text-2xl text-on-surface dark:text-[#ede0df]">{t('moments.detail_section')}</h2>
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-on-surface-variant dark:text-zinc-400 ml-2">Judul momen ini *</label>
+              <label className="text-xs font-semibold text-on-surface-variant dark:text-zinc-400 ml-2">{t('moments.title_label')}</label>
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 className="glass-input"
-                placeholder="contoh: Pagi pertama di Paris..."
+                placeholder={t('moments.title_placeholder')}
                 type="text"
                 required
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-xs font-semibold text-on-surface-variant dark:text-zinc-400 ml-2">Kapan momen ini terjadi?</label>
+                <label className="text-xs font-semibold text-on-surface-variant dark:text-zinc-400 ml-2">{t('moments.when_label')}</label>
                 <input
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
@@ -190,12 +192,12 @@ export default function AddMoment() {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-semibold text-on-surface-variant dark:text-zinc-400 ml-2">Di mana kita waktu itu?</label>
+                <label className="text-xs font-semibold text-on-surface-variant dark:text-zinc-400 ml-2">{t('moments.where_label')}</label>
                 <input
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   className="glass-input"
-                  placeholder="Cari lokasi..."
+                  placeholder={t('moments.where_placeholder')}
                   type="text"
                 />
               </div>
@@ -206,13 +208,13 @@ export default function AddMoment() {
           <section className="glass-panel rounded-2xl p-6 md:p-12 space-y-6 md:space-y-8">
             <div className="flex items-center gap-3 mb-4">
               <span className="material-symbols-outlined text-primary dark:text-rose-300 text-3xl">favorite</span>
-              <h2 className="font-serif text-2xl text-on-surface dark:text-[#ede0df]">Ceritanya</h2>
+              <h2 className="font-serif text-2xl text-on-surface dark:text-[#ede0df]">{t('moments.story_section')}</h2>
             </div>
             <textarea
               value={story}
               onChange={(e) => setStory(e.target.value)}
               className="glass-input resize-none"
-              placeholder="Ceritain momen kamu di sini... 💭"
+              placeholder={t('moments.story_placeholder')}
               rows="6"
             />
           </section>
@@ -227,14 +229,14 @@ export default function AddMoment() {
             <button
               type="submit"
               disabled={loading}
-              className="bg-gradient-to-r from-primary to-secondary text-on-primary text-xs font-semibold tracking-wide px-12 py-5 rounded-full shadow-[0_10px_30px_rgba(113,88,91,0.3)] hover:shadow-[0_15px_40px_rgba(113,88,91,0.4)] hover:-translate-y-1 transition-all duration-300 flex items-center gap-3 disabled:opacity-50"
+              className="bg-gradient-to-r from-primary to-secondary text-on-primary text-xs font-semibold tracking-wide px-12 py-5 rounded-full shadow-[0_10px_30_rgba(113,88,91,0.3)] hover:shadow-[0_15px_40px_rgba(113,88,91,0.4)] hover:-translate-y-1 transition-all duration-300 flex items-center gap-3 disabled:opacity-50"
             >
               {loading ? (
                 <span className="material-symbols-outlined animate-spin">progress_activity</span>
               ) : (
                 <span className="material-symbols-outlined">check</span>
               )}
-              {loading ? 'Menyimpan...' : 'Simpan Kenangan'}
+              {loading ? t('moments.saving') : t('moments.save_button')}
             </button>
           </div>
         </form>

@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import MainLayout from '../components/layout/MainLayout';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { getMoments } from '../services/momentService';
 
 export default function StolenMoments() {
   const { coupleId } = useAuth();
+  const { t, language } = useLanguage();
   const [moments, setMoments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all');
@@ -38,11 +40,11 @@ export default function StolenMoments() {
         <div className="text-center mb-10 md:mb-16 flex flex-col items-center">
           <span className="font-sans text-xs font-semibold text-on-surface-variant dark:text-zinc-500 uppercase tracking-widest mb-4 inline-flex items-center gap-2">
             <span className="material-symbols-outlined text-[16px] text-primary dark:text-rose-300">favorite</span>
-            Diari Kita
+            {t('moments.diary_title')}
           </span>
-          <h1 className="font-serif text-3xl md:text-5xl text-primary dark:text-rose-300 italic mb-4 md:mb-6">Momen Indah Bersamamu</h1>
+          <h1 className="font-serif text-3xl md:text-5xl text-primary dark:text-rose-300 italic mb-4 md:mb-6">{t('moments.title')}</h1>
           <p className="text-lg text-on-surface-variant dark:text-zinc-400 max-w-2xl mx-auto opacity-80">
-            Kumpulan hal-hal kecil yang berarti segalanya.
+            {t('moments.subtitle')}
           </p>
         </div>
 
@@ -52,7 +54,7 @@ export default function StolenMoments() {
             <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant dark:text-zinc-500">search</span>
             <input
               type="text"
-              placeholder="Cari kata di judul, cerita, atau lokasi..."
+              placeholder={t('moments.search_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-12 pr-4 py-3 bg-white/50 dark:bg-[#1e1a1b]/50 border border-outline-variant/30 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all text-on-surface dark:text-[#ede0df]"
@@ -63,38 +65,38 @@ export default function StolenMoments() {
               onClick={() => setActiveTab('all')}
               className={`px-6 py-2 rounded-xl text-sm font-semibold transition-all ${activeTab === 'all' ? 'bg-primary text-on-primary shadow-sm' : 'text-on-surface-variant dark:text-zinc-400 hover:text-primary dark:hover:text-rose-300'}`}
             >
-              Semua
+              {t('common.all')}
             </button>
             <button
               onClick={() => setActiveTab('favorite')}
               className={`px-6 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-1 ${activeTab === 'favorite' ? 'bg-rose-500 text-white shadow-sm' : 'text-on-surface-variant dark:text-zinc-400 hover:text-rose-500'}`}
             >
               <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
-              Favorit
+              {t('common.favorite')}
             </button>
           </div>
         </div>
 
         {/* Content */}
         {loading ? (
-          <p className="text-center text-on-surface-variant dark:text-zinc-500 py-20 font-serif italic">Memuat momen...</p>
+          <p className="text-center text-on-surface-variant dark:text-zinc-500 py-20 font-serif italic">{t('common.loading')}</p>
         ) : moments.length === 0 ? (
           <div className="text-center py-20">
             <span className="material-symbols-outlined text-6xl text-outline-variant dark:text-zinc-700 mb-4 block">photo_camera</span>
-            <p className="text-on-surface-variant dark:text-zinc-500 font-serif italic text-lg mb-6">Belum ada momen yang tersimpan</p>
+            <p className="text-on-surface-variant dark:text-zinc-500 font-serif italic text-lg mb-6">{t('moments.no_moments')}</p>
             <Link
               to="/momen/baru"
               className="inline-flex items-center gap-2 bg-gradient-to-r from-primary to-secondary text-on-primary px-8 py-4 rounded-full font-semibold text-sm shadow-md hover:opacity-90 transition-opacity"
             >
               <span className="material-symbols-outlined">add</span>
-              Tambah Momen Pertama
+              {t('moments.add_moment')}
             </Link>
           </div>
         ) : filteredMoments.length === 0 ? (
           <div className="text-center py-20">
             <span className="material-symbols-outlined text-5xl text-outline-variant dark:text-zinc-700 mb-4 block">search_off</span>
             <p className="text-on-surface-variant dark:text-zinc-500 font-serif italic text-lg mb-6">
-              Tidak ada momen yang cocok dengan pencarianmu.
+              {t('moments.no_results')}
             </p>
           </div>
         ) : (
@@ -124,7 +126,7 @@ export default function StolenMoments() {
                 <div className="px-1">
                   {moment.date && (
                     <time className="font-sans text-xs font-semibold text-outline dark:text-zinc-500 mb-1 block">
-                      {new Date(moment.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      {new Date(moment.date).toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </time>
                   )}
                   <div className="flex items-start justify-between gap-2">

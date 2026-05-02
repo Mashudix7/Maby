@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '../components/layout/MainLayout';
+import { useLanguage } from '../context/LanguageContext';
 import { getMomentById, deleteMoment, toggleFavoriteMoment } from '../services/momentService';
 
 export default function MomentDetail() {
   const { id } = useParams();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [moment, setMoment] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -21,10 +23,10 @@ export default function MomentDetail() {
       })
       .catch((err) => {
         console.error('Gagal memuat detail:', err);
-        setError('Momen tidak ditemukan');
+        setError(t('moments.error_not_found'));
       })
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, t]);
 
   useEffect(() => {
     if (isZoomed) {
@@ -38,7 +40,7 @@ export default function MomentDetail() {
   }, [isZoomed]);
 
   async function handleDelete() {
-    if (!window.confirm('Yakin ingin menghapus momen ini?')) return;
+    if (!window.confirm(t('moments.confirm_delete'))) return;
     try {
       await deleteMoment(id);
       navigate('/momen');
@@ -62,7 +64,7 @@ export default function MomentDetail() {
     return (
       <MainLayout activePage="/momen">
         <div className="flex items-center justify-center py-20">
-          <p className="font-serif italic text-on-surface-variant dark:text-zinc-500">Memuat...</p>
+          <p className="font-serif italic text-on-surface-variant dark:text-zinc-500">{t('common.loading')}</p>
         </div>
       </MainLayout>
     );
@@ -73,7 +75,7 @@ export default function MomentDetail() {
       <MainLayout activePage="/momen">
         <div className="flex flex-col items-center justify-center py-20">
           <span className="material-symbols-outlined text-5xl text-outline-variant dark:text-zinc-700 mb-4">error</span>
-          <p className="font-serif italic text-on-surface-variant dark:text-zinc-500">{error || 'Momen tidak ditemukan'}</p>
+          <p className="font-serif italic text-on-surface-variant dark:text-zinc-500">{error || t('moments.error_not_found')}</p>
         </div>
       </MainLayout>
     );
@@ -103,7 +105,7 @@ export default function MomentDetail() {
                 )}
                 {moment.date && (
                   <span className="glass-panel px-4 py-1.5 rounded-full text-xs font-semibold text-white border-white/20 bg-white/20">
-                    {new Date(moment.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    {new Date(moment.date).toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
                   </span>
                 )}
               </div>
@@ -130,7 +132,7 @@ export default function MomentDetail() {
               )}
               {moment.date && (
                 <span className="text-xs font-semibold text-outline dark:text-zinc-500">
-                  {new Date(moment.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                  {new Date(moment.date).toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
                 </span>
               )}
             </div>
@@ -157,7 +159,7 @@ export default function MomentDetail() {
             className="ghost-btn"
           >
             <span className="material-symbols-outlined text-[16px]">arrow_back</span>
-            Kembali
+            {t('common.back')}
           </button>
           <button
             onClick={handleToggleFavorite}
@@ -166,14 +168,14 @@ export default function MomentDetail() {
             <span className="material-symbols-outlined text-[16px]" style={isFavorite ? { fontVariationSettings: "'FILL' 1" } : undefined}>
               favorite
             </span>
-            {isFavorite ? 'Favorit' : 'Jadikan Favorit'}
+            {isFavorite ? t('moments.is_favorite') : t('moments.make_favorite')}
           </button>
           <button
             onClick={handleDelete}
             className="ghost-btn text-error hover:bg-error-container/30"
           >
             <span className="material-symbols-outlined text-[16px]">delete</span>
-            Hapus
+            {t('common.delete')}
           </button>
         </div>
       </div>
@@ -200,7 +202,7 @@ export default function MomentDetail() {
 
           <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/60 text-sm font-sans flex items-center gap-2 bg-black/40 px-4 py-2 rounded-full backdrop-blur-md">
             <span className="material-symbols-outlined text-[16px]">touch_app</span>
-            Klik di mana saja untuk menutup
+            {t('moments.zoom_close_hint')}
           </div>
         </div>
       )}

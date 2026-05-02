@@ -1,13 +1,16 @@
 import { Link } from 'react-router-dom';
-
-const navItems = [
-  { to: '/', label: 'Beranda', icon: 'home' },
-  { to: '/momen', label: 'Momen', icon: 'auto_awesome_motion' },
-  { to: '/harapan', label: 'Harapan', icon: 'favorite' },
-  { to: '/fakta', label: 'Profil', icon: 'person' },
-];
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function BottomNav({ activePage = '/' }) {
+  const { t } = useLanguage();
+
+  const navItems = [
+    { to: '/', label: t('nav.dashboard'), icon: 'home' },
+    { to: '/momen', label: t('nav.moments'), icon: 'auto_awesome_motion' },
+    { to: '/harapan', label: t('nav.wishes'), icon: 'favorite' },
+    { to: '/fakta', label: t('nav.profile'), icon: 'person' },
+  ];
+
   return (
     <nav 
       className="md:hidden fixed left-1/2 -translate-x-1/2 flex items-center justify-around gap-1 z-50 glass-panel backdrop-blur-xl bg-white/70 dark:bg-[#1a1517]/70 w-[calc(100%-2rem)] max-w-sm rounded-2xl px-2 py-2 shadow-[0_20px_40px_rgba(248,215,218,0.2)] dark:shadow-[0_20px_40px_rgba(0,0,0,0.3)]"

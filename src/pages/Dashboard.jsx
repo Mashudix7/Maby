@@ -4,17 +4,19 @@ import GlassCard from '../components/ui/GlassCard';
 import MomentCard from '../components/ui/MomentCard';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { getMoments } from '../services/momentService';
 import { getMoodToday, setMoodToday } from '../services/moodService';
 import { getWishes } from '../services/wishService';
 
 const MOOD_OPTIONS = [
-  { emoji: '🥰', label: 'Bahagia' },
-  { emoji: '😌', label: 'Damai' },
-  { emoji: '🥺', label: 'Rindu' },
+  { emoji: '🥰', label_id: 'Bahagia', label_en: 'Happy' },
+  { emoji: '😌', label_id: 'Damai', label_en: 'Peaceful' },
+  { emoji: '🥺', label_id: 'Rindu', label_en: 'Missing' },
 ];
 
 function RelationshipTimer() {
+  const { t } = useLanguage();
   const [time, setTime] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
@@ -47,19 +49,19 @@ function RelationshipTimer() {
     <div className="glass-panel p-4 md:p-6 rounded-2xl md:rounded-[2rem] flex justify-between text-center mt-6">
       <div className="flex flex-col flex-1">
         <span className="text-xl sm:text-2xl md:text-4xl font-serif text-rose-400 dark:text-rose-300">{time.days}</span>
-        <span className="text-[9px] sm:text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">Hari</span>
+        <span className="text-[9px] sm:text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">{t('dashboard.days')}</span>
       </div>
       <div className="flex flex-col flex-1">
         <span className="text-xl sm:text-2xl md:text-4xl font-serif text-rose-400 dark:text-rose-300">{time.hours}</span>
-        <span className="text-[9px] sm:text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">Jam</span>
+        <span className="text-[9px] sm:text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">{t('dashboard.hours')}</span>
       </div>
       <div className="flex flex-col flex-1">
         <span className="text-xl sm:text-2xl md:text-4xl font-serif text-rose-400 dark:text-rose-300">{time.minutes}</span>
-        <span className="text-[9px] sm:text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">Menit</span>
+        <span className="text-[9px] sm:text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">{t('dashboard.minutes')}</span>
       </div>
       <div className="flex flex-col flex-1">
         <span className="text-xl sm:text-2xl md:text-4xl font-serif text-rose-400 dark:text-rose-300">{time.seconds}</span>
-        <span className="text-[9px] sm:text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">Detik</span>
+        <span className="text-[9px] sm:text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">{t('dashboard.seconds')}</span>
       </div>
     </div>
   );
@@ -67,6 +69,7 @@ function RelationshipTimer() {
 
 export default function Dashboard() {
   const { profile, coupleId, user } = useAuth();
+  const { t, language } = useLanguage();
   const [moments, setMoments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentMood, setCurrentMood] = useState(null);
@@ -119,10 +122,12 @@ export default function Dashboard() {
       years--;
       months += 12;
     }
-    if (years === 0 && months === 0) return 'Baru saja dimulai 💗';
-    let text = 'Sudah bersama ';
-    if (years > 0) text += `${years} tahun `;
-    if (months > 0) text += `${months} bulan`;
+    
+    if (years === 0 && months === 0) return t('dashboard.duration_just_started');
+    
+    let text = t('dashboard.relationship_duration') + ' ';
+    if (years > 0) text += `${years} ${t('dashboard.years')} `;
+    if (months > 0) text += `${months} ${t('dashboard.months')}`;
     return text + ' 💗';
   };
 
@@ -132,16 +137,16 @@ export default function Dashboard() {
         {/* Hero Greeting */}
         <section className="flex flex-col items-center text-center mt-8">
           <span className="font-sans text-xs font-semibold tracking-widest uppercase text-primary mb-4">
-            21 Februari 2026
+            {new Date('2026-02-21').toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
           </span>
           <h1 className="font-serif text-3xl md:text-5xl text-on-surface dark:text-[#ede0df] mb-2 md:mb-4">
-            Hai, {profile?.display_name || 'sayangku'} 👋
+            {t('dashboard.hai')}, {profile?.display_name || t('dashboard.sayangku')} 👋
           </h1>
           <p className="font-sans text-sm md:text-base font-semibold text-rose-500 dark:text-rose-400 mb-6">
             {getRelationshipDuration()}
           </p>
           <div className="w-full max-w-lg mx-auto bg-primary-container/20 dark:bg-rose-900/10 rounded-3xl p-4 border border-primary/10">
-            <p className="text-xs font-semibold text-primary dark:text-rose-300 mb-2 tracking-widest uppercase">Menuju Anniversary</p>
+            <p className="text-xs font-semibold text-primary dark:text-rose-300 mb-2 tracking-widest uppercase">{t('dashboard.anniversary_countdown')}</p>
             <RelationshipTimer />
           </div>
         </section>
@@ -154,7 +159,7 @@ export default function Dashboard() {
             <div className="md:col-span-12 glass-panel bg-gradient-to-r from-rose-50 to-orange-50 dark:from-[#322024] dark:to-[#38221b] border-rose-200 dark:border-rose-900/50 rounded-2xl md:rounded-[2rem] p-4 md:p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-4">
                 <span className="material-symbols-outlined text-rose-500">history</span>
-                <h3 className="font-serif text-lg text-rose-800 dark:text-rose-200">On This Day</h3>
+                <h3 className="font-serif text-lg text-rose-800 dark:text-rose-200">{t('dashboard.on_this_day')}</h3>
               </div>
               <div className="flex overflow-x-auto gap-4 hide-scrollbar">
                 {onThisDayMoments.map(m => {
@@ -169,7 +174,7 @@ export default function Dashboard() {
                         </div>
                       )}
                       <div>
-                        <p className="text-[10px] font-bold text-rose-500 uppercase tracking-wider">{yearsAgo} Tahun Lalu</p>
+                        <p className="text-[10px] font-bold text-rose-500 uppercase tracking-wider">{yearsAgo} {t('dashboard.years_ago')}</p>
                         <p className="font-serif text-sm text-on-surface dark:text-[#ede0df] line-clamp-2 group-hover:text-rose-500 transition-colors">{m.title}</p>
                       </div>
                     </Link>
@@ -184,7 +189,7 @@ export default function Dashboard() {
             {latestMoment?.image_url ? (
               <div className="absolute inset-0 z-0">
                 <img
-                  alt="Kenangan Terakhir"
+                  alt={t('dashboard.last_memory')}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-60"
                   src={latestMoment.image_url}
                   loading="lazy"
@@ -198,12 +203,12 @@ export default function Dashboard() {
               <div className="flex justify-between items-start">
                 <span className="inline-flex items-center px-4 py-2 rounded-full bg-white/70 dark:bg-white/10 text-primary dark:text-rose-300 font-sans text-xs font-semibold tracking-wide backdrop-blur-md">
                   <span className="material-symbols-outlined mr-2 text-[16px]">photo_library</span>
-                  {latestMoment ? 'Kenangan Terakhir' : 'Belum Ada Kenangan'}
+                  {latestMoment ? t('dashboard.last_memory') : t('dashboard.no_memory')}
                 </span>
               </div>
               <div className="mt-auto">
                 <h2 className="font-serif text-xl md:text-3xl text-on-surface dark:text-[#ede0df] mb-2">
-                  {latestMoment?.title || 'Tambah momen pertamamu!'}
+                  {latestMoment?.title || t('dashboard.add_first')}
                 </h2>
                 {latestMoment?.story && (
                   <p className="font-sans text-base text-on-surface-variant dark:text-zinc-400 font-serif italic line-clamp-2">
@@ -218,14 +223,15 @@ export default function Dashboard() {
           <div className="md:col-span-4 flex flex-col gap-8">
             {/* Mood Tracker */}
             <GlassCard className="flex flex-col items-center justify-center text-center p-4 md:p-8">
-              <h3 className="font-serif text-xl md:text-2xl text-on-surface dark:text-[#ede0df] mb-4 md:mb-6">Mood Kamu Hari Ini</h3>
+              <h3 className="font-serif text-xl md:text-2xl text-on-surface dark:text-[#ede0df] mb-4 md:mb-6">{t('dashboard.mood_title')}</h3>
               <div className="flex gap-4 justify-center">
                 {MOOD_OPTIONS.map((mood) => {
-                  const isActive = currentMood === mood.label;
+                  const moodLabel = language === 'id' ? mood.label_id : mood.label_en;
+                  const isActive = currentMood === moodLabel;
                   return (
                   <button
                     key={mood.emoji}
-                    onClick={() => handleSetMood(mood.label)}
+                    onClick={() => handleSetMood(moodLabel)}
                     disabled={!!currentMood}
                     className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl transition-transform shadow-sm ${isActive
                         ? 'bg-primary-container/50 border border-primary/20 ring-2 ring-primary/30'
@@ -239,7 +245,7 @@ export default function Dashboard() {
                 )})}
               </div>
               <p className="font-sans text-xs font-semibold text-outline dark:text-zinc-500 mt-6 h-4">
-                {currentMood ? `Mood sudah terkunci hari ini: ${currentMood.toLowerCase()} ${MOOD_OPTIONS.find(m => m.label === currentMood)?.emoji}` : 'Gimana perasaanmu hari ini?'}
+                {currentMood ? `${t('dashboard.mood_locked')}: ${currentMood.toLowerCase()} ${MOOD_OPTIONS.find(m => (language === 'id' ? m.label_id : m.label_en) === currentMood)?.emoji}` : t('dashboard.mood_hint')}
               </p>
             </GlassCard>
 
@@ -249,13 +255,13 @@ export default function Dashboard() {
                 <div className="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
                   <span className="material-symbols-outlined text-2xl">add_a_photo</span>
                 </div>
-                <span className="font-serif text-sm font-semibold text-on-surface dark:text-[#ede0df]">Momen<br/>Baru</span>
+                <span className="font-serif text-sm font-semibold text-on-surface dark:text-[#ede0df]" dangerouslySetInnerHTML={{ __html: t('dashboard.new_moment').replace(' ', '<br/>') }} />
               </Link>
               <Link to="/harapan" className="glass-panel p-4 md:p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-3 hover:bg-white/60 dark:hover:bg-white/10 transition-all group">
                 <div className="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container group-hover:scale-110 transition-transform">
                   <span className="material-symbols-outlined text-2xl">favorite</span>
                 </div>
-                <span className="font-serif text-sm font-semibold text-on-surface dark:text-[#ede0df]">Tulis<br/>Harapan</span>
+                <span className="font-serif text-sm font-semibold text-on-surface dark:text-[#ede0df]" dangerouslySetInnerHTML={{ __html: t('dashboard.write_wish').replace(' ', '<br/>') }} />
               </Link>
             </div>
 
@@ -265,7 +271,7 @@ export default function Dashboard() {
                 <div className="absolute top-0 right-0 w-16 h-16 bg-secondary-container/30 rounded-bl-[100px] -z-10 group-hover:scale-110 transition-transform" />
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-secondary dark:text-purple-300 text-sm">edit_note</span>
-                  <span className="font-sans text-[10px] font-bold uppercase tracking-wider text-outline dark:text-zinc-500">Catatan Terbaru</span>
+                  <span className="font-sans text-[10px] font-bold uppercase tracking-wider text-outline dark:text-zinc-500">{t('dashboard.latest_note')}</span>
                 </div>
                 <p className="font-serif text-sm md:text-base italic text-on-surface dark:text-[#ede0df] line-clamp-3">
                   &quot;{latestWish.text}&quot;
@@ -275,7 +281,7 @@ export default function Dashboard() {
                     {latestWish.profiles?.display_name?.[0] || '?'}
                   </div>
                   <span className="text-[10px] text-on-surface-variant dark:text-zinc-400">
-                    {new Date(latestWish.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                    {new Date(latestWish.created_at).toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'short' })}
                   </span>
                 </div>
               </GlassCard>
@@ -286,20 +292,20 @@ export default function Dashboard() {
         {/* Recent Moments */}
         <GlassCard className="flex flex-col gap-6 md:gap-8 p-4 md:p-8">
           <div className="flex justify-between items-center border-b border-outline-variant/30 dark:border-white/10 pb-4">
-            <h2 className="font-serif text-xl md:text-2xl text-on-surface dark:text-[#ede0df]">Momen Terakhir</h2>
+            <h2 className="font-serif text-xl md:text-2xl text-on-surface dark:text-[#ede0df]">{t('dashboard.see_all')}</h2>
             <Link
               to="/momen"
               className="font-sans text-[11px] md:text-xs font-semibold text-primary dark:text-rose-300 hover:text-on-surface transition-colors flex items-center gap-1 bg-primary-container/30 dark:bg-primary-container/10 px-3 py-1.5 rounded-full whitespace-nowrap shrink-0"
             >
-              Lihat Semua <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+              {t('dashboard.see_all')} <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
             </Link>
           </div>
           {loading ? (
-            <p className="text-center text-on-surface-variant dark:text-zinc-500 py-8 font-serif italic">Memuat momen...</p>
+            <p className="text-center text-on-surface-variant dark:text-zinc-500 py-8 font-serif italic">{t('common.loading')}</p>
           ) : moments.length === 0 ? (
             <div className="text-center py-8">
               <span className="material-symbols-outlined text-4xl text-outline-variant dark:text-zinc-700 mb-3 block">photo_camera</span>
-              <p className="text-sm text-on-surface-variant dark:text-zinc-500 font-serif italic">Belum ada momen. Yuk buat yang pertama!</p>
+              <p className="text-sm text-on-surface-variant dark:text-zinc-500 font-serif italic">{t('dashboard.no_moments')}</p>
             </div>
           ) : (
             <div className="flex overflow-x-auto gap-4 md:gap-6 pb-4 hide-scrollbar">
@@ -308,7 +314,7 @@ export default function Dashboard() {
                   key={moment.id}
                   id={moment.id}
                   image={moment.image_url}
-                  date={moment.date ? new Date(moment.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) : ''}
+                  date={moment.date ? new Date(moment.date).toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'short' }) : ''}
                   title={moment.title}
                 />
               ))}

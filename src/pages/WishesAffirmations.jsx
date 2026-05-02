@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react';
 import MainLayout from '../components/layout/MainLayout';
 import WishCard from '../components/ui/WishCard';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { getWishes, createWish, getRandomWish } from '../services/wishService';
 
 export default function WishesAffirmations() {
   const { user, coupleId } = useAuth();
+  const { t, language } = useLanguage();
   const [wishes, setWishes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newWish, setNewWish] = useState('');
@@ -51,15 +53,15 @@ export default function WishesAffirmations() {
   return (
     <MainLayout activePage="/harapan" className="relative">
       {/* Ambient orbs */}
-      <div className="fixed w-64 h-64 bg-primary-container rounded-full blur-[60px] opacity-40 dark:opacity-20 top-20 left-10 -z-10 pointer-events-none" />
-      <div className="fixed w-80 h-80 bg-secondary-container rounded-full blur-[60px] opacity-40 dark:opacity-20 bottom-40 right-20 -z-10 pointer-events-none" />
+      <div className="fixed w-64 h-64 bg-primary-container rounded-full blur-[80px] opacity-40 dark:opacity-20 top-20 left-10 -z-10 pointer-events-none" />
+      <div className="fixed w-80 h-80 bg-secondary-container rounded-full blur-[80px] opacity-40 dark:opacity-20 bottom-40 right-20 -z-10 pointer-events-none" />
 
       <div className="max-w-[1140px] mx-auto flex flex-col items-center">
         {/* Header */}
         <div className="text-center mb-10 md:mb-16 max-w-2xl">
-          <h1 className="font-serif text-3xl md:text-5xl text-primary dark:text-rose-300 mb-4 italic">Harapan &amp; Afirmasi</h1>
+          <h1 className="font-serif text-3xl md:text-5xl text-primary dark:text-rose-300 mb-4 italic">{t('wishes.title')}</h1>
           <p className="text-lg text-on-surface-variant dark:text-zinc-400 max-w-md mx-auto">
-            Pengingat lembut dan bisikan hangat buat mencerahkan harimu 💕
+            {t('wishes.subtitle')}
           </p>
         </div>
 
@@ -74,13 +76,13 @@ export default function WishesAffirmations() {
                 &quot;{randomWish.text}&quot;
               </p>
               <p className="text-xs font-semibold text-on-surface-variant dark:text-zinc-400">
-                — {randomWish.profiles?.display_name || 'Anonim'}
+                — {randomWish.profiles?.display_name || t('wishes.anonymous')}
               </p>
               <button
                 onClick={() => setShowRandom(false)}
                 className="mt-8 ghost-btn mx-auto"
               >
-                Tutup
+                {t('wishes.close')}
               </button>
             </div>
           </div>
@@ -92,7 +94,7 @@ export default function WishesAffirmations() {
             <textarea
               value={newWish}
               onChange={(e) => setNewWish(e.target.value)}
-              placeholder="Tulis harapan atau afirmasi untuk pasanganmu.."
+              placeholder={t('wishes.placeholder')}
               rows="2"
               className="glass-input resize-none flex-1"
             />
@@ -112,11 +114,11 @@ export default function WishesAffirmations() {
 
         {/* Wishes Grid */}
         {loading ? (
-          <p className="text-center text-on-surface-variant dark:text-zinc-500 py-12 font-serif italic">Memuat harapan...</p>
+          <p className="text-center text-on-surface-variant dark:text-zinc-500 py-12 font-serif italic">{t('wishes.loading')}</p>
         ) : wishes.length === 0 ? (
           <div className="text-center py-12">
             <span className="material-symbols-outlined text-5xl text-outline-variant dark:text-zinc-700 mb-4 block">edit_note</span>
-            <p className="text-on-surface-variant dark:text-zinc-500 font-serif italic">Belum ada harapan. Mulai tulis yang pertama!</p>
+            <p className="text-on-surface-variant dark:text-zinc-500 font-serif italic">{t('wishes.empty')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
@@ -130,16 +132,16 @@ export default function WishesAffirmations() {
                     {(wish.profiles?.display_name || '?')[0].toUpperCase()}
                   </div>
                   <span className="text-xs font-semibold text-on-surface-variant dark:text-zinc-500">
-                    {wish.profiles?.display_name || 'Anonim'}
+                    {wish.profiles?.display_name || t('wishes.anonymous')}
                   </span>
                   <span className="text-xs text-outline dark:text-zinc-600 ml-auto">
-                    {new Date(wish.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                    {new Date(wish.created_at).toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'short' })}
                   </span>
                 </div>
               </WishCard>
             ))}
           </div>
-        )}
+        )}   )}
       </div>
     </MainLayout>
   );

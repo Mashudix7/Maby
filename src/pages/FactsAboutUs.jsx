@@ -3,12 +3,14 @@ import MainLayout from '../components/layout/MainLayout';
 import FactCard from '../components/ui/FactCard';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { getFacts, upsertFact, FACT_CATEGORIES } from '../services/factService';
 import { db } from '../lib/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 
 export default function FactsAboutUs() {
   const { user, coupleId } = useAuth();
+  const { t, language } = useLanguage();
   const [myFacts, setMyFacts] = useState({});
   const [partnerFacts, setPartnerFacts] = useState({});
   const [myProfile, setMyProfile] = useState(null);
@@ -96,7 +98,7 @@ export default function FactsAboutUs() {
             <div>
               <h2 className="font-serif text-xl text-on-surface dark:text-[#ede0df] mb-1">{profile?.display_name || '...'}</h2>
               <p className="font-sans text-xs font-semibold uppercase tracking-wider text-on-surface-variant dark:text-zinc-500">
-                {isMe ? 'Hatiku' : 'Jiwaku'}
+                {isMe ? t('facts.my_heart') : t('facts.my_soul')}
               </p>
             </div>
           </div>
@@ -108,9 +110,9 @@ export default function FactsAboutUs() {
               icon={cat.icon}
               iconBg={cat.iconBg}
               iconColor={cat.iconColor}
-              label={cat.label}
+              label={language === 'id' ? cat.label : (cat.label_en || cat.label)}
               value={isMe ? (myFacts[cat.key] || '') : (facts[cat.key] || '')}
-              placeholder={cat.placeholder}
+              placeholder={language === 'id' ? cat.placeholder : (cat.placeholder_en || cat.placeholder)}
               isTextarea={cat.isTextarea}
               onChange={isMe ? undefined : undefined}
               onBlur={isMe ? (e) => handleBlur(cat.key, e.target.value) : undefined}
@@ -126,7 +128,7 @@ export default function FactsAboutUs() {
     return (
       <MainLayout activePage="/fakta">
         <div className="text-center py-20">
-          <p className="font-serif italic text-on-surface-variant dark:text-zinc-500">Memuat fakta...</p>
+          <p className="font-serif italic text-on-surface-variant dark:text-zinc-500">{t('facts.loading')}</p>
         </div>
       </MainLayout>
     );
@@ -136,12 +138,12 @@ export default function FactsAboutUs() {
     <MainLayout activePage="/fakta">
       <div className="max-w-[1140px] mx-auto">
         <div className="text-center mb-10 md:mb-16 space-y-4">
-          <h1 className="font-serif text-3xl md:text-5xl text-primary dark:text-rose-300">Fakta Tentang Kita</h1>
-          <p className="text-lg text-on-surface-variant dark:text-zinc-400 font-serif italic">Hal-hal kecil yang bikin kita utuh, tercatat di sini.</p>
+          <h1 className="font-serif text-3xl md:text-5xl text-primary dark:text-rose-300">{t('facts.title')}</h1>
+          <p className="text-lg text-on-surface-variant dark:text-zinc-400 font-serif italic">{t('facts.subtitle')}</p>
           <div className="flex justify-center pt-2">
             <Link to="/rahasia" className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-zinc-900 dark:bg-black text-zinc-300 hover:text-white border border-zinc-700 dark:border-zinc-800 transition-colors shadow-sm">
               <span className="material-symbols-outlined text-[18px]">lock</span>
-              <span className="text-sm font-semibold tracking-wide">Ruang Rahasia</span>
+              <span className="text-sm font-semibold tracking-wide">{t('facts.private_space')}</span>
             </Link>
           </div>
           <div className="w-16 h-[1px] bg-gradient-to-r from-transparent via-primary-container to-transparent mx-auto mt-8" />

@@ -4,6 +4,7 @@ import nprogress from 'nprogress';
 import 'nprogress/nprogress.css';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
+import { LanguageProvider } from './context/LanguageContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
 // Lazy load pages
@@ -37,8 +38,9 @@ function RouteChangeListener() {
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
+    <LanguageProvider>
+      <ThemeProvider>
+        <AuthProvider>
         <BrowserRouter>
           <RouteChangeListener />
           <Suspense fallback={<PageLoader />}>
@@ -62,5 +64,6 @@ export default function App() {
         </BrowserRouter>
       </AuthProvider>
     </ThemeProvider>
-  );
+  </LanguageProvider>
+);
 }

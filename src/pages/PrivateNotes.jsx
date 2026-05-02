@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import MainLayout from '../components/layout/MainLayout';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { getPrivateNotes, createPrivateNote, deletePrivateNote } from '../services/privateNoteService';
 
 export default function PrivateNotes() {
   const { user } = useAuth();
+  const { t, language } = useLanguage();
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newNote, setNewNote] = useState('');
@@ -27,14 +29,14 @@ export default function PrivateNotes() {
       setNewNote('');
     } catch (err) {
       console.error(err);
-      alert('Gagal menyimpan catatan');
+      alert(t('private_notes.error_save'));
     } finally {
       setSubmitting(false);
     }
   }
 
   async function handleDelete(id) {
-    if (!window.confirm('Hapus catatan ini?')) return;
+    if (!window.confirm(t('private_notes.confirm_delete'))) return;
     try {
       await deletePrivateNote(id);
       setNotes(notes.filter(n => n.id !== id));
@@ -48,9 +50,9 @@ export default function PrivateNotes() {
       <div className="max-w-2xl mx-auto min-h-[80vh] flex flex-col pt-8">
         <div className="text-center mb-10">
           <span className="material-symbols-outlined text-4xl text-zinc-600 mb-4 block">lock</span>
-          <h1 className="font-serif text-3xl text-zinc-300 italic mb-2">Ruang Rahasia</h1>
+          <h1 className="font-serif text-3xl text-zinc-300 italic mb-2">{t('private_notes.title')}</h1>
           <p className="text-zinc-500 text-sm max-w-sm mx-auto">
-            Catatan ini hanya bisa dilihat olehmu. Tidak tersinkronisasi ke pasanganmu.
+            {t('private_notes.subtitle')}
           </p>
         </div>
 
@@ -58,7 +60,7 @@ export default function PrivateNotes() {
           <textarea
             value={newNote}
             onChange={(e) => setNewNote(e.target.value)}
-            placeholder="Apa yang sedang kamu rasakan hari ini? Kesal? Sedih? Lega?"
+            placeholder={t('private_notes.placeholder')}
             className="w-full h-32 bg-[#1a1517]/80 border border-zinc-800/50 rounded-2xl p-4 text-zinc-300 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600 transition-colors resize-none shadow-inner"
             disabled={submitting}
           />
@@ -68,18 +70,18 @@ export default function PrivateNotes() {
               disabled={submitting || !newNote.trim()}
               className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-6 py-2 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50"
             >
-              {submitting ? 'Menyimpan...' : 'Simpan Rahasia'}
+              {submitting ? t('common.loading') : t('private_notes.save')}
             </button>
           </div>
         </form>
 
         <div className="flex flex-col gap-4 flex-1">
           {loading ? (
-            <p className="text-center text-zinc-600 font-serif italic py-10">Membuka brankas...</p>
+            <p className="text-center text-zinc-600 font-serif italic py-10">{t('private_notes.loading')}</p>
           ) : notes.length === 0 ? (
             <div className="text-center py-20 opacity-50">
               <span className="material-symbols-outlined text-4xl text-zinc-700 mb-2 block">speaker_notes_off</span>
-              <p className="text-zinc-500 text-sm font-serif italic">Belum ada catatan rahasia.</p>
+              <p className="text-zinc-500 text-sm font-serif italic">{t('private_notes.empty')}</p>
             </div>
           ) : (
             notes.map(note => (
@@ -87,12 +89,12 @@ export default function PrivateNotes() {
                 <p className="text-zinc-400 text-sm leading-relaxed whitespace-pre-wrap pr-8">{note.text}</p>
                 <div className="flex justify-between items-end mt-4">
                   <span className="text-[10px] text-zinc-600 font-serif italic">
-                    {new Date(note.created_at).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                    {new Date(note.created_at).toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                   </span>
                   <button
                     onClick={() => handleDelete(note.id)}
                     className="text-zinc-700 hover:text-red-900/80 transition-colors opacity-0 group-hover:opacity-100"
-                    title="Hapus"
+                    title={t('common.delete')}
                   >
                     <span className="material-symbols-outlined text-[16px]">delete</span>
                   </button>
