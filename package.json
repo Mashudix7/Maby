@@ -15,7 +15,6 @@
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-router-dom": "^7.14.2",
-    "react-virtualized-auto-sizer": "^2.0.3",
     "react-window": "^2.2.7",
     "sweetalert2": "^11.26.24",
     "sweetalert2-react-content": "^5.1.2"
