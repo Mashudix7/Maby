@@ -8,12 +8,44 @@ import { useLanguage } from '../context/LanguageContext';
 import { getMoments } from '../services/momentService';
 import { getMoodToday, setMoodToday } from '../services/moodService';
 import { getWishes } from '../services/wishService';
+import { getStreak, getDailyActivity } from '../services/streakService';
+import { requestNotificationPermission, listenForPartnerWishes } from '../services/notificationService';
 
 const MOOD_OPTIONS = [
   { emoji: '🥰', label_id: 'Bahagia', label_en: 'Happy' },
   { emoji: '😌', label_id: 'Damai', label_en: 'Peaceful' },
   { emoji: '🥺', label_id: 'Rindu', label_en: 'Missing' },
 ];
+
+function StreakIndicator({ streak, activity }) {
+  const { t } = useLanguage();
+  const isCompleted = activity?.completed;
+  const showHint = !isCompleted && (activity?.user1_active || activity?.user2_active);
+
+  return (
+    <GlassCard className="p-4 md:p-6 flex flex-col items-center text-center gap-2 h-full justify-center">
+      <div className={`w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center mb-1 transition-all duration-700 ${isCompleted ? 'bg-orange-500 text-white shadow-[0_0_25px_rgba(249,115,22,0.5)] scale-110' : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-600'}`}>
+        <span className="material-symbols-outlined text-2xl md:text-3xl" style={isCompleted ? { fontVariationSettings: "'FILL' 1" } : undefined}>
+          local_fire_department
+        </span>
+      </div>
+      <div>
+        <h3 className="font-serif text-xl md:text-2xl text-on-surface dark:text-[#ede0df] leading-none">{streak} {t('streak.days')}</h3>
+        <p className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-outline dark:text-zinc-500 mt-1.5">{t('streak.title')}</p>
+      </div>
+      {showHint && (
+        <p className="text-[9px] text-rose-500 dark:text-rose-400 font-semibold animate-pulse mt-1">
+          {t('streak.hint')}
+        </p>
+      )}
+      {isCompleted && (
+         <p className="text-[9px] text-orange-500 font-bold mt-1">
+           {t('streak.completed')}
+         </p>
+      )}
+    </GlassCard>
+  );
+}
 
 function RelationshipTimer() {
   const { t } = useLanguage();
@@ -75,6 +107,8 @@ export default function Dashboard() {
   const [currentMood, setCurrentMood] = useState(null);
   const [latestWish, setLatestWish] = useState(null);
   const [onThisDayMoments, setOnThisDayMoments] = useState([]);
+  const [streakData, setStreakData] = useState({ total_streak: 0 });
+  const [dailyActivity, setDailyActivity] = useState(null);
 
   useEffect(() => {
     if (!coupleId || !user) return;
@@ -99,7 +133,18 @@ export default function Dashboard() {
     getWishes(coupleId).then(wishes => {
       if (wishes && wishes.length > 0) setLatestWish(wishes[0]);
     });
-  }, [coupleId, user]);
+
+    getStreak(coupleId).then(setStreakData);
+    getDailyActivity(coupleId, new Date().toISOString().split('T')[0]).then(setDailyActivity);
+
+    // Notifications
+    requestNotificationPermission(t);
+    const unsubscribeWishes = listenForPartnerWishes(coupleId, user.uid, t);
+
+    return () => {
+      if (unsubscribeWishes) unsubscribeWishes();
+    };
+  }, [coupleId, user, t]);
 
   const handleSetMood = async (moodLabel) => {
     if (currentMood) return; // Mood already set for today
@@ -221,6 +266,9 @@ export default function Dashboard() {
 
           {/* Side Column */}
           <div className="md:col-span-4 flex flex-col gap-8">
+            {/* Streak Indicator */}
+            <StreakIndicator streak={streakData.total_streak} activity={dailyActivity} />
+
             {/* Mood Tracker */}
             <GlassCard className="flex flex-col items-center justify-center text-center p-4 md:p-8">
               <h3 className="font-serif text-xl md:text-2xl text-on-surface dark:text-[#ede0df] mb-4 md:mb-6">{t('dashboard.mood_title')}</h3>

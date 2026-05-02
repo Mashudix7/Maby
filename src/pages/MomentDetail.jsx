@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '../components/layout/MainLayout';
 import { useLanguage } from '../context/LanguageContext';
 import { getMomentById, deleteMoment, toggleFavoriteMoment } from '../services/momentService';
+import { showConfirmDelete, showSuccess, showError } from '../lib/alerts';
 
 export default function MomentDetail() {
   const { id } = useParams();
@@ -40,12 +41,16 @@ export default function MomentDetail() {
   }, [isZoomed]);
 
   async function handleDelete() {
-    if (!window.confirm(t('moments.confirm_delete'))) return;
+    const result = await showConfirmDelete(t);
+    if (!result.isConfirmed) return;
+    
     try {
       await deleteMoment(id);
+      await showSuccess(t, 'delete');
       navigate('/momen');
     } catch (err) {
       console.error('Gagal menghapus:', err);
+      showError(t, t('moments.error_save'));
     }
   }
 

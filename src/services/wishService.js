@@ -1,5 +1,6 @@
 import { db } from '../lib/firebase';
 import { collection, query, where, getDocs, doc, getDoc, addDoc, deleteDoc, orderBy } from 'firebase/firestore';
+import { updateStreakActivity } from './streakService';
 
 export async function getWishes(coupleId) {
   try {
@@ -36,6 +37,10 @@ export async function createWish(coupleId, userId, text) {
   };
 
   const docRef = await addDoc(collection(db, 'wishes'), docData);
+  
+  // Trigger streak update
+  updateStreakActivity(coupleId, userId).catch(err => console.error('Streak update failed:', err));
+
   const userSnap = await getDoc(doc(db, 'users', userId));
   return { id: docRef.id, ...docData, profiles: userSnap.exists() ? userSnap.data() : null };
 }

@@ -4,6 +4,7 @@ import MainLayout from '../components/layout/MainLayout';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { createMoment } from '../services/momentService';
+import { showSuccess, showError } from '../lib/alerts';
 
 export default function AddMoment() {
   const { user, coupleId } = useAuth();
@@ -117,10 +118,11 @@ export default function AddMoment() {
         location: location || '',
       });
       localStorage.removeItem('moment_draft'); // Clear draft on success
+      await showSuccess(t, 'save');
       navigate('/momen');
     } catch (err) {
       console.error('Gagal menyimpan:', err);
-      setError(err.message || t('moments.error_save'));
+      showError(t, err.message || t('moments.error_save'));
     } finally {
       setLoading(false);
     }

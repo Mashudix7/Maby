@@ -3,6 +3,7 @@ import MainLayout from '../components/layout/MainLayout';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { getPrivateNotes, createPrivateNote, deletePrivateNote } from '../services/privateNoteService';
+import { showConfirmDelete, showSuccess, showError } from '../lib/alerts';
 
 export default function PrivateNotes() {
   const { user } = useAuth();
@@ -27,21 +28,26 @@ export default function PrivateNotes() {
       const note = await createPrivateNote(user.uid, newNote);
       setNotes([note, ...notes]);
       setNewNote('');
+      await showSuccess(t, 'save');
     } catch (err) {
       console.error(err);
-      alert(t('private_notes.error_save'));
+      showError(t, t('private_notes.error_save'));
     } finally {
       setSubmitting(false);
     }
   }
 
   async function handleDelete(id) {
-    if (!window.confirm(t('private_notes.confirm_delete'))) return;
+    const result = await showConfirmDelete(t);
+    if (!result.isConfirmed) return;
+    
     try {
       await deletePrivateNote(id);
       setNotes(notes.filter(n => n.id !== id));
+      await showSuccess(t, 'delete');
     } catch (err) {
       console.error(err);
+      showError(t);
     }
   }
 

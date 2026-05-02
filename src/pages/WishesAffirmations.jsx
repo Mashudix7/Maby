@@ -4,6 +4,7 @@ import WishCard from '../components/ui/WishCard';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { getWishes, createWish, getRandomWish } from '../services/wishService';
+import { showSuccess, showError } from '../lib/alerts';
 
 export default function WishesAffirmations() {
   const { user, coupleId } = useAuth();
@@ -31,8 +32,10 @@ export default function WishesAffirmations() {
       const wish = await createWish(coupleId, user.uid, newWish.trim());
       setWishes((prev) => [wish, ...prev]);
       setNewWish('');
+      await showSuccess(t, 'save');
     } catch (err) {
       console.error('Gagal menambah harapan:', err);
+      showError(t);
     } finally {
       setSaving(false);
     }

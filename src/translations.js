@@ -63,6 +63,20 @@ export const translations = {
       minutes: 'Menit',
       seconds: 'Detik',
     },
+    streak: {
+      title: 'Streak Kita',
+      days: 'Hari',
+      hint: 'Keduanya harus kirim harapan hari ini!',
+      completed: 'Streak hari ini selesai! 🔥',
+    },
+    notifications: {
+      request_title: 'Aktifkan Notifikasi',
+      request_text: 'Dapatkan pemberitahuan saat pasanganmu mengirim harapan!',
+      allow: 'Izinkan',
+      denied: 'Notifikasi diblokir. Silakan aktifkan di pengaturan browser.',
+      new_wish_title: 'Harapan Baru!',
+      new_wish_body: 'Pasanganmu baru saja mengirim harapan buat kamu 💕',
+    },
     moments: {
       title: 'Momen Indah Bersamamu',
       subtitle: 'Kumpulan hal-hal kecil yang berarti segalanya.',
@@ -141,6 +155,16 @@ export const translations = {
       filter_cozy: 'Santai di Rumah',
       filter_outdoor: 'Petualangan Outdoor',
       filter_budget: 'Hemat Budget',
+    sweetalert: {
+      confirm_delete_title: 'Hapus data ini?',
+      confirm_delete_text: 'Tindakan ini tidak dapat dibatalkan!',
+      confirm_button: 'Ya, hapus!',
+      cancel_button: 'Batal',
+      success_title: 'Berhasil!',
+      success_delete: 'Data telah dihapus.',
+      success_save: 'Data telah disimpan.',
+      error_title: 'Ups...',
+      error_text: 'Terjadi kesalahan.',
     },
   },
   en: {
@@ -206,6 +230,20 @@ export const translations = {
       hours: 'Hours',
       minutes: 'Minutes',
       seconds: 'Seconds',
+    },
+    streak: {
+      title: 'Our Streak',
+      days: 'Days',
+      hint: 'Both must send wishes today!',
+      completed: "Today's streak completed! 🔥",
+    },
+    notifications: {
+      request_title: 'Enable Notifications',
+      request_text: 'Get notified when your partner sends a wish!',
+      allow: 'Allow',
+      denied: 'Notifications blocked. Please enable them in browser settings.',
+      new_wish_title: 'New Wish!',
+      new_wish_body: 'Your partner just sent you a wish 💕',
     },
     moments: {
       title: 'Beautiful Moments Together',
@@ -285,6 +323,16 @@ export const translations = {
       my_soul: 'My Soul',
       private_space: 'Private Room',
       loading: 'Loading facts...',
+    sweetalert: {
+      confirm_delete_title: 'Delete this data?',
+      confirm_delete_text: 'This action cannot be undone!',
+      confirm_button: 'Yes, delete it!',
+      cancel_button: 'Cancel',
+      success_title: 'Success!',
+      success_delete: 'Data has been deleted.',
+      success_save: 'Data has been saved.',
+      error_title: 'Oops...',
+      error_text: 'Something went wrong.',
     },
   }
 };

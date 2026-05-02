@@ -7,6 +7,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { getFacts, upsertFact, FACT_CATEGORIES } from '../services/factService';
 import { db } from '../lib/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
+import { showSuccess } from '../lib/alerts';
 
 export default function FactsAboutUs() {
   const { user, coupleId } = useAuth();
@@ -69,6 +70,7 @@ export default function FactsAboutUs() {
     try {
       await upsertFact(coupleId, user.uid, category, value);
       setMyFacts((prev) => ({ ...prev, [category]: value }));
+      await showSuccess(t, 'save');
     } catch (err) {
       console.error('Gagal menyimpan:', err);
     } finally {
