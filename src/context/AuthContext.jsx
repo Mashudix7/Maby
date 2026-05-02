@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { auth, db } from '../lib/firebase';
+import { onAuthStateChanged, signInWithEmailAndPassword, signOut as firebaseSignOut, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 const AuthContext = createContext();
 
@@ -9,45 +11,27 @@ export function AuthProvider({ children }) {
   const [coupleId, setCoupleId] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch profile + couple membership for a given user id
-  async function loadUserData(userId) {
+  async function loadUserData(firebaseUser) {
     try {
-      // Fetch profile
-      const { data: prof } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .maybeSingle();
-      setProfile(prof || null);
+      const userRef = doc(db, 'users', firebaseUser.uid);
+      const userSnap = await getDoc(userRef);
+      
+      let userData = null;
+      const FIXED_COUPLE_ID = 'maby-space-1';
 
-      // Fetch couple membership
-      let { data: membership } = await supabase
-        .from('couple_members')
-        .select('couple_id')
-        .eq('user_id', userId)
-        .maybeSingle();
-        
-      let finalCoupleId = membership?.couple_id;
-
-      // AUTO-COUPLE LOGIC FOR MABY
-      if (!finalCoupleId) {
-         // Gunakan upsert agar tidak error duplicate, dan pastikan insert valid
-         const { data: existingCouples } = await supabase.from('couples').select('id').limit(1);
-         if (existingCouples && existingCouples.length > 0) {
-            const cId = existingCouples[0].id;
-            await supabase.from('couple_members').upsert({ user_id: userId, couple_id: cId });
-            finalCoupleId = cId;
-         } else {
-            // Beri nilai dummy pada insert agar Postgres tidak error "empty payload"
-            const { data: newCouple } = await supabase.from('couples').insert({ invite_code: 'maby-love' }).select('id').maybeSingle();
-            if (newCouple) {
-              await supabase.from('couple_members').upsert({ user_id: userId, couple_id: newCouple.id });
-              finalCoupleId = newCouple.id;
-            }
-         }
+      if (userSnap.exists()) {
+        userData = userSnap.data();
+      } else {
+        userData = {
+          display_name: firebaseUser.displayName || 'Pengguna',
+          avatar_url: '',
+          couple_id: FIXED_COUPLE_ID
+        };
+        await setDoc(userRef, userData);
       }
-
-      setCoupleId(finalCoupleId || null);
+      
+      setProfile(userData);
+      setCoupleId(FIXED_COUPLE_ID);
     } catch (err) {
       console.error('Error loading user data:', err);
     }
@@ -55,92 +39,50 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     let mounted = true;
-
-    async function initializeAuth() {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        const currentUser = session?.user || null;
-        if (mounted) setUser(currentUser);
-        
-        if (currentUser) {
-          await loadUserData(currentUser.id);
-        }
-      } catch (err) {
-        console.error('Auth initialization error:', err);
-      } finally {
+    
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (mounted) setUser(firebaseUser);
+      
+      if (firebaseUser) {
+        if (!profile && mounted) setLoading(true);
+        await loadUserData(firebaseUser);
         if (mounted) setLoading(false);
-      }
-    }
-
-    initializeAuth();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (event === 'INITIAL_SESSION') return; // Sudah ditangani oleh getSession
-        
-        const currentUser = session?.user || null;
-        const isFirstLoad = !user && currentUser; // Hanya set loading jika user tadinya null
-        if (mounted) setUser(currentUser);
-        
-        if (currentUser) {
-          if (mounted && isFirstLoad) setLoading(true);
-          await loadUserData(currentUser.id);
-          if (mounted && isFirstLoad) setLoading(false);
-        } else {
-          if (mounted) {
-            setProfile(null);
-            setCoupleId(null);
-            setLoading(false);
-          }
+      } else {
+        if (mounted) {
+          setProfile(null);
+          setCoupleId(null);
+          setLoading(false);
         }
       }
-    );
+    });
 
     return () => {
       mounted = false;
-      subscription.unsubscribe();
+      unsubscribe();
     };
   }, []);
 
-  // Auth actions
-  async function signUp(email, password, displayName) {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { display_name: displayName },
-      },
-    });
-    if (error) throw error;
-    return data;
-  }
-
   async function signIn(email, password) {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) throw error;
-    return data;
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    return userCredential.user;
+  }
+  
+  async function signUp(email, password, displayName) {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    await updateProfile(userCredential.user, { displayName });
+    return userCredential.user;
   }
 
   async function signOut() {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    await firebaseSignOut(auth);
     setUser(null);
     setProfile(null);
     setCoupleId(null);
   }
 
-  // Refresh couple data (called after couple create/join)
   async function refreshCouple() {
-    if (!user) return;
-    const { data } = await supabase
-      .from('couple_members')
-      .select('couple_id')
-      .eq('user_id', user.id)
-      .single();
-    setCoupleId(data?.couple_id || null);
+    // Dengan firebase + single couple, tidak perlu refresh membership
+    setCoupleId('maby-space-1');
   }
 
   return (
@@ -150,8 +92,8 @@ export function AuthProvider({ children }) {
         profile,
         coupleId,
         loading,
-        signUp,
         signIn,
+        signUp,
         signOut,
         refreshCouple,
       }}

@@ -1,4 +1,5 @@
-import { supabase } from '../lib/supabase';
+import { db } from '../lib/firebase';
+import { collection, query, where, getDocs, doc, setDoc } from 'firebase/firestore';
 
 // Fact categories with their UI config
 export const FACT_CATEGORIES = [
@@ -10,29 +11,24 @@ export const FACT_CATEGORIES = [
 ];
 
 export async function getFacts(coupleId) {
-  const { data, error } = await supabase
-    .from('facts')
-    .select('*')
-    .eq('couple_id', coupleId);
-  if (error) throw error;
-  return data || [];
+  const q = query(collection(db, 'facts'), where('couple_id', '==', coupleId));
+  const snap = await getDocs(q);
+  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
 
 export async function upsertFact(coupleId, userId, category, content) {
-  const { data, error } = await supabase
-    .from('facts')
-    .upsert(
-      {
-        couple_id: coupleId,
-        user_id: userId,
-        category,
-        content,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: 'user_id,category' }
-    )
-    .select()
-    .single();
-  if (error) throw error;
-  return data;
+  // Use a predictable document ID to act as "upsert" mechanism (one fact per user per category)
+  const factId = `${userId}_${category}`;
+  const docRef = doc(db, 'facts', factId);
+  
+  const factData = {
+    couple_id: coupleId,
+    user_id: userId,
+    category,
+    content,
+    updated_at: new Date().toISOString(),
+  };
+
+  await setDoc(docRef, factData, { merge: true });
+  return { id: factId, ...factData };
 }

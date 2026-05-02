@@ -1,59 +1,54 @@
-import { supabase } from '../lib/supabase';
+import { db, storage } from '../lib/firebase';
+import { collection, query, where, getDocs, doc, getDoc, addDoc, deleteDoc, orderBy } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 export async function getMoments(coupleId) {
-  const { data, error } = await supabase
-    .from('moments')
-    .select('*')
-    .eq('couple_id', coupleId)
-    .order('date', { ascending: false });
-  if (error) throw error;
-  return data || [];
+  try {
+    const q = query(
+      collection(db, 'moments'),
+      where('couple_id', '==', coupleId),
+      orderBy('date', 'desc')
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.warn("Mungkin index belum dibuat, mencoba tanpa orderBy", error);
+    const qFallback = query(collection(db, 'moments'), where('couple_id', '==', coupleId));
+    const snap = await getDocs(qFallback);
+    const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return data.sort((a, b) => new Date(b.date) - new Date(a.date));
+  }
 }
 
 export async function getMomentById(id) {
-  const { data, error } = await supabase
-    .from('moments')
-    .select('*')
-    .eq('id', id)
-    .single();
-  if (error) throw error;
-  return data;
+  const docRef = doc(db, 'moments', id);
+  const snap = await getDoc(docRef);
+  if (!snap.exists()) throw new Error('Moment tidak ditemukan');
+  return { id: snap.id, ...snap.data() };
 }
 
 export async function createMoment(coupleId, userId, momentData) {
-  const { data, error } = await supabase
-    .from('moments')
-    .insert({
-      couple_id: coupleId,
-      user_id: userId,
-      title: momentData.title,
-      story: momentData.story || '',
-      image_url: momentData.image_url || '',
-      date: momentData.date || null,
-      location: momentData.location || '',
-      song_url: momentData.song_url || '',
-    })
-    .select()
-    .single();
-  if (error) throw error;
-  return data;
+  const docData = {
+    ...momentData,
+    couple_id: coupleId,
+    user_id: userId,
+    created_at: new Date().toISOString()
+  };
+
+  const docRef = await addDoc(collection(db, 'moments'), docData);
+  return { id: docRef.id, ...docData };
 }
 
 export async function deleteMoment(id) {
-  const { error } = await supabase.from('moments').delete().eq('id', id);
-  if (error) throw error;
+  await deleteDoc(doc(db, 'moments', id));
 }
 
 export async function uploadMomentImage(file) {
   const ext = file.name.split('.').pop();
-  const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-  const filePath = `moments/${fileName}`;
-
-  const { error: uploadErr } = await supabase.storage
-    .from('moments')
-    .upload(filePath, file);
-  if (uploadErr) throw uploadErr;
-
-  const { data } = supabase.storage.from('moments').getPublicUrl(filePath);
-  return data.publicUrl;
+  const fileName = `moments/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+  const storageRef = ref(storage, fileName);
+  
+  await uploadBytes(storageRef, file);
+  const url = await getDownloadURL(storageRef);
+  return url;
 }

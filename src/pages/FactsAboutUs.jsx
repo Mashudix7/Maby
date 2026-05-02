@@ -3,7 +3,8 @@ import MainLayout from '../components/layout/MainLayout';
 import FactCard from '../components/ui/FactCard';
 import { useAuth } from '../context/AuthContext';
 import { getFacts, upsertFact, FACT_CATEGORIES } from '../services/factService';
-import { supabase } from '../lib/supabase';
+import { db } from '../lib/firebase';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 
 export default function FactsAboutUs() {
   const { user, coupleId } = useAuth();
@@ -18,10 +19,9 @@ export default function FactsAboutUs() {
     if (!coupleId || !user) return;
     try {
       // Get both couple members
-      const { data: members } = await supabase
-        .from('couple_members')
-        .select('user_id, profiles(id, display_name, avatar_url)')
-        .eq('couple_id', coupleId);
+      const q = query(collection(db, 'users'), where('couple_id', '==', coupleId));
+      const membersSnap = await getDocs(q);
+      const members = membersSnap.docs.map(doc => ({ user_id: doc.id, profiles: doc.data() }));
 
       const me = members?.find((m) => m.user_id === user.id);
       const partner = members?.find((m) => m.user_id !== user.id);

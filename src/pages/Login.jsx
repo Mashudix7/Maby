@@ -25,13 +25,12 @@ export default function Login() {
       // Coba login
       await signIn(email, password);
     } catch (err) {
-      if (err.message.includes('Invalid login credentials') || err.message.includes('Email not confirmed')) {
+      if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found') {
         try {
           // Jika gagal karena akun belum ada, buat otomatis lalu login
           await signUp(email, password, displayName);
-          await signIn(email, password);
         } catch (signUpErr) {
-          if (signUpErr.message.includes('User already registered')) {
+          if (signUpErr.code === 'auth/email-already-in-use') {
             setError('Password yang kamu masukkan salah.');
           } else {
             setError(`Gagal daftar: ${signUpErr.message}`);
