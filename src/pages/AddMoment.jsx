@@ -56,7 +56,7 @@ export default function AddMoment() {
           const canvas = document.createElement('canvas');
           let width = img.width;
           let height = img.height;
-          const max_size = 500;
+          const max_size = 1080; // Full HD quality limit
 
           if (width > height) {
             if (width > max_size) {
@@ -74,7 +74,7 @@ export default function AddMoment() {
           canvas.height = height;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
-          resolve(canvas.toDataURL('image/jpeg', 0.5));
+          resolve(canvas.toDataURL('image/jpeg', 0.7)); // Quality 70% (better balance)
         } catch (e) {
           reject(e);
         }
