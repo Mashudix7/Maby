@@ -5,7 +5,7 @@ import { auth } from '../../lib/firebase';
 import { signOut } from 'firebase/auth';
 
 export default function Navbar({ activePage = '/' }) {
-  const { isDark, toggleTheme, isPoppins, toggleFont } = useTheme();
+  const { isDark, toggleTheme } = useTheme();
   const { language, toggleLanguage, t } = useLanguage();
 
   const handleLogout = async () => {
@@ -56,13 +56,6 @@ export default function Navbar({ activePage = '/' }) {
             aria-label="Toggle language"
           >
             {language === 'id' ? 'ID' : 'EN'}
-          </button>
-          <button
-            onClick={toggleFont}
-            className="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-rose-400 dark:text-rose-300 hover:bg-white/30 dark:hover:bg-white/10 transition-colors duration-300 shrink-0 font-serif font-bold text-lg"
-            aria-label="Toggle font"
-          >
-            {isPoppins ? 'S' : 'P'}
           </button>
           <button
             onClick={toggleTheme}
