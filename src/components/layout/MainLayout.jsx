@@ -14,7 +14,7 @@ export default function MainLayout({ children, activePage, className = '' }) {
       <div className="fixed w-[250px] md:w-[400px] h-[250px] md:h-[400px] bg-secondary-container/40 dark:bg-purple-900/10 rounded-full blur-[80px] md:blur-[120px] bottom-[10%] right-[-5%] pointer-events-none z-0" />
 
       <Navbar activePage={currentPage} />
-      <main className={`pt-28 md:pt-36 pb-28 md:pb-20 px-4 md:px-6 relative z-10 ${className}`} style={{ paddingTop: 'calc(7rem + env(safe-area-inset-top, 0px))', paddingBottom: 'calc(7rem + env(safe-area-inset-bottom, 0px))' }}>
+      <main className={`pt-28 md:pt-36 pb-28 md:pb-20 px-4 md:px-6 relative z-10 page-transition ${className}`} style={{ paddingTop: 'calc(7rem + env(safe-area-inset-top, 0px))', paddingBottom: 'calc(7rem + env(safe-area-inset-bottom, 0px))' }}>
         {children}
       </main>
       <BottomNav activePage={currentPage} />

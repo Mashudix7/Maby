@@ -26,6 +26,14 @@ const PageLoader = () => (
   </div>
 );
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
 function RouteChangeListener() {
   const location = useLocation();
   useEffect(() => {
@@ -42,6 +50,7 @@ export default function App() {
       <ThemeProvider>
         <AuthProvider>
         <BrowserRouter>
+          <ScrollToTop />
           <RouteChangeListener />
           <Suspense fallback={<PageLoader />}>
             <Routes>

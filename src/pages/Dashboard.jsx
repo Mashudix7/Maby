@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import MainLayout from '../components/layout/MainLayout';
 import GlassCard from '../components/ui/GlassCard';
-import MomentCard from '../components/ui/MomentCard';
+import MomentCard, { MomentCardSkeleton } from '../components/ui/MomentCard';
+import ScrollReveal from '../components/ui/ScrollReveal';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -186,7 +187,7 @@ export default function Dashboard() {
     <MainLayout activePage="/">
       <div className="max-w-[1140px] mx-auto flex flex-col gap-12 md:gap-20">
         {/* Hero Greeting */}
-        <section className="flex flex-col items-center text-center mt-8 px-4">
+        <ScrollReveal className="flex flex-col items-center text-center mt-8 px-4">
           <div className="w-full max-w-lg flex justify-between items-center mb-6">
             <span className="font-sans text-[10px] font-semibold tracking-widest uppercase text-primary/60">
               {new Date('2026-02-21').toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
@@ -212,7 +213,7 @@ export default function Dashboard() {
             <p className="text-xs font-semibold text-primary dark:text-rose-300 mb-2 tracking-widest uppercase">{t('dashboard.anniversary_countdown')}</p>
             <RelationshipTimer />
           </div>
-        </section>
+        </ScrollReveal>
 
         {/* Bento Grid Layout */}
         <section className="grid grid-cols-1 md:grid-cols-12 gap-8">
@@ -248,7 +249,7 @@ export default function Dashboard() {
           )}
 
           {/* Today's Memory */}
-          <div className="md:col-span-8 glass-panel rounded-2xl md:rounded-[2rem] p-4 md:p-8 flex flex-col relative overflow-hidden group min-h-[280px] md:min-h-[400px]">
+          <ScrollReveal className="md:col-span-8 glass-panel rounded-2xl md:rounded-[2rem] p-4 md:p-8 flex flex-col relative overflow-hidden group min-h-[280px] md:min-h-[400px]" delay={200}>
             {latestMoment?.image_url ? (
               <div className="absolute inset-0 z-0">
                 <img
@@ -280,10 +281,10 @@ export default function Dashboard() {
                 )}
               </div>
             </div>
-          </div>
+          </ScrollReveal>
 
           {/* Side Column */}
-          <div className="md:col-span-4 flex flex-col gap-8">
+          <ScrollReveal className="md:col-span-4 flex flex-col gap-8" delay={400}>
             {/* Mood Tracker */}
             <GlassCard className="flex flex-col items-center justify-center text-center p-4 md:p-8">
               <h3 className="font-serif text-xl md:text-2xl text-on-surface dark:text-[#ede0df] mb-4 md:mb-6">{t('dashboard.mood_title')}</h3>
@@ -349,7 +350,7 @@ export default function Dashboard() {
                 </div>
               </GlassCard>
             )}
-          </div>
+          </ScrollReveal>
         </section>
 
         {/* Recent Moments */}
@@ -364,7 +365,11 @@ export default function Dashboard() {
             </Link>
           </div>
           {loading ? (
-            <p className="text-center text-on-surface-variant dark:text-zinc-500 py-8 font-serif italic">{t('common.loading')}</p>
+            <div className="flex overflow-x-auto gap-4 md:gap-6 pb-4 hide-scrollbar">
+              <MomentCardSkeleton />
+              <MomentCardSkeleton />
+              <MomentCardSkeleton />
+            </div>
           ) : moments.length === 0 ? (
             <div className="text-center py-8">
               <span className="material-symbols-outlined text-4xl text-outline-variant dark:text-zinc-700 mb-3 block">photo_camera</span>
