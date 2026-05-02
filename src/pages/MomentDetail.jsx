@@ -109,25 +109,7 @@ export default function MomentDetail() {
           </article>
         )}
 
-        {/* Song */}
-        {moment.song_url && (
-          <div className="glass-panel rounded-2xl p-6 mb-8 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full soft-gradient flex items-center justify-center text-white shrink-0">
-              <span className="material-symbols-outlined">music_note</span>
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-on-surface-variant dark:text-zinc-400 mb-1">Soundtrack</p>
-              <a
-                href={moment.song_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary dark:text-rose-300 hover:underline text-sm"
-              >
-                {moment.song_url}
-              </a>
-            </div>
-          </div>
-        )}
+
 
         {/* Actions */}
         <div className="flex justify-center gap-4 pt-4">

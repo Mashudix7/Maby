@@ -11,7 +11,6 @@ export default function AddMoment() {
   const [story, setStory] = useState('');
   const [date, setDate] = useState('');
   const [location, setLocation] = useState('');
-  const [songUrl, setSongUrl] = useState('');
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
   const [loading, setLoading] = useState(false);
@@ -43,7 +42,6 @@ export default function AddMoment() {
         image_url: imageUrl,
         date: date || null,
         location,
-        song_url: songUrl,
       });
       navigate('/momen');
     } catch (err) {
@@ -145,16 +143,6 @@ export default function AddMoment() {
               placeholder="Ceritain momen kamu di sini... 💭"
               rows="6"
             />
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-on-surface-variant dark:text-zinc-400 ml-2">Soundtrack (Opsional)</label>
-              <input
-                value={songUrl}
-                onChange={(e) => setSongUrl(e.target.value)}
-                className="glass-input"
-                placeholder="Tempel link Spotify atau Apple Music..."
-                type="url"
-              />
-            </div>
           </section>
 
           {/* Error */}

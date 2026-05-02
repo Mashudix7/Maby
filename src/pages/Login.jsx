@@ -74,8 +74,8 @@ export default function Login() {
                 onChange={(e) => setName(e.target.value)}
                 className="glass-input cursor-pointer"
               >
-                <option value="feby">Feby Zahara 🌸</option>
-                <option value="mashudi">Mashudi 🗿</option>
+                <option value="feby">Feby Zahara</option>
+                <option value="mashudi">Mashudi</option>
               </select>
             </div>
 

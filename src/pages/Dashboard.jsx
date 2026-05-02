@@ -5,10 +5,11 @@ import MomentCard from '../components/ui/MomentCard';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getMoments } from '../services/momentService';
+import { getMoodToday, setMoodToday } from '../services/moodService';
 
-const moods = [
+const MOOD_OPTIONS = [
   { emoji: '🥰', label: 'Bahagia' },
-  { emoji: '😌', label: 'Damai', isActive: true },
+  { emoji: '😌', label: 'Damai' },
   { emoji: '🥺', label: 'Rindu' },
 ];
 
@@ -57,17 +58,30 @@ function RelationshipTimer() {
 }
 
 export default function Dashboard() {
-  const { profile, coupleId } = useAuth();
+  const { profile, coupleId, user } = useAuth();
   const [moments, setMoments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentMood, setCurrentMood] = useState(null);
 
   useEffect(() => {
-    if (!coupleId) return;
+    if (!coupleId || !user) return;
+    
     getMoments(coupleId)
       .then((data) => setMoments(data.slice(0, 3)))
       .catch((err) => console.error('Gagal memuat momen:', err))
       .finally(() => setLoading(false));
-  }, [coupleId]);
+      
+    getMoodToday(coupleId, user.uid).then(setCurrentMood);
+  }, [coupleId, user]);
+
+  const handleSetMood = async (moodLabel) => {
+    setCurrentMood(moodLabel);
+    try {
+      await setMoodToday(coupleId, user.uid, moodLabel);
+    } catch (err) {
+      console.error('Gagal menyimpan mood', err);
+    }
+  };
 
   const latestMoment = moments[0];
 
@@ -132,20 +146,23 @@ export default function Dashboard() {
             <GlassCard className="flex flex-col items-center justify-center text-center">
               <h3 className="font-serif text-2xl text-on-surface dark:text-[#ede0df] mb-6">Mood Kamu Hari Ini</h3>
               <div className="flex gap-4 justify-center">
-                {moods.map((mood) => (
+                {MOOD_OPTIONS.map((mood) => {
+                  const isActive = currentMood === mood.label;
+                  return (
                   <button
                     key={mood.emoji}
-                    className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl transition-transform hover:scale-110 shadow-sm ${mood.isActive
+                    onClick={() => handleSetMood(mood.label)}
+                    className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl transition-transform hover:scale-110 shadow-sm ${isActive
                         ? 'bg-primary-container/50 border border-primary/20 ring-2 ring-primary/30'
                         : 'bg-white/50 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 border border-white/40 dark:border-white/10'
                       }`}
                   >
                     {mood.emoji}
                   </button>
-                ))}
+                )})}
               </div>
-              <p className="font-sans text-xs font-semibold text-outline dark:text-zinc-500 mt-6">
-                Kamu lagi merasa damai 🌿
+              <p className="font-sans text-xs font-semibold text-outline dark:text-zinc-500 mt-6 h-4">
+                {currentMood ? `Kamu lagi merasa ${currentMood.toLowerCase()} ${MOOD_OPTIONS.find(m => m.label === currentMood)?.emoji}` : 'Gimana perasaanmu hari ini?'}
               </p>
             </GlassCard>
 
