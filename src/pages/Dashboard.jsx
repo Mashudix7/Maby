@@ -190,7 +190,7 @@ export default function Dashboard() {
             <h2 className="font-serif text-xl md:text-2xl text-on-surface dark:text-[#ede0df]">Momen Terakhir</h2>
             <Link
               to="/momen"
-              className="font-sans text-xs font-semibold text-primary dark:text-rose-300 hover:text-on-surface transition-colors flex items-center gap-1 bg-primary-container/30 dark:bg-primary-container/10 px-3 py-1.5 rounded-full"
+              className="font-sans text-[11px] md:text-xs font-semibold text-primary dark:text-rose-300 hover:text-on-surface transition-colors flex items-center gap-1 bg-primary-container/30 dark:bg-primary-container/10 px-3 py-1.5 rounded-full whitespace-nowrap shrink-0"
             >
               Lihat Semua <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
             </Link>
