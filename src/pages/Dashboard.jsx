@@ -139,10 +139,14 @@ export default function Dashboard() {
     };
   }, [coupleId, user, t]);
 
-  const handleTestNotification = () => {
-    import('../services/notificationService').then(({ showLocalNotification }) => {
+  const handleTestNotification = async () => {
+    const { requestNotificationPermission, showLocalNotification } = await import('../services/notificationService');
+    const granted = await requestNotificationPermission(t);
+    if (granted) {
       showLocalNotification(t('notifications.new_wish_title'), t('notifications.new_wish_body'));
-    });
+    } else {
+      alert(t('notifications.denied'));
+    }
   };
 
   const handleSetMood = async (moodLabel) => {
@@ -343,7 +347,7 @@ export default function Dashboard() {
               
               <button 
                 onClick={handleTestNotification}
-                className="w-full py-2 px-4 rounded-xl border border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary dark:text-rose-300 text-xs font-semibold transition-colors flex items-center justify-center gap-2"
+                className="w-full py-2 px-4 rounded-xl border border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary dark:text-rose-300 text-xs font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer relative z-10"
               >
                 <span className="material-symbols-outlined text-[16px]">notifications</span>
                 Test Notification
