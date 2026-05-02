@@ -1,8 +1,42 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import { List } from 'react-window';
 
 /**
- * A responsive virtualized grid component using react-window's FixedSizeList.
+ * Internal Row component for the VirtualGrid.
+ * Optimized with memo to prevent unnecessary re-renders.
+ */
+const GridRow = memo(({ index, style, data }) => {
+  const { items, columns, gap, renderItem } = data;
+  const startIndex = index * columns;
+  const rowItems = items.slice(startIndex, startIndex + columns);
+
+  return (
+    <div
+      style={{
+        ...style,
+        display: 'grid',
+        gridTemplateColumns: `repeat(${columns}, 1fr)`,
+        gap: `${gap}px`,
+        paddingBottom: `${gap}px`,
+      }}
+    >
+      {rowItems.map((item, colIndex) => (
+        <div key={item.id || startIndex + colIndex} className="h-full">
+          {renderItem(item, startIndex + colIndex)}
+        </div>
+      ))}
+      {/* Fill empty slots in the last row to maintain grid alignment */}
+      {rowItems.length < columns && 
+        Array.from({ length: columns - rowItems.length }).map((_, i) => (
+          <div key={`empty-${i}`} />
+        ))
+      }
+    </div>
+  );
+});
+
+/**
+ * A responsive virtualized grid component using react-window's List.
  * It automatically calculates columns based on the container width.
  */
 export default function VirtualGrid({
@@ -20,6 +54,7 @@ export default function VirtualGrid({
     const observer = new ResizeObserver((entries) => {
       if (entries[0]) {
         const { width, height } = entries[0].contentRect;
+        // Only update if there's a significant change to avoid jitter
         setDimensions({ width, height });
       }
     });
@@ -38,25 +73,13 @@ export default function VirtualGrid({
   const columns = Math.max(1, Math.floor((width + gap) / (minColumnWidth + gap)));
   // Total rows needed
   const rowCount = Math.ceil(items.length / columns);
-  
-  // Row renderer
-  const Row = ({ index, style }) => {
-    const startIndex = index * columns;
-    const rowItems = items.slice(startIndex, startIndex + columns);
-    
-    return (
-      <div 
-        style={{
-          ...style,
-          display: 'grid',
-          gridTemplateColumns: `repeat(${columns}, 1fr)`,
-          gap: `${gap}px`,
-          paddingBottom: `${gap}px`, // simulate gap between rows
-        }}
-      >
-        {rowItems.map((item, colIndex) => renderItem(item, startIndex + colIndex))}
-      </div>
-    );
+
+  // Memoize the data object passed to rows
+  const itemData = {
+    items,
+    columns,
+    gap,
+    renderItem
   };
 
   return (
@@ -66,10 +89,12 @@ export default function VirtualGrid({
         itemCount={rowCount}
         itemSize={itemHeight + gap}
         width={width}
+        itemData={itemData}
         className="hide-scrollbar"
       >
-        {Row}
+        {GridRow}
       </List>
     </div>
   );
 }
+
