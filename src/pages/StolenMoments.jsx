@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import MainLayout from '../components/layout/MainLayout';
-import FloatingActionButton from '../components/ui/FloatingActionButton';
 import { useAuth } from '../context/AuthContext';
 import { getMoments } from '../services/momentService';
 
@@ -87,8 +86,6 @@ export default function StolenMoments() {
           </div>
         )}
       </div>
-
-      <FloatingActionButton to="/momen/baru" label="Tambah Momen" />
     </MainLayout>
   );
 }

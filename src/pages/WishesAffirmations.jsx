@@ -63,16 +63,7 @@ export default function WishesAffirmations() {
           </p>
         </div>
 
-        {/* Surprise Button */}
-        <div className="mb-10">
-          <button
-            onClick={handleSurprise}
-            className="bg-gradient-to-r from-primary to-secondary text-white px-8 py-4 rounded-full text-sm font-semibold flex items-center gap-2 hover:opacity-90 transition-opacity shadow-md"
-          >
-            <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
-            Kejutkan Aku 💗
-          </button>
-        </div>
+
 
         {/* Random Wish Modal */}
         {showRandom && randomWish && (
@@ -101,7 +92,7 @@ export default function WishesAffirmations() {
             <textarea
               value={newWish}
               onChange={(e) => setNewWish(e.target.value)}
-              placeholder="Tulis harapan atau afirmasi untuk pasanganmu... 💭"
+              placeholder="Tulis harapan atau afirmasi untuk pasanganmu.."
               rows="2"
               className="glass-input resize-none flex-1"
             />

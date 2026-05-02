@@ -34,7 +34,7 @@ export default function FactsAboutUs() {
         setPartnerProfile(partner.profiles);
       } else {
         // Fallback for Maby if partner hasn't logged in yet
-        const partnerName = myDisplayName.toLowerCase().includes('feby') ? 'Mashudi 🗿' : 'Feby Zahara 🌸';
+        const partnerName = myDisplayName.toLowerCase().includes('feby') ? 'Mashudi' : 'Feby Zahara';
         setPartnerProfile({ display_name: partnerName, avatar_url: '' });
       }
 
@@ -89,7 +89,7 @@ export default function FactsAboutUs() {
               </div>
             )}
             <div>
-              <h2 className="font-serif text-xl text-on-surface dark:text-[#ede0df] mb-1">{isMe ? 'Aku' : (profile?.display_name || 'Pasangan')}</h2>
+              <h2 className="font-serif text-xl text-on-surface dark:text-[#ede0df] mb-1">{profile?.display_name || '...'}</h2>
               <p className="font-sans text-xs font-semibold uppercase tracking-wider text-on-surface-variant dark:text-zinc-500">
                 {isMe ? 'Hatiku' : 'Jiwaku'}
               </p>

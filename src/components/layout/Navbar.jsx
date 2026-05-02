@@ -1,5 +1,7 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
+import { auth } from '../../lib/firebase';
+import { signOut } from 'firebase/auth';
 
 
 const navItems = [
@@ -11,6 +13,14 @@ const navItems = [
 
 export default function Navbar({ activePage = '/' }) {
   const { isDark, toggleTheme, isPoppins, toggleFont } = useTheme();
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Gagal logout:", error);
+    }
+  };
 
 
   return (
@@ -56,7 +66,15 @@ export default function Navbar({ activePage = '/' }) {
               {isDark ? 'light_mode' : 'dark_mode'}
             </span>
           </button>
-
+          <button
+            onClick={handleLogout}
+            className="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-rose-400 dark:text-rose-300 hover:bg-white/30 dark:hover:bg-white/10 transition-colors duration-300 shrink-0"
+            aria-label="Keluar"
+          >
+            <span className="material-symbols-outlined text-[20px] md:text-[22px]">
+              logout
+            </span>
+          </button>
         </div>
       </div>
     </header>
