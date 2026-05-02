@@ -90,6 +90,22 @@
   :root.dark body {
     background-color: #1a1517;
     color: #ede0df;
+    --color-primary: #debfc2;
+    --color-on-primary: #412b2d;
+    --color-primary-container: #584144;
+    --color-on-primary-container: #fcdbde;
+    --color-secondary: #d0c0e7;
+    --color-on-secondary: #362a4a;
+    --color-secondary-container: #4d4161;
+    --color-on-secondary-container: #ecdcff;
+    --color-surface: #1a1517;
+    --color-on-surface: #ede0df;
+    --color-surface-variant: #4f4445;
+    --color-on-surface-variant: #d2c3c4;
+    --color-outline: #9b8e8f;
+    --color-background: #1a1517;
+    --color-on-background: #ede0df;
+    --color-surface-container-low: #282022;
   }
 
   ::selection {

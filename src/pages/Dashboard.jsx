@@ -244,7 +244,7 @@ export default function Dashboard() {
                   src={latestMoment.image_url}
                   loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-surface-container-low/90 via-surface-container-low/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-surface-container-low/90 dark:from-[#1a1517]/90 via-surface-container-low/40 dark:via-[#1a1517]/40 to-transparent" />
               </div>
             ) : (
               <div className="absolute inset-0 z-0 soft-gradient opacity-30" />
