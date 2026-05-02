@@ -141,7 +141,7 @@ export default function WishesAffirmations() {
               </WishCard>
             ))}
           </div>
-        )}   )}
+        )}
       </div>
     </MainLayout>
   );
