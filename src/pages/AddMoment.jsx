@@ -34,7 +34,7 @@ export default function AddMoment() {
           const canvas = document.createElement('canvas');
           let width = img.width;
           let height = img.height;
-          const max_size = 800;
+          const max_size = 500;
 
           if (width > height) {
             if (width > max_size) {
@@ -52,7 +52,7 @@ export default function AddMoment() {
           canvas.height = height;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
-          resolve(canvas.toDataURL('image/jpeg', 0.6));
+          resolve(canvas.toDataURL('image/jpeg', 0.5));
         };
         img.onerror = error => reject(error);
       };
@@ -71,14 +71,18 @@ export default function AddMoment() {
     try {
       let imageUrl = '';
       if (imageFile) {
-        imageUrl = await compressImage(imageFile);
+        try {
+          imageUrl = await compressImage(imageFile);
+        } catch (e) {
+          throw new Error('Gagal memproses foto. Pastikan format didukung.');
+        }
       }
       await createMoment(coupleId, user.uid, {
         title: title.trim(),
-        story,
-        image_url: imageUrl,
+        story: story || '',
+        image_url: imageUrl || '',
         date: date || null,
-        location,
+        location: location || '',
       });
       navigate('/momen');
     } catch (err) {
