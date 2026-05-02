@@ -52,7 +52,7 @@ export default function PrivateNotes() {
   }
 
   return (
-    <MainLayout activePage="/fakta" className="bg-[#110e0f] dark:bg-[#0a0809]">
+    <MainLayout activePage="/fakta" className="bg-background dark:bg-[#0a0809]">
       <div className="max-w-2xl mx-auto min-h-[80vh] flex flex-col pt-8">
         <div className="text-center mb-10">
           <span className="material-symbols-outlined text-4xl text-zinc-600 mb-4 block">lock</span>

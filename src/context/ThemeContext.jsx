@@ -19,10 +19,15 @@ export function ThemeProvider({ children }) {
     } else {
       root.classList.remove('dark');
     }
-    localStorage.setItem('ourspace-theme', isDark ? 'dark' : 'light');
   }, [isDark]);
 
-  const toggleTheme = () => setIsDark((prev) => !prev);
+  const toggleTheme = () => {
+    setIsDark((prev) => {
+      const next = !prev;
+      localStorage.setItem('ourspace-theme', next ? 'dark' : 'light');
+      return next;
+    });
+  };
 
   return (
     <ThemeContext.Provider value={{ isDark, toggleTheme }}>
