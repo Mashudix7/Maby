@@ -1,0 +1,21 @@
+{
+  "name": "Maby",
+  "short_name": "Maby",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fff8f7",
+  "theme_color": "#fcdbde",
+  "description": "Our Space - Maby",
+  "icons": [
+    {
+      "src": "/logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "/logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
