@@ -37,6 +37,22 @@ export const generatePhotoboothStrip = async (photoUrls, frame) => {
         // Apply versatile beauty filter
         ctx.filter = 'brightness(1.05) contrast(1.05) saturate(1.1) sepia(0.08)';
 
+        // Calculate object-fit: cover crop dimensions
+        const imgAspect = img.width / img.height;
+        const targetAspect = PHOTO_WIDTH / PHOTO_HEIGHT;
+        
+        let sx = 0, sy = 0, sWidth = img.width, sHeight = img.height;
+        
+        if (imgAspect > targetAspect) {
+          // Image is wider, crop sides
+          sWidth = img.height * targetAspect;
+          sx = (img.width - sWidth) / 2;
+        } else {
+          // Image is taller, crop top/bottom
+          sHeight = img.width / targetAspect;
+          sy = (img.height - sHeight) / 2;
+        }
+
         if (frame.clipShape === 'heart') {
           ctx.save();
           // Define heart clipping path
@@ -56,11 +72,11 @@ export const generatePhotoboothStrip = async (photoUrls, frame) => {
           
           // Reset transform so image draws in correct absolute coords
           ctx.setTransform(1, 0, 0, 1, 0, 0);
-          ctx.drawImage(img, x, y, PHOTO_WIDTH, PHOTO_HEIGHT);
+          ctx.drawImage(img, sx, sy, sWidth, sHeight, x, y, PHOTO_WIDTH, PHOTO_HEIGHT);
           ctx.restore();
         } else {
           // Normal rectangular draw
-          ctx.drawImage(img, x, y, PHOTO_WIDTH, PHOTO_HEIGHT);
+          ctx.drawImage(img, sx, sy, sWidth, sHeight, x, y, PHOTO_WIDTH, PHOTO_HEIGHT);
         }
         
         // Reset filter for subsequent drawings (like frame text)
