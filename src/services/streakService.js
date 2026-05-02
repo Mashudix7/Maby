@@ -86,6 +86,12 @@ export const updateStreakActivity = async (coupleId, userId) => {
     }
 
     await setDoc(activityRef, activityData, { merge: true });
+    
+    // 5. Update last activity timestamp for auto-nudge
+    await setDoc(streakRef, { 
+      last_activity_at: new Date().toISOString() 
+    }, { merge: true });
+
     return activityData;
   } catch (error) {
     console.error('Error updating streak activity:', error);

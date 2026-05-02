@@ -1,5 +1,5 @@
 import { db } from '../lib/firebase';
-import { collection, addDoc, query, where, onSnapshot, orderBy, limit, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, query, where, onSnapshot, orderBy, limit, serverTimestamp, doc, setDoc } from 'firebase/firestore';
 import { showLocalNotification } from './notificationService';
 
 /**
@@ -12,6 +12,12 @@ export const sendNudge = async (coupleId, userId) => {
       from_user_id: userId,
       created_at: serverTimestamp(),
     });
+
+    // Update last nudge time to prevent spam
+    await setDoc(doc(db, 'streaks', coupleId), {
+      last_nudge_at: serverTimestamp()
+    }, { merge: true });
+
     return true;
   } catch (err) {
     console.error('Failed to send nudge:', err);

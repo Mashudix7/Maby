@@ -134,14 +134,28 @@ export default function Dashboard() {
     };
   }, [coupleId, user, t]);
 
-  const handleSendNudge = useCallback(async () => {
-    const success = await sendNudge(coupleId, user.uid);
-    if (success) {
-      showSuccess(t, t('sweetalert.success_title'), t('streak.remind_button'));
-    } else {
-      showError(t, t('sweetalert.error_title'), t('sweetalert.error_text'));
+    // Automatic Nudge Check (Auto-Colek)
+    const checkAutoNudge = async () => {
+      if (!coupleId || !user || !streakData.last_activity_at) return;
+      
+      const lastActivity = new Date(streakData.last_activity_at).getTime();
+      const lastNudge = streakData.last_nudge_at ? streakData.last_nudge_at.toMillis?.() || new Date(streakData.last_nudge_at).getTime() : 0;
+      const now = new Date().getTime();
+      
+      const hoursSinceActivity = (now - lastActivity) / (1000 * 60 * 60);
+      const hoursSinceNudge = (now - lastNudge) / (1000 * 60 * 60);
+
+      // If inactive for > 18 hours AND haven't nudged in the last 18 hours
+      if (hoursSinceActivity >= 18 && hoursSinceNudge >= 18) {
+        console.log('Sending automatic streak reminder...');
+        sendNudge(coupleId, user.uid);
+      }
+    };
+
+    if (streakData.last_activity_at) {
+      checkAutoNudge();
     }
-  }, [coupleId, user?.uid, t]);
+  }, [coupleId, user, t, streakData.last_activity_at, streakData.last_nudge_at]);
 
   const handleSetMood = useCallback(async (moodLabel) => {
     if (currentMood) return; // Mood already set for today
@@ -177,19 +191,12 @@ export default function Dashboard() {
     <MainLayout activePage="/">
       <div className="max-w-[1140px] mx-auto flex flex-col gap-12 md:gap-20">
         {/* Hero Greeting */}
-        <ScrollReveal className="flex flex-col items-center text-center mt-8 px-4">
+        <div className="flex flex-col items-center text-center mt-8 px-4">
           <div className="w-full max-w-lg flex justify-between items-center mb-6">
             <span className="font-sans text-[10px] font-semibold tracking-widest uppercase text-primary/60">
               {new Date('2026-02-21').toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
             </span>
             <div className="flex items-center gap-2">
-              <button 
-                onClick={handleSendNudge}
-                className="w-10 h-10 rounded-full glass-panel border border-primary/20 flex items-center justify-center text-primary hover:bg-primary-container/30 transition-all active:scale-95 group"
-                title={t('streak.remind_button')}
-              >
-                <span className="material-symbols-outlined text-[20px] group-hover:animate-bounce">touch_app</span>
-              </button>
               <StreakIndicator streak={streakData.total_streak} activity={dailyActivity} />
             </div>
           </div>
@@ -203,13 +210,13 @@ export default function Dashboard() {
             <p className="text-xs font-semibold text-primary dark:text-rose-300 mb-2 tracking-widest uppercase">{t('dashboard.anniversary_countdown')}</p>
             <RelationshipTimer />
           </div>
-        </ScrollReveal>
+        </div>
 
         {/* Bento Grid Layout */}
         <section className="grid grid-cols-1 md:grid-cols-12 gap-8">
           
           {/* Today's Memory */}
-          <ScrollReveal className="md:col-span-8 glass-panel rounded-2xl md:rounded-[2rem] p-4 md:p-8 flex flex-col relative overflow-hidden group min-h-[280px] md:min-h-[400px]" delay={50}>
+          <div className="md:col-span-8 glass-panel rounded-2xl md:rounded-[2rem] p-4 md:p-8 flex flex-col relative overflow-hidden group min-h-[280px] md:min-h-[400px]">
             {latestMoment?.image_url ? (
               <div className="absolute inset-0 z-0">
                 <img
@@ -241,10 +248,10 @@ export default function Dashboard() {
                 )}
               </div>
             </div>
-          </ScrollReveal>
+          </div>
 
           {/* Side Column */}
-          <ScrollReveal className="md:col-span-4 flex flex-col gap-8" delay={100}>
+          <div className="md:col-span-4 flex flex-col gap-8">
             {/* Mood Tracker */}
             <GlassCard className="flex flex-col items-center justify-center text-center p-4 md:p-8">
               <h3 className="font-serif text-xl md:text-2xl text-on-surface dark:text-[#ede0df] mb-4 md:mb-6">{t('dashboard.mood_title')}</h3>
@@ -310,7 +317,7 @@ export default function Dashboard() {
                 </div>
               </GlassCard>
             )}
-          </ScrollReveal>
+          </div>
         </section>
 
         {/* Recent Moments */}
