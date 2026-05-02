@@ -45,7 +45,7 @@ const BottomNav = memo(function BottomNav({ activePage = '/' }) {
       {/* Central Photobooth Button */}
       <Link
         to="/photobooth"
-        className="relative -top-5 w-14 h-14 bg-gradient-to-br from-primary to-secondary dark:from-rose-500 dark:to-purple-600 text-white rounded-full flex items-center justify-center shadow-[0_8px_20px_rgba(225,29,72,0.3)] hover:scale-110 active:scale-95 transition-all shrink-0 border-4 border-background dark:border-[#1a1517] z-10"
+        className="relative -top-5 w-14 h-14 bg-gradient-to-br from-[#800000] to-[#4a0000] text-white rounded-full flex items-center justify-center shadow-[0_8px_20px_rgba(128,0,0,0.4)] hover:scale-110 active:scale-95 transition-all shrink-0 border-4 border-background dark:border-[#1a1517] z-10"
       >
         <span className="material-symbols-outlined text-[28px]">photo_camera</span>
       </Link>
