@@ -1,7 +1,8 @@
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 
-export default function BottomNav({ activePage = '/' }) {
+const BottomNav = memo(function BottomNav({ activePage = '/' }) {
   const { t } = useLanguage();
 
   const navItems = [
@@ -42,4 +43,6 @@ export default function BottomNav({ activePage = '/' }) {
       })}
     </nav>
   );
-}
+});
+
+export default BottomNav;

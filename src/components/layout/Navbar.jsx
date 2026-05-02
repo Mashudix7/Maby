@@ -1,10 +1,11 @@
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { auth } from '../../lib/firebase';
 import { signOut } from 'firebase/auth';
 
-export default function Navbar({ activePage = '/' }) {
+const Navbar = memo(function Navbar({ activePage = '/' }) {
   const { isDark, toggleTheme } = useTheme();
   const { language, toggleLanguage, t } = useLanguage();
 
@@ -79,4 +80,6 @@ export default function Navbar({ activePage = '/' }) {
       </div>
     </header>
   );
-}
+});
+
+export default Navbar;
