@@ -4,6 +4,7 @@ import MainLayout from '../components/layout/MainLayout';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { getMoments } from '../services/momentService';
+import { MomentGridSkeleton } from '../components/ui/Skeleton';
 
 export default function StolenMoments() {
   const { coupleId } = useAuth();
@@ -98,7 +99,9 @@ export default function StolenMoments() {
 
         {/* Content */}
         {loading ? (
-          <p className="text-center text-on-surface-variant dark:text-zinc-500 py-20 font-serif italic">{t('common.loading')}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
+            {[...Array(6)].map((_, i) => <MomentGridSkeleton key={i} />)}
+          </div>
         ) : moments.length === 0 ? (
           <div className="text-center py-20">
             <span className="material-symbols-outlined text-6xl text-outline-variant dark:text-zinc-700 mb-4 block">photo_camera</span>

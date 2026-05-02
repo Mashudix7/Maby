@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import MainLayout from '../components/layout/MainLayout';
 import GlassCard from '../components/ui/GlassCard';
 import MomentCard, { MomentCardSkeleton } from '../components/ui/MomentCard';
@@ -105,25 +105,35 @@ export default function Dashboard() {
   const [streakData, setStreakData] = useState({ total_streak: 0 });
   const [dailyActivity, setDailyActivity] = useState(null);
 
+  // Strategy 10: Parallel data fetch with Promise.all
+  // Strategy 3: Removed `t` from deps — it's UI-only, not data logic
   useEffect(() => {
     if (!coupleId || !user) return;
     
-    getMoments(coupleId)
-      .then((data) => {
-        setMoments(data.slice(0, 3));
+    const today = new Date().toISOString().split('T')[0];
+
+    Promise.all([
+      getMoments(coupleId),
+      getMoodToday(coupleId, user.uid),
+      getWishes(coupleId),
+      getStreak(coupleId),
+      getDailyActivity(coupleId, today),
+    ])
+      .then(([momentsData, moodData, wishesData, streakResult, activityResult]) => {
+        setMoments(momentsData.slice(0, 3));
+        setCurrentMood(moodData);
+        if (wishesData && wishesData.length > 0) setLatestWish(wishesData[0]);
+        setStreakData(streakResult);
+        setDailyActivity(activityResult);
       })
-      .catch((err) => console.error('Gagal memuat momen:', err))
+      .catch((err) => console.error('Dashboard data fetch error:', err))
       .finally(() => setLoading(false));
-      
-    getMoodToday(coupleId, user.uid).then(setCurrentMood);
-    getWishes(coupleId).then(wishes => {
-      if (wishes && wishes.length > 0) setLatestWish(wishes[0]);
-    });
+  }, [coupleId, user]);
 
-    getStreak(coupleId).then(setStreakData);
-    getDailyActivity(coupleId, new Date().toISOString().split('T')[0]).then(setDailyActivity);
+  // Separate effect for notifications (depends on `t` for display text)
+  useEffect(() => {
+    if (!coupleId || !user) return;
 
-    // Notifications & Nudges
     requestNotificationPermission(t);
     const unsubscribeWishes = listenForPartnerWishes(coupleId, user.uid, t);
     const unsubscribeNudges = listenForNudges(coupleId, user.uid, t);
@@ -134,29 +144,22 @@ export default function Dashboard() {
     };
   }, [coupleId, user, t]);
 
+  // Automatic Nudge Check (Auto-Colek)
   useEffect(() => {
-    // Automatic Nudge Check (Auto-Colek)
-    const checkAutoNudge = async () => {
-      if (!coupleId || !user || !streakData.last_activity_at) return;
-      
-      const lastActivity = new Date(streakData.last_activity_at).getTime();
-      const lastNudge = streakData.last_nudge_at ? streakData.last_nudge_at.toMillis?.() || new Date(streakData.last_nudge_at).getTime() : 0;
-      const now = new Date().getTime();
-      
-      const hoursSinceActivity = (now - lastActivity) / (1000 * 60 * 60);
-      const hoursSinceNudge = (now - lastNudge) / (1000 * 60 * 60);
+    if (!coupleId || !user || !streakData.last_activity_at) return;
+    
+    const lastActivity = new Date(streakData.last_activity_at).getTime();
+    const lastNudge = streakData.last_nudge_at ? streakData.last_nudge_at.toMillis?.() || new Date(streakData.last_nudge_at).getTime() : 0;
+    const now = new Date().getTime();
+    
+    const hoursSinceActivity = (now - lastActivity) / (1000 * 60 * 60);
+    const hoursSinceNudge = (now - lastNudge) / (1000 * 60 * 60);
 
-      // If inactive for > 18 hours AND haven't nudged in the last 18 hours
-      if (hoursSinceActivity >= 18 && hoursSinceNudge >= 18) {
-        console.log('Sending automatic streak reminder...');
-        sendNudge(coupleId, user.uid);
-      }
-    };
-
-    if (streakData.last_activity_at) {
-      checkAutoNudge();
+    if (hoursSinceActivity >= 18 && hoursSinceNudge >= 18) {
+      console.log('Sending automatic streak reminder...');
+      sendNudge(coupleId, user.uid);
     }
-  }, [coupleId, user, t, streakData.last_activity_at, streakData.last_nudge_at]);
+  }, [coupleId, user, streakData.last_activity_at, streakData.last_nudge_at]);
 
   const handleSetMood = useCallback(async (moodLabel) => {
     if (currentMood) return; // Mood already set for today
@@ -170,7 +173,8 @@ export default function Dashboard() {
 
   const latestMoment = moments[0];
 
-  const getRelationshipDuration = () => {
+  // Strategy 7: Precompute data with useMemo
+  const relationshipDuration = useMemo(() => {
     const start = new Date('2026-02-21');
     const now = new Date();
     let years = now.getFullYear() - start.getFullYear();
@@ -186,7 +190,14 @@ export default function Dashboard() {
     if (years > 0) text += `${years} ${t('dashboard.years')} `;
     if (months > 0) text += `${months} ${t('dashboard.months')}`;
     return text + ' 💗';
-  };
+  }, [language, t]);
+
+  const formattedStartDate = useMemo(() => {
+    return new Date('2026-02-21').toLocaleDateString(
+      language === 'id' ? 'id-ID' : 'en-US',
+      { day: 'numeric', month: 'long', year: 'numeric' }
+    );
+  }, [language]);
 
   return (
     <MainLayout activePage="/">
@@ -195,7 +206,7 @@ export default function Dashboard() {
         <div className="flex flex-col items-center text-center mt-8 px-4">
           <div className="w-full max-w-lg flex justify-between items-center mb-6">
             <span className="font-sans text-[10px] font-semibold tracking-widest uppercase text-primary/60">
-              {new Date('2026-02-21').toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
+              {formattedStartDate}
             </span>
             <div className="flex items-center gap-2">
               <StreakIndicator streak={streakData.total_streak} activity={dailyActivity} />
@@ -205,7 +216,7 @@ export default function Dashboard() {
             {t('dashboard.hai')}, {profile?.display_name || t('dashboard.sayangku')} 👋
           </h1>
           <p className="font-sans text-sm md:text-base font-semibold text-rose-500 dark:text-rose-400 mb-6">
-            {getRelationshipDuration()}
+            {relationshipDuration}
           </p>
           <div className="w-full max-w-lg mx-auto bg-primary-container/20 dark:bg-rose-900/10 rounded-3xl p-4 border border-primary/10">
             <p className="text-xs font-semibold text-primary dark:text-rose-300 mb-2 tracking-widest uppercase">{t('dashboard.anniversary_countdown')}</p>

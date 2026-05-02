@@ -1,11 +1,15 @@
+import { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
 import BottomNav from './BottomNav';
 
 export default function MainLayout({ children, activePage, className = '', fab }) {
   const location = useLocation();
-  // Auto-detect active page from URL, with fallback to prop
-  const currentPage = activePage || '/' + (location.pathname.split('/')[1] || '');
+  // Memoize active page to prevent unnecessary re-renders of Navbar/BottomNav
+  const currentPage = useMemo(
+    () => activePage || '/' + (location.pathname.split('/')[1] || ''),
+    [activePage, location.pathname]
+  );
 
   return (
     <div className="min-h-screen bg-background dark:bg-[#1a1517] text-on-background dark:text-[#ede0df] transition-colors duration-300 relative overflow-hidden">

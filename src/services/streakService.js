@@ -1,17 +1,26 @@
 import { db } from '../lib/firebase';
 import { doc, getDoc, setDoc, updateDoc, increment, collection, query, where, getDocs } from 'firebase/firestore';
+import { getCached, setCached, invalidatePrefix } from '../lib/queryCache';
+
+const STREAK_TTL = 3 * 60 * 1000; // 3 minutes
+const ACTIVITY_TTL = 3 * 60 * 1000; // 3 minutes
 
 /**
  * Get the current streak status for a couple
  */
 export const getStreak = async (coupleId) => {
+  const cacheKey = `streak:${coupleId}`;
+  const cached = getCached(cacheKey);
+  if (cached) return cached;
+
   try {
     const streakDoc = await getDoc(doc(db, 'streaks', coupleId));
-    if (streakDoc.exists()) {
-      return streakDoc.data();
-    }
-    // Return initial state if doc doesn't exist
-    return { total_streak: 0, last_increment_date: null };
+    const data = streakDoc.exists()
+      ? streakDoc.data()
+      : { total_streak: 0, last_increment_date: null };
+    
+    setCached(cacheKey, data, STREAK_TTL);
+    return data;
   } catch (error) {
     console.error('Error getting streak:', error);
     return { total_streak: 0, last_increment_date: null };
@@ -22,12 +31,18 @@ export const getStreak = async (coupleId) => {
  * Check activity for a specific date
  */
 export const getDailyActivity = async (coupleId, date) => {
+  const cacheKey = `activity:${coupleId}:${date}`;
+  const cached = getCached(cacheKey);
+  if (cached) return cached;
+
   try {
     const activityDoc = await getDoc(doc(db, 'streaks', coupleId, 'daily_activity', date));
-    if (activityDoc.exists()) {
-      return activityDoc.data();
-    }
-    return { user1_active: false, user2_active: false, completed: false };
+    const data = activityDoc.exists()
+      ? activityDoc.data()
+      : { user1_active: false, user2_active: false, completed: false };
+    
+    setCached(cacheKey, data, ACTIVITY_TTL);
+    return data;
   } catch (error) {
     console.error('Error getting daily activity:', error);
     return { user1_active: false, user2_active: false, completed: false };
@@ -91,6 +106,10 @@ export const updateStreakActivity = async (coupleId, userId) => {
     await setDoc(streakRef, { 
       last_activity_at: new Date().toISOString() 
     }, { merge: true });
+
+    // Invalidate caches after write
+    invalidatePrefix('streak:');
+    invalidatePrefix('activity:');
 
     return activityData;
   } catch (error) {

@@ -37,6 +37,7 @@ export const listenForNudges = (coupleId, userId, t) => {
   );
 
   let initialLoad = true;
+  let debounceTimer = null;
 
   return onSnapshot(q, (snapshot) => {
     if (initialLoad) {
@@ -44,17 +45,21 @@ export const listenForNudges = (coupleId, userId, t) => {
       return;
     }
 
-    snapshot.docChanges().forEach((change) => {
-      if (change.type === 'added') {
-        const nudge = change.doc.data();
-        // Notify only if it's from the partner
-        if (nudge.from_user_id !== userId) {
-          showLocalNotification(
-            t('notifications.nudge_title'),
-            t('notifications.nudge_body')
-          );
+    // Throttle: debounce rapid snapshot events (3s)
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === 'added') {
+          const nudge = change.doc.data();
+          // Notify only if it's from the partner
+          if (nudge.from_user_id !== userId) {
+            showLocalNotification(
+              t('notifications.nudge_title'),
+              t('notifications.nudge_body')
+            );
+          }
         }
-      }
-    });
+      });
+    }, 3000);
   });
 };

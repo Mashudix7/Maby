@@ -49,6 +49,7 @@ export const listenForPartnerWishes = (coupleId, userId, t) => {
   );
 
   let initialLoad = true;
+  let debounceTimer = null;
 
   return onSnapshot(q, (snapshot) => {
     if (initialLoad) {
@@ -56,17 +57,21 @@ export const listenForPartnerWishes = (coupleId, userId, t) => {
       return;
     }
 
-    snapshot.docChanges().forEach((change) => {
-      if (change.type === 'added') {
-        const wish = change.doc.data();
-        // Notify only if it's from the partner
-        if (wish.user_id !== userId) {
-          showLocalNotification(
-            t('notifications.streak_reminder_title'),
-            t('notifications.streak_reminder_body')
-          );
+    // Throttle: debounce rapid snapshot events (3s)
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === 'added') {
+          const wish = change.doc.data();
+          // Notify only if it's from the partner
+          if (wish.user_id !== userId) {
+            showLocalNotification(
+              t('notifications.streak_reminder_title'),
+              t('notifications.streak_reminder_body')
+            );
+          }
         }
-      }
-    });
+      });
+    }, 3000);
   });
 };

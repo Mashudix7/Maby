@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PhotoboothPreview from '../components/ui/PhotoboothPreview';
+const PhotoboothPreview = lazy(() => import('../components/ui/PhotoboothPreview'));
 
 export default function Photobooth() {
   const navigate = useNavigate();
@@ -130,7 +130,11 @@ export default function Photobooth() {
   };
 
   if (mode === 'preview') {
-    return <PhotoboothPreview photos={photos} onRetake={handleRetake} />;
+    return (
+      <Suspense fallback={<div className="fixed inset-0 bg-black flex items-center justify-center"><div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin" /></div>}>
+        <PhotoboothPreview photos={photos} onRetake={handleRetake} />
+      </Suspense>
+    );
   }
 
   return (

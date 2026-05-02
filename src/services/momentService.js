@@ -1,13 +1,16 @@
 import { db } from '../lib/firebase';
 import { collection, query, where, getDocs, doc, getDoc, addDoc, deleteDoc, updateDoc, orderBy, limit } from 'firebase/firestore';
+import { getCached, setCached, invalidatePrefix } from '../lib/queryCache';
 
-// In-memory cache to reduce client load
-let momentsCache = null;
-let lastCoupleId = null;
+const CACHE_KEY = 'moments';
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 export async function getMoments(coupleId, useCache = true) {
-  if (useCache && momentsCache && lastCoupleId === coupleId) {
-    return momentsCache;
+  const cacheKey = `${CACHE_KEY}:${coupleId}`;
+  
+  if (useCache) {
+    const cached = getCached(cacheKey);
+    if (cached) return cached;
   }
 
   try {
@@ -20,8 +23,7 @@ export async function getMoments(coupleId, useCache = true) {
     const snap = await getDocs(q);
     const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     
-    momentsCache = data;
-    lastCoupleId = coupleId;
+    setCached(cacheKey, data, CACHE_TTL);
     return data;
   } catch (error) {
     console.warn("Falling back to client-side sort", error);
@@ -30,15 +32,13 @@ export async function getMoments(coupleId, useCache = true) {
     const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     const sorted = data.sort((a, b) => new Date(b.date) - new Date(a.date));
     
-    momentsCache = sorted;
-    lastCoupleId = coupleId;
+    setCached(cacheKey, sorted, CACHE_TTL);
     return sorted;
   }
 }
 
 export function invalidateMomentsCache() {
-  momentsCache = null;
-  lastCoupleId = null;
+  invalidatePrefix(CACHE_KEY);
 }
 
 export async function getMomentById(id) {
@@ -70,4 +70,3 @@ export async function toggleFavoriteMoment(id, isFavorite) {
   const docRef = doc(db, 'moments', id);
   await updateDoc(docRef, { is_favorite: isFavorite });
 }
-

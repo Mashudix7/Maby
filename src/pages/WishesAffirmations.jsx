@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { getWishes, createWish, getRandomWish } from '../services/wishService';
 import { showSuccess, showError } from '../lib/alerts';
+import { WishCardSkeleton } from '../components/ui/Skeleton';
 
 export default function WishesAffirmations() {
   const { user, coupleId } = useAuth();
@@ -15,6 +16,7 @@ export default function WishesAffirmations() {
   const [saving, setSaving] = useState(false);
   const [randomWish, setRandomWish] = useState(null);
   const [showRandom, setShowRandom] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(12);
 
   useEffect(() => {
     if (!coupleId) return;
@@ -117,33 +119,47 @@ export default function WishesAffirmations() {
 
         {/* Wishes Grid */}
         {loading ? (
-          <p className="text-center text-on-surface-variant dark:text-zinc-500 py-12 font-serif italic">{t('wishes.loading')}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+            {[...Array(6)].map((_, i) => <WishCardSkeleton key={i} />)}
+          </div>
         ) : wishes.length === 0 ? (
           <div className="text-center py-12">
             <span className="material-symbols-outlined text-5xl text-outline-variant dark:text-zinc-700 mb-4 block">edit_note</span>
             <p className="text-on-surface-variant dark:text-zinc-500 font-serif italic">{t('wishes.empty')}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-            {wishes.map((wish) => (
-              <WishCard key={wish.id} className="flex flex-col justify-between">
-                <p className="font-serif text-lg text-on-surface-variant dark:text-zinc-300 italic leading-relaxed mb-4">
-                  &quot;{wish.text}&quot;
-                </p>
-                <div className="flex items-center gap-2 mt-auto">
-                  <div className="w-8 h-8 rounded-full bg-primary-container dark:bg-primary-container/30 flex items-center justify-center text-primary text-sm font-serif">
-                    {(wish.profiles?.display_name || '?')[0].toUpperCase()}
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+              {wishes.slice(0, visibleCount).map((wish) => (
+                <WishCard key={wish.id} className="flex flex-col justify-between">
+                  <p className="font-serif text-lg text-on-surface-variant dark:text-zinc-300 italic leading-relaxed mb-4">
+                    &quot;{wish.text}&quot;
+                  </p>
+                  <div className="flex items-center gap-2 mt-auto">
+                    <div className="w-8 h-8 rounded-full bg-primary-container dark:bg-primary-container/30 flex items-center justify-center text-primary text-sm font-serif">
+                      {(wish.profiles?.display_name || '?')[0].toUpperCase()}
+                    </div>
+                    <span className="text-xs font-semibold text-on-surface-variant dark:text-zinc-500">
+                      {wish.profiles?.display_name || t('wishes.anonymous')}
+                    </span>
+                    <span className="text-xs text-outline dark:text-zinc-600 ml-auto">
+                      {new Date(wish.created_at).toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'short' })} • {new Date(wish.created_at).toLocaleTimeString(language === 'id' ? 'id-ID' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
+                    </span>
                   </div>
-                  <span className="text-xs font-semibold text-on-surface-variant dark:text-zinc-500">
-                    {wish.profiles?.display_name || t('wishes.anonymous')}
-                  </span>
-                  <span className="text-xs text-outline dark:text-zinc-600 ml-auto">
-                    {new Date(wish.created_at).toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'short' })} • {new Date(wish.created_at).toLocaleTimeString(language === 'id' ? 'id-ID' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                </div>
-              </WishCard>
-            ))}
-          </div>
+                </WishCard>
+              ))}
+            </div>
+            {visibleCount < wishes.length && (
+              <div className="mt-10 flex justify-center">
+                <button
+                  onClick={() => setVisibleCount(prev => prev + 12)}
+                  className="px-8 py-3 rounded-full glass-panel border border-primary/20 text-primary dark:text-rose-300 font-semibold text-sm hover:bg-primary/5 transition-colors"
+                >
+                  {t('common.load_more') || 'Load More'}
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </MainLayout>

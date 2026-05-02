@@ -1,13 +1,17 @@
 import { db } from '../lib/firebase';
-import { collection, query, where, getDocs, doc, getDoc, addDoc, deleteDoc, orderBy } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc, addDoc, deleteDoc, orderBy, limit } from 'firebase/firestore';
 import { updateStreakActivity } from './streakService';
+import { getCached, setCached, invalidatePrefix } from '../lib/queryCache';
 
-let wishesCache = null;
-let lastCoupleId = null;
+const CACHE_KEY = 'wishes';
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 export async function getWishes(coupleId, useCache = true) {
-  if (useCache && wishesCache && lastCoupleId === coupleId) {
-    return wishesCache;
+  const cacheKey = `${CACHE_KEY}:${coupleId}`;
+
+  if (useCache) {
+    const cached = getCached(cacheKey);
+    if (cached) return cached;
   }
 
   try {
@@ -20,7 +24,8 @@ export async function getWishes(coupleId, useCache = true) {
     const q = query(
       collection(db, 'wishes'),
       where('couple_id', '==', coupleId),
-      orderBy('created_at', 'desc')
+      orderBy('created_at', 'desc'),
+      limit(50) // Cap initial reads
     );
     const snap = await getDocs(q);
     const results = snap.docs.map(d => {
@@ -28,8 +33,7 @@ export async function getWishes(coupleId, useCache = true) {
       return { id: d.id, ...data, profiles: membersMap[data.user_id] || null };
     });
 
-    wishesCache = results;
-    lastCoupleId = coupleId;
+    setCached(cacheKey, results, CACHE_TTL);
     return results;
   } catch (error) {
     console.warn("Falling back to client-side sort for wishes", error);
@@ -46,15 +50,13 @@ export async function getWishes(coupleId, useCache = true) {
     });
     const sorted = results.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     
-    wishesCache = sorted;
-    lastCoupleId = coupleId;
+    setCached(cacheKey, sorted, CACHE_TTL);
     return sorted;
   }
 }
 
 export function invalidateWishesCache() {
-  wishesCache = null;
-  lastCoupleId = null;
+  invalidatePrefix(CACHE_KEY);
 }
 
 export async function createWish(coupleId, userId, text) {
