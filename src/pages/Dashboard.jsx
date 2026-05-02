@@ -134,6 +134,7 @@ export default function Dashboard() {
     };
   }, [coupleId, user, t]);
 
+  useEffect(() => {
     // Automatic Nudge Check (Auto-Colek)
     const checkAutoNudge = async () => {
       if (!coupleId || !user || !streakData.last_activity_at) return;
