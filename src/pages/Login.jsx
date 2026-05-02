@@ -19,7 +19,7 @@ export default function Login() {
     setLoading(true);
     
     // Konversi nama menjadi email dummy untuk Supabase Auth
-    const email = `${name}@maby.com`;
+    const email = `${name}@ourspace.com`;
     const displayName = name === 'feby' ? 'Feby' : 'Mashudi';
 
     try {
