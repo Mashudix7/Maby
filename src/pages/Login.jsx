@@ -4,13 +4,10 @@ import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
   const { user, coupleId, signUp, signIn } = useAuth();
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [email, setEmail] = useState('');
+  const [name, setName] = useState('feby');
   const [password, setPassword] = useState('');
-  const [displayName, setDisplayName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState('');
 
   // Redirect if already logged in
   if (user && coupleId) return <Navigate to="/" replace />;
@@ -19,17 +16,31 @@ export default function Login() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
-    setSuccess('');
     setLoading(true);
+    
+    // Konversi nama menjadi email dummy untuk Supabase Auth
+    const email = `${name}@maby.com`;
+    const displayName = name === 'feby' ? 'Feby' : 'Mashudi';
+
     try {
-      if (isSignUp) {
-        await signUp(email, password, displayName || email.split('@')[0]);
-        setSuccess('Akun berhasil dibuat! Silakan cek email untuk verifikasi, atau langsung login.');
-      } else {
-        await signIn(email, password);
-      }
+      // Coba login
+      await signIn(email, password);
     } catch (err) {
-      setError(err.message || 'Terjadi kesalahan');
+      if (err.message.includes('Invalid login credentials') || err.message.includes('Email not confirmed')) {
+        try {
+          // Jika gagal karena akun belum ada, buat otomatis lalu login
+          await signUp(email, password, displayName);
+          await signIn(email, password);
+        } catch (signUpErr) {
+          if (signUpErr.message.includes('User already registered')) {
+            setError('Password yang kamu masukkan salah.');
+          } else {
+            setError('Terjadi kesalahan saat masuk');
+          }
+        }
+      } else {
+        setError('Terjadi kesalahan saat masuk');
+      }
     } finally {
       setLoading(false);
     }
@@ -53,33 +64,20 @@ export default function Login() {
         {/* Card */}
         <div className="glass-panel rounded-2xl p-8">
           <h2 className="font-serif text-2xl text-on-surface dark:text-[#ede0df] mb-6 text-center">
-            {isSignUp ? 'Buat Akun Baru' : 'Masuk ke Akunmu'}
+            Masuk ke Ruang Kita
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            {isSignUp && (
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-on-surface-variant dark:text-zinc-400 ml-1">Nama kamu</label>
-                <input
-                  type="text"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  placeholder="Nama panggilanmu..."
-                  className="glass-input"
-                />
-              </div>
-            )}
-
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-on-surface-variant dark:text-zinc-400 ml-1">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="email@contoh.com"
-                required
-                className="glass-input"
-              />
+              <label className="text-xs font-semibold text-on-surface-variant dark:text-zinc-400 ml-1">Kamu siapa?</label>
+              <select
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="glass-input cursor-pointer"
+              >
+                <option value="feby">Feby 🌸</option>
+                <option value="mashudi">Mashudi 🗿</option>
+              </select>
             </div>
 
             <div className="space-y-1.5">
@@ -88,7 +86,7 @@ export default function Login() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Minimal 6 karakter"
+                placeholder="Ketik passwordmu..."
                 required
                 minLength={6}
                 className="glass-input"
@@ -101,41 +99,21 @@ export default function Login() {
               </div>
             )}
 
-            {success && (
-              <div className="bg-tertiary-container/50 text-on-tertiary-container text-sm p-3 rounded-xl text-center">
-                {success}
-              </div>
-            )}
-
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-primary to-secondary text-on-primary py-4 rounded-full font-semibold text-sm tracking-wide flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 shadow-md"
+              className="w-full bg-gradient-to-r from-primary to-secondary text-on-primary py-4 rounded-full font-semibold text-sm tracking-wide flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 shadow-md mt-4"
             >
               {loading ? (
                 <span className="material-symbols-outlined animate-spin text-lg">progress_activity</span>
               ) : (
                 <>
-                  <span className="material-symbols-outlined text-lg">
-                    {isSignUp ? 'person_add' : 'login'}
-                  </span>
-                  {isSignUp ? 'Daftar' : 'Masuk'}
+                  <span className="material-symbols-outlined text-lg">login</span>
+                  Masuk
                 </>
               )}
             </button>
           </form>
-
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => { setIsSignUp(!isSignUp); setError(''); setSuccess(''); }}
-              className="text-sm text-on-surface-variant dark:text-zinc-400 hover:text-primary transition-colors"
-            >
-              {isSignUp ? 'Sudah punya akun? ' : 'Belum punya akun? '}
-              <span className="font-semibold text-primary dark:text-rose-300">
-                {isSignUp ? 'Masuk' : 'Daftar'}
-              </span>
-            </button>
-          </div>
         </div>
       </div>
     </div>
