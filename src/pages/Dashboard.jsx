@@ -10,6 +10,8 @@ import { getMoodToday, setMoodToday } from '../services/moodService';
 import { getWishes } from '../services/wishService';
 import { getStreak, getDailyActivity } from '../services/streakService';
 import { requestNotificationPermission, listenForPartnerWishes } from '../services/notificationService';
+import { sendNudge, listenForNudges } from '../services/nudgeService';
+import { showSuccess, showError } from '../lib/alerts';
 
 const MOOD_OPTIONS = [
   { emoji: '🥰', label_id: 'Bahagia', label_en: 'Happy' },
@@ -130,14 +132,25 @@ export default function Dashboard() {
     getStreak(coupleId).then(setStreakData);
     getDailyActivity(coupleId, new Date().toISOString().split('T')[0]).then(setDailyActivity);
 
-    // Notifications
+    // Notifications & Nudges
     requestNotificationPermission(t);
     const unsubscribeWishes = listenForPartnerWishes(coupleId, user.uid, t);
+    const unsubscribeNudges = listenForNudges(coupleId, user.uid, t);
 
     return () => {
       if (unsubscribeWishes) unsubscribeWishes();
+      if (unsubscribeNudges) unsubscribeNudges();
     };
   }, [coupleId, user, t]);
+
+  const handleSendNudge = async () => {
+    const success = await sendNudge(coupleId, user.uid);
+    if (success) {
+      showSuccess(t, t('sweetalert.success_title'), t('streak.remind_button'));
+    } else {
+      showError(t, t('sweetalert.error_title'), t('sweetalert.error_text'));
+    }
+  };
 
   const handleSetMood = async (moodLabel) => {
     if (currentMood) return; // Mood already set for today
@@ -178,7 +191,16 @@ export default function Dashboard() {
             <span className="font-sans text-[10px] font-semibold tracking-widest uppercase text-primary/60">
               {new Date('2026-02-21').toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
             </span>
-            <StreakIndicator streak={streakData.total_streak} activity={dailyActivity} />
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={handleSendNudge}
+                className="w-10 h-10 rounded-full glass-panel border border-primary/20 flex items-center justify-center text-primary hover:bg-primary-container/30 transition-all active:scale-95 group"
+                title={t('streak.remind_button')}
+              >
+                <span className="material-symbols-outlined text-[20px] group-hover:animate-bounce">touch_app</span>
+              </button>
+              <StreakIndicator streak={streakData.total_streak} activity={dailyActivity} />
+            </div>
           </div>
           <h1 className="font-serif text-3xl md:text-5xl text-on-surface dark:text-[#ede0df] mb-2 md:mb-4">
             {t('dashboard.hai')}, {profile?.display_name || t('dashboard.sayangku')} 👋

@@ -76,6 +76,8 @@ export const translations = {
       denied: 'Notifikasi diblokir. Silakan aktifkan di pengaturan browser.',
       streak_reminder_title: 'Ingat Streak Kita! 🔥',
       streak_reminder_body: 'Pasanganmu sudah kirim harapan. Ayo kirim balik biar streak bertambah!',
+      nudge_title: 'Colek! 👉',
+      nudge_body: 'Pasanganmu kangen nih, ayo kirim harapan sekarang!',
     },
     moments: {
       title: 'Momen Indah Bersamamu',
@@ -237,6 +239,7 @@ export const translations = {
       days: 'Days',
       hint: 'Both must send wishes today!',
       completed: "Today's streak completed! 🔥",
+      remind_button: 'Remind Partner',
     },
     notifications: {
       request_title: 'Enable Notifications',
@@ -245,6 +248,8 @@ export const translations = {
       denied: 'Notifications blocked. Please enable them in browser settings.',
       streak_reminder_title: 'Our Streak! 🔥',
       streak_reminder_body: 'Your partner has sent a wish. Send one back to increase the streak!',
+      nudge_title: 'Nudge! 👉',
+      nudge_body: 'Your partner is missing you! Send a wish now to keep the streak alive.',
     },
     moments: {
       title: 'Beautiful Moments Together',
