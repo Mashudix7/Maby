@@ -155,6 +155,7 @@ export const translations = {
       filter_cozy: 'Santai di Rumah',
       filter_outdoor: 'Petualangan Outdoor',
       filter_budget: 'Hemat Budget',
+    },
     sweetalert: {
       confirm_delete_title: 'Hapus data ini?',
       confirm_delete_text: 'Tindakan ini tidak dapat dibatalkan!',
@@ -323,6 +324,7 @@ export const translations = {
       my_soul: 'My Soul',
       private_space: 'Private Room',
       loading: 'Loading facts...',
+    },
     sweetalert: {
       confirm_delete_title: 'Delete this data?',
       confirm_delete_text: 'This action cannot be undone!',
