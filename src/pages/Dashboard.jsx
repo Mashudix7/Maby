@@ -68,6 +68,8 @@ function RelationshipTimer() {
 export default function Dashboard() {
   const { profile, coupleId, user } = useAuth();
   const [moments, setMoments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentMood, setCurrentMood] = useState(null);
   const [latestWish, setLatestWish] = useState(null);
   const [onThisDayMoments, setOnThisDayMoments] = useState([]);
 
