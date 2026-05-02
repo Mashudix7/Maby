@@ -2,10 +2,16 @@ import { db } from '../lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { getCached, setCached, invalidate } from '../lib/queryCache';
 
-const MOOD_TTL = 10 * 60 * 1000; // 10 minutes (mood only changes once per day)
+const MOOD_TTL = 10 * 60 * 1000; // 10 minutes
+
+function getLocalDateString() {
+  const d = new Date();
+  // Format as YYYY-MM-DD using local time
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
 
 export async function getMoodToday(coupleId, userId) {
-  const dateStr = new Date().toISOString().split('T')[0];
+  const dateStr = getLocalDateString();
   const cacheKey = `mood:${coupleId}:${userId}:${dateStr}`;
   
   const cached = getCached(cacheKey);
@@ -21,7 +27,7 @@ export async function getMoodToday(coupleId, userId) {
 }
 
 export async function setMoodToday(coupleId, userId, mood) {
-  const dateStr = new Date().toISOString().split('T')[0];
+  const dateStr = getLocalDateString();
   const id = `${coupleId}_${userId}_${dateStr}`;
   const docRef = doc(db, 'moods', id);
   await setDoc(docRef, {

@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { getMoments } from '../services/momentService';
 import { MomentGridSkeleton } from '../components/ui/Skeleton';
+import VirtualGrid from '../components/ui/VirtualGrid';
 
 export default function StolenMoments() {
   const { coupleId } = useAuth();
@@ -14,7 +15,6 @@ export default function StolenMoments() {
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [visibleCount, setVisibleCount] = useState(9);
 
   useEffect(() => {
     if (!coupleId) return;
@@ -122,61 +122,51 @@ export default function StolenMoments() {
             </p>
           </div>
         ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
-              {filteredMoments.slice(0, visibleCount).map((moment) => (
-                <Link
-                  key={moment.id}
-                  to={`/momen/${moment.id}`}
-                  className="glass-panel rounded-2xl p-5 md:p-6 flex flex-col gap-4 group hover:scale-[1.01] transition-transform duration-300"
-                >
-                  {moment.image_url && (
-                    <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden">
-                      <img
-                        alt={moment.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        src={moment.image_url}
-                        loading="lazy"
-                      />
-                      {moment.location && (
-                        <span className="absolute top-3 right-3 inline-flex items-center gap-1 glass-panel px-3 py-1 rounded-full text-xs font-semibold text-on-surface-variant dark:text-zinc-300">
-                          <span className="material-symbols-outlined text-[14px]">location_on</span>
-                          {moment.location}
-                        </span>
-                      )}
-                    </div>
-                  )}
-                  <div className="px-1">
-                    {moment.date && (
-                      <time className="font-sans text-xs font-semibold text-outline dark:text-zinc-500 mb-1 block">
-                        {new Date(moment.date).toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
-                      </time>
-                    )}
-                    <div className="flex items-start justify-between gap-2">
-                      <h3 className="font-serif text-xl text-primary dark:text-rose-300 italic">{moment.title}</h3>
-                      {moment.is_favorite && (
-                        <span className="material-symbols-outlined text-rose-500 text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
-                      )}
-                    </div>
-                    {moment.story && (
-                      <p className="text-sm text-on-surface-variant dark:text-zinc-400 mt-2 line-clamp-2">{moment.story}</p>
+          <VirtualGrid
+            items={filteredMoments}
+            itemHeight={380}
+            minColumnWidth={300}
+            renderItem={(moment) => (
+              <Link
+                key={moment.id}
+                to={`/momen/${moment.id}`}
+                className="glass-panel rounded-2xl p-5 md:p-6 flex flex-col gap-4 group hover:scale-[1.01] transition-transform duration-300 h-full"
+              >
+                {moment.image_url && (
+                  <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden shrink-0">
+                    <img
+                      alt={moment.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      src={moment.image_url}
+                      loading="lazy"
+                    />
+                    {moment.location && (
+                      <span className="absolute top-3 right-3 inline-flex items-center gap-1 glass-panel px-3 py-1 rounded-full text-xs font-semibold text-on-surface-variant dark:text-zinc-300">
+                        <span className="material-symbols-outlined text-[14px]">location_on</span>
+                        {moment.location}
+                      </span>
                     )}
                   </div>
-                </Link>
-              ))}
-            </div>
-            
-            {visibleCount < filteredMoments.length && (
-              <div className="mt-12 flex justify-center">
-                <button
-                  onClick={() => setVisibleCount(prev => prev + 9)}
-                  className="px-8 py-3 rounded-full glass-panel border border-primary/20 text-primary dark:text-rose-300 font-semibold text-sm hover:bg-primary/5 transition-colors"
-                >
-                  {t('common.load_more') || 'Load More'}
-                </button>
-              </div>
+                )}
+                <div className="px-1 flex flex-col flex-1">
+                  {moment.date && (
+                    <time className="font-sans text-xs font-semibold text-outline dark:text-zinc-500 mb-1 block">
+                      {new Date(moment.date).toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </time>
+                  )}
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="font-serif text-xl text-primary dark:text-rose-300 italic">{moment.title}</h3>
+                    {moment.is_favorite && (
+                      <span className="material-symbols-outlined text-rose-500 text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
+                    )}
+                  </div>
+                  {moment.story && (
+                    <p className="text-sm text-on-surface-variant dark:text-zinc-400 mt-2 line-clamp-2">{moment.story}</p>
+                  )}
+                </div>
+              </Link>
             )}
-          </>
+          />
         )}
       </div>
     </MainLayout>
