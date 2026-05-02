@@ -131,7 +131,7 @@
 
   .glass-input {
     width: 100%;
-    background-color: color-mix(in srgb, var(--color-surface-container-low) 50%, transparent);
+    background-color: rgba(0, 0, 0, 0.04);
     border: 1px solid transparent;
     border-radius: 0.5rem;
     padding: 0.75rem 1rem;
@@ -151,7 +151,7 @@
   }
 
   .dark .glass-input {
-    background-color: rgba(40, 30, 32, 0.5);
+    background-color: rgba(0, 0, 0, 0.3);
     color: #ede0df;
   }
   .dark .glass-input:focus {

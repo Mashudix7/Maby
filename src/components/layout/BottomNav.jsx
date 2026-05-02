@@ -9,7 +9,7 @@ const navItems = [
 
 export default function BottomNav({ activePage = '/' }) {
   return (
-    <nav className="md:hidden fixed bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-1 z-50 glass-panel w-[calc(100%-2rem)] max-w-sm rounded-2xl px-2 py-2 shadow-[0_20px_40px_rgba(248,215,218,0.2)] dark:shadow-[0_20px_40px_rgba(0,0,0,0.3)]">
+    <nav className="md:hidden fixed bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-1 z-50 glass-panel backdrop-blur-xl bg-white/70 dark:bg-[#1a1517]/70 w-[calc(100%-2rem)] max-w-sm rounded-2xl px-2 py-2 shadow-[0_20px_40px_rgba(248,215,218,0.2)] dark:shadow-[0_20px_40px_rgba(0,0,0,0.3)]">
       {navItems.map((item) => {
         const isActive = activePage === item.to;
         return (

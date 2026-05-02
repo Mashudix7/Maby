@@ -77,7 +77,7 @@ export default function Dashboard() {
         {/* Hero Greeting */}
         <section className="flex flex-col items-center text-center mt-8">
           <span className="font-sans text-xs font-semibold tracking-widest uppercase text-primary mb-4">
-            {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+            21 Februari 2026
           </span>
           <h1 className="font-serif text-3xl md:text-5xl text-on-surface dark:text-[#ede0df] mb-4 md:mb-6">
             Hai, {profile?.display_name || 'sayangku'} <span className="text-rose-400">💗</span>
@@ -109,7 +109,7 @@ export default function Dashboard() {
             <div className="relative z-10 flex flex-col h-full justify-between">
               <div className="flex justify-between items-start">
                 <span className="inline-flex items-center px-4 py-2 rounded-full bg-white/70 dark:bg-white/10 text-primary dark:text-rose-300 font-sans text-xs font-semibold tracking-wide backdrop-blur-md">
-                  <span className="material-symbols-outlined mr-2 text-[16px]">auto_awesome</span>
+                  <span className="material-symbols-outlined mr-2 text-[16px]">photo_library</span>
                   {latestMoment ? 'Kenangan Terakhir' : 'Belum Ada Kenangan'}
                 </span>
               </div>
@@ -149,25 +149,21 @@ export default function Dashboard() {
               </p>
             </GlassCard>
 
-            {/* Quick Actions */}
-            <GlassCard className="flex flex-col gap-4">
-              <h3 className="font-serif text-2xl text-on-surface dark:text-[#ede0df] mb-2">Aksi Cepat</h3>
-              {[
-                { icon: 'add_a_photo', label: 'Tambah momen', bg: 'bg-primary-container', color: 'text-primary', to: '/momen/baru' },
-                { icon: 'edit_note', label: 'Tulis harapan', bg: 'bg-secondary-container', color: 'text-on-secondary-container', to: '/harapan' },
-              ].map((action) => (
-                <Link
-                  key={action.label}
-                  to={action.to}
-                  className="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-white/50 dark:hover:bg-white/5 transition-colors text-left border border-transparent hover:border-white/40 dark:hover:border-white/10 group"
-                >
-                  <div className={`w-10 h-10 rounded-full ${action.bg} flex items-center justify-center ${action.color} group-hover:scale-110 transition-transform`}>
-                    <span className="material-symbols-outlined">{action.icon}</span>
-                  </div>
-                  <span className="font-sans text-base text-on-surface dark:text-[#ede0df]">{action.label}</span>
-                </Link>
-              ))}
-            </GlassCard>
+            {/* Action Boxes */}
+            <div className="grid grid-cols-2 gap-4">
+              <Link to="/momen/baru" className="glass-panel p-4 md:p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-3 hover:bg-white/60 dark:hover:bg-white/10 transition-all group">
+                <div className="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                  <span className="material-symbols-outlined text-2xl">add_a_photo</span>
+                </div>
+                <span className="font-serif text-sm font-semibold text-on-surface dark:text-[#ede0df]">Momen<br/>Baru</span>
+              </Link>
+              <Link to="/harapan" className="glass-panel p-4 md:p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-3 hover:bg-white/60 dark:hover:bg-white/10 transition-all group">
+                <div className="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container group-hover:scale-110 transition-transform">
+                  <span className="material-symbols-outlined text-2xl">favorite</span>
+                </div>
+                <span className="font-serif text-sm font-semibold text-on-surface dark:text-[#ede0df]">Tulis<br/>Harapan</span>
+              </Link>
+            </div>
           </div>
         </section>
 

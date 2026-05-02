@@ -15,7 +15,7 @@ export default function Navbar({ activePage = '/' }) {
 
   return (
     <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-screen-lg">
-      <div className="glass-panel rounded-2xl border border-white/30 dark:border-white/10 px-4 md:px-8 py-3 md:py-4 flex justify-between items-center">
+      <div className="glass-panel backdrop-blur-xl bg-white/70 dark:bg-[#1a1517]/70 rounded-2xl border border-white/30 dark:border-white/10 px-4 md:px-8 py-3 md:py-4 flex justify-between items-center">
         <Link to="/" className="flex items-center gap-3 text-xl md:text-2xl font-serif italic text-rose-400 dark:text-rose-300 hover:text-rose-500 transition-colors shrink-0">
           <img src="/logo.jpg" alt="Maby Logo" className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover shadow-sm border border-white/50 dark:border-white/10" />
           Maby

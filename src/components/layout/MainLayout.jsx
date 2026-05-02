@@ -10,7 +10,7 @@ export default function MainLayout({ children, activePage, className = '' }) {
   return (
     <div className="min-h-screen bg-background dark:bg-[#1a1517] text-on-background dark:text-[#ede0df] transition-colors duration-300">
       <Navbar activePage={currentPage} />
-      <main className={`pt-24 md:pt-28 pb-24 md:pb-16 px-4 md:px-6 ${className}`}>
+      <main className={`pt-28 md:pt-36 pb-28 md:pb-20 px-4 md:px-6 ${className}`}>
         {children}
       </main>
       <BottomNav activePage={currentPage} />
