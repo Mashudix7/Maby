@@ -25,12 +25,12 @@ export default function AddMoment() {
 
   const compressImage = (file) => {
     return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (event) => {
-        const img = new Image();
-        img.src = event.target.result;
-        img.onload = () => {
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+      
+      img.onload = () => {
+        URL.revokeObjectURL(objectUrl); // Clean up memory
+        try {
           const canvas = document.createElement('canvas');
           let width = img.width;
           let height = img.height;
@@ -53,10 +53,17 @@ export default function AddMoment() {
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
           resolve(canvas.toDataURL('image/jpeg', 0.5));
-        };
-        img.onerror = error => reject(error);
+        } catch (e) {
+          reject(e);
+        }
       };
-      reader.onerror = error => reject(error);
+      
+      img.onerror = (error) => {
+        URL.revokeObjectURL(objectUrl);
+        reject(error);
+      };
+
+      img.src = objectUrl;
     });
   };
 
@@ -74,7 +81,8 @@ export default function AddMoment() {
         try {
           imageUrl = await compressImage(imageFile);
         } catch (e) {
-          throw new Error('Gagal memproses foto. Pastikan format didukung.');
+          console.error("Compression error:", e);
+          throw new Error('Gagal memproses foto. Memorinya terlalu besar atau format tak didukung.');
         }
       }
       await createMoment(coupleId, user.uid, {
