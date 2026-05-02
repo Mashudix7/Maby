@@ -138,7 +138,7 @@ export default function WishesAffirmations() {
                     {wish.profiles?.display_name || t('wishes.anonymous')}
                   </span>
                   <span className="text-xs text-outline dark:text-zinc-600 ml-auto">
-                    {new Date(wish.created_at).toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'short' })}
+                    {new Date(wish.created_at).toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'short' })} • {new Date(wish.created_at).toLocaleTimeString(language === 'id' ? 'id-ID' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
               </WishCard>
