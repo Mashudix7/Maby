@@ -17,29 +17,31 @@ export function AuthProvider({ children }) {
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
-      setProfile(prof);
+        .maybeSingle();
+      setProfile(prof || null);
 
       // Fetch couple membership
       let { data: membership } = await supabase
         .from('couple_members')
         .select('couple_id')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
         
       let finalCoupleId = membership?.couple_id;
 
       // AUTO-COUPLE LOGIC FOR MABY
       if (!finalCoupleId) {
+         // Gunakan upsert agar tidak error duplicate, dan pastikan insert valid
          const { data: existingCouples } = await supabase.from('couples').select('id').limit(1);
          if (existingCouples && existingCouples.length > 0) {
             const cId = existingCouples[0].id;
-            await supabase.from('couple_members').insert({ user_id: userId, couple_id: cId });
+            await supabase.from('couple_members').upsert({ user_id: userId, couple_id: cId });
             finalCoupleId = cId;
          } else {
-            const { data: newCouple } = await supabase.from('couples').insert({}).select('id').single();
+            // Beri nilai dummy pada insert agar Postgres tidak error "empty payload"
+            const { data: newCouple } = await supabase.from('couples').insert({ invite_code: 'maby-love' }).select('id').maybeSingle();
             if (newCouple) {
-              await supabase.from('couple_members').insert({ user_id: userId, couple_id: newCouple.id });
+              await supabase.from('couple_members').upsert({ user_id: userId, couple_id: newCouple.id });
               finalCoupleId = newCouple.id;
             }
          }
@@ -52,32 +54,51 @@ export function AuthProvider({ children }) {
   }
 
   useEffect(() => {
-    // Check existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      const currentUser = session?.user || null;
-      setUser(currentUser);
-      if (currentUser) {
-        loadUserData(currentUser.id).finally(() => setLoading(false));
-      } else {
-        setLoading(false);
-      }
-    });
+    let mounted = true;
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+    async function initializeAuth() {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
         const currentUser = session?.user || null;
-        setUser(currentUser);
+        if (mounted) setUser(currentUser);
+        
         if (currentUser) {
           await loadUserData(currentUser.id);
+        }
+      } catch (err) {
+        console.error('Auth initialization error:', err);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+
+    initializeAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === 'INITIAL_SESSION') return; // Sudah ditangani oleh getSession
+        
+        const currentUser = session?.user || null;
+        if (mounted) setUser(currentUser);
+        
+        if (currentUser) {
+          if (mounted) setLoading(true);
+          await loadUserData(currentUser.id);
+          if (mounted) setLoading(false);
         } else {
-          setProfile(null);
-          setCoupleId(null);
+          if (mounted) {
+            setProfile(null);
+            setCoupleId(null);
+            setLoading(false);
+          }
         }
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   // Auth actions
