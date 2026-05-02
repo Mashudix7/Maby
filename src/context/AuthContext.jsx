@@ -22,8 +22,9 @@ export function AuthProvider({ children }) {
       if (userSnap.exists()) {
         userData = userSnap.data();
       } else {
+        const defaultName = firebaseUser.email?.includes('feby') ? 'Feby Zahara' : 'Mashudi';
         userData = {
-          display_name: firebaseUser.displayName || 'Pengguna',
+          display_name: firebaseUser.displayName || defaultName,
           avatar_url: '',
           couple_id: FIXED_COUPLE_ID
         };

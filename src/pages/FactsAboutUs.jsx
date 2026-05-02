@@ -23,17 +23,18 @@ export default function FactsAboutUs() {
       const membersSnap = await getDocs(q);
       const members = membersSnap.docs.map(doc => ({ user_id: doc.id, profiles: doc.data() }));
 
-      const me = members?.find((m) => m.user_id === user.id);
-      const partner = members?.find((m) => m.user_id !== user.id);
+      const me = members?.find((m) => m.user_id === user.uid);
+      const partner = members?.find((m) => m.user_id !== user.uid);
       
-      setMyProfile(me?.profiles || { display_name: user?.user_metadata?.display_name || 'Aku', avatar_url: '' });
+      const myDisplayName = user?.displayName || (user?.email?.includes('feby') ? 'Feby Zahara' : 'Mashudi');
+      
+      setMyProfile(me?.profiles || { display_name: myDisplayName, avatar_url: '' });
       
       if (partner?.profiles) {
         setPartnerProfile(partner.profiles);
       } else {
         // Fallback for Maby if partner hasn't logged in yet
-        const myName = user?.user_metadata?.display_name || '';
-        const partnerName = myName.toLowerCase().includes('feby') ? 'Mashudi' : 'Feby Zahara';
+        const partnerName = myDisplayName.toLowerCase().includes('feby') ? 'Mashudi 🗿' : 'Feby Zahara 🌸';
         setPartnerProfile({ display_name: partnerName, avatar_url: '' });
       }
 
@@ -42,7 +43,7 @@ export default function FactsAboutUs() {
       const myMap = {};
       const partnerMap = {};
       facts.forEach((f) => {
-        if (f.user_id === user.id) myMap[f.category] = f.content;
+        if (f.user_id === user.uid) myMap[f.category] = f.content;
         else partnerMap[f.category] = f.content;
       });
       setMyFacts(myMap);
@@ -59,7 +60,7 @@ export default function FactsAboutUs() {
   async function handleSave(category, value) {
     setSaving(category);
     try {
-      await upsertFact(coupleId, user.id, category, value);
+      await upsertFact(coupleId, user.uid, category, value);
       setMyFacts((prev) => ({ ...prev, [category]: value }));
     } catch (err) {
       console.error('Gagal menyimpan:', err);

@@ -35,22 +35,22 @@ function RelationshipTimer() {
   }, []);
 
   return (
-    <div className="glass-panel p-6 rounded-[2rem] flex justify-around text-center mt-6">
-      <div className="flex flex-col">
-        <span className="text-2xl md:text-4xl font-serif text-rose-400 dark:text-rose-300">{time.days}</span>
-        <span className="text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">Hari</span>
+    <div className="glass-panel p-4 md:p-6 rounded-2xl md:rounded-[2rem] flex justify-between text-center mt-6">
+      <div className="flex flex-col flex-1">
+        <span className="text-xl sm:text-2xl md:text-4xl font-serif text-rose-400 dark:text-rose-300">{time.days}</span>
+        <span className="text-[9px] sm:text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">Hari</span>
       </div>
-      <div className="flex flex-col">
-        <span className="text-2xl md:text-4xl font-serif text-rose-400 dark:text-rose-300">{time.hours}</span>
-        <span className="text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">Jam</span>
+      <div className="flex flex-col flex-1">
+        <span className="text-xl sm:text-2xl md:text-4xl font-serif text-rose-400 dark:text-rose-300">{time.hours}</span>
+        <span className="text-[9px] sm:text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">Jam</span>
       </div>
-      <div className="flex flex-col">
-        <span className="text-2xl md:text-4xl font-serif text-rose-400 dark:text-rose-300">{time.minutes}</span>
-        <span className="text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">Menit</span>
+      <div className="flex flex-col flex-1">
+        <span className="text-xl sm:text-2xl md:text-4xl font-serif text-rose-400 dark:text-rose-300">{time.minutes}</span>
+        <span className="text-[9px] sm:text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">Menit</span>
       </div>
-      <div className="flex flex-col">
-        <span className="text-2xl md:text-4xl font-serif text-rose-400 dark:text-rose-300">{time.seconds}</span>
-        <span className="text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">Detik</span>
+      <div className="flex flex-col flex-1">
+        <span className="text-xl sm:text-2xl md:text-4xl font-serif text-rose-400 dark:text-rose-300">{time.seconds}</span>
+        <span className="text-[9px] sm:text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">Detik</span>
       </div>
     </div>
   );

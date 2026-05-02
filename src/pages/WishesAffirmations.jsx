@@ -26,7 +26,7 @@ export default function WishesAffirmations() {
     if (!newWish.trim()) return;
     setSaving(true);
     try {
-      const wish = await createWish(coupleId, user.id, newWish.trim());
+      const wish = await createWish(coupleId, user.uid, newWish.trim());
       setWishes((prev) => [wish, ...prev]);
       setNewWish('');
     } catch (err) {

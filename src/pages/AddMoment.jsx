@@ -37,7 +37,7 @@ export default function AddMoment() {
       if (imageFile) {
         imageUrl = await uploadMomentImage(imageFile);
       }
-      await createMoment(coupleId, user.id, {
+      await createMoment(coupleId, user.uid, {
         title: title.trim(),
         story,
         image_url: imageUrl,
