@@ -170,7 +170,7 @@ export default function Dashboard() {
         {/* Recent Moments */}
         <section className="flex flex-col gap-8">
           <div className="flex justify-between items-end">
-            <h2 className="font-serif text-3xl text-on-surface dark:text-[#ede0df]">Momen Terakhir</h2>
+            <h2 className="font-serif text-2xl md:text-3xl text-on-surface dark:text-[#ede0df]">Momen Terakhir</h2>
             <Link
               to="/momen"
               className="font-sans text-xs font-semibold text-primary dark:text-rose-300 hover:text-on-surface transition-colors flex items-center gap-1"
