@@ -25,8 +25,17 @@ export default function FactsAboutUs() {
 
       const me = members?.find((m) => m.user_id === user.id);
       const partner = members?.find((m) => m.user_id !== user.id);
-      setMyProfile(me?.profiles || { display_name: 'Aku', avatar_url: '' });
-      setPartnerProfile(partner?.profiles || null);
+      
+      setMyProfile(me?.profiles || { display_name: user?.user_metadata?.display_name || 'Aku', avatar_url: '' });
+      
+      if (partner?.profiles) {
+        setPartnerProfile(partner.profiles);
+      } else {
+        // Fallback for Maby if partner hasn't logged in yet
+        const myName = user?.user_metadata?.display_name || '';
+        const partnerName = myName.toLowerCase().includes('feby') ? 'Mashudi' : 'Feby Zahara';
+        setPartnerProfile({ display_name: partnerName, avatar_url: '' });
+      }
 
       // Get all facts for this couple
       const facts = await getFacts(coupleId);
@@ -127,14 +136,7 @@ export default function FactsAboutUs() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
           <ProfileSection profile={myProfile} facts={myFacts} isMe={true} />
-          {partnerProfile ? (
-            <ProfileSection profile={partnerProfile} facts={partnerFacts} isMe={false} />
-          ) : (
-            <div className="glass-panel rounded-xl p-10 flex flex-col items-center justify-center text-center">
-              <span className="material-symbols-outlined text-5xl text-outline-variant dark:text-zinc-700 mb-4">person_add</span>
-              <p className="font-serif italic text-on-surface-variant dark:text-zinc-500">Pasanganmu belum bergabung</p>
-            </div>
-          )}
+          <ProfileSection profile={partnerProfile} facts={partnerFacts} isMe={false} />
         </div>
       </div>
     </MainLayout>

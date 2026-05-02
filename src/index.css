@@ -73,12 +73,17 @@
 /* ===== BASE STYLES ===== */
 @layer base {
   body {
-    font-family: "Plus Jakarta Sans", sans-serif;
+    font-family: var(--current-font, "Plus Jakarta Sans", sans-serif);
     background-color: var(--color-background);
     color: var(--color-on-background);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     transition: background-color 0.3s, color 0.3s;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    min-h-screen: 100vh;
+    -webkit-user-select: none;
+    user-select: none;
   }
 
   .dark body,
@@ -218,4 +223,17 @@
     transform: scale(1);
     box-shadow: 0 0 0 0 rgba(231, 214, 254, 0);
   }
+}
+
+/* ===== NPROGRESS CUSTOMIZATION ===== */
+#nprogress .bar {
+  background: var(--color-primary-container) !important;
+  height: 4px !important;
+}
+#nprogress .peg {
+  box-shadow: 0 0 10px var(--color-primary-container), 0 0 5px var(--color-primary-container) !important;
+}
+#nprogress .spinner-icon {
+  border-top-color: var(--color-primary-container) !important;
+  border-left-color: var(--color-primary-container) !important;
 }

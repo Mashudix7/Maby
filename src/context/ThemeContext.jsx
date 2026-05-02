@@ -12,6 +12,14 @@ export function ThemeProvider({ children }) {
     return false;
   });
 
+  const [isPoppins, setIsPoppins] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('ourspace-font');
+      if (saved) return saved === 'poppins';
+    }
+    return false;
+  });
+
   useEffect(() => {
     const root = document.documentElement;
     if (isDark) {
@@ -22,10 +30,24 @@ export function ThemeProvider({ children }) {
     localStorage.setItem('ourspace-theme', isDark ? 'dark' : 'light');
   }, [isDark]);
 
+  useEffect(() => {
+    if (isPoppins) {
+      document.documentElement.style.setProperty('--current-font', '"Poppins", sans-serif');
+      document.documentElement.style.setProperty('--font-sans', '"Poppins", sans-serif');
+      document.documentElement.style.setProperty('--font-serif', '"Poppins", sans-serif');
+    } else {
+      document.documentElement.style.removeProperty('--current-font');
+      document.documentElement.style.removeProperty('--font-sans');
+      document.documentElement.style.removeProperty('--font-serif');
+    }
+    localStorage.setItem('ourspace-font', isPoppins ? 'poppins' : 'default');
+  }, [isPoppins]);
+
   const toggleTheme = () => setIsDark((prev) => !prev);
+  const toggleFont = () => setIsPoppins((prev) => !prev);
 
   return (
-    <ThemeContext.Provider value={{ isDark, toggleTheme }}>
+    <ThemeContext.Provider value={{ isDark, toggleTheme, isPoppins, toggleFont }}>
       {children}
     </ThemeContext.Provider>
   );

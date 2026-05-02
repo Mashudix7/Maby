@@ -1,4 +1,7 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+import nprogress from 'nprogress';
+import 'nprogress/nprogress.css';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -14,11 +17,22 @@ import InteractiveMap from './pages/InteractiveMap';
 import DateIdeas from './pages/DateIdeas';
 import RelationshipJourney from './pages/RelationshipJourney';
 
+function RouteChangeListener() {
+  const location = useLocation();
+  useEffect(() => {
+    nprogress.start();
+    const timer = setTimeout(() => nprogress.done(), 300);
+    return () => clearTimeout(timer);
+  }, [location]);
+  return null;
+}
+
 export default function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
         <BrowserRouter>
+          <RouteChangeListener />
           <Routes>
             {/* Public routes */}
             <Route path="/login" element={<Login />} />

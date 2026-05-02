@@ -12,6 +12,50 @@ const moods = [
   { emoji: '🥺', label: 'Rindu' },
 ];
 
+function RelationshipTimer() {
+  const [time, setTime] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+  useEffect(() => {
+    const startDate = new Date('2026-02-21T00:00:00+07:00').getTime();
+    
+    const interval = setInterval(() => {
+      const now = new Date().getTime();
+      const diff = now - startDate;
+      
+      if (diff > 0) {
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        setTime({ days, hours, minutes, seconds });
+      }
+    }, 1000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="glass-panel p-6 rounded-[2rem] flex justify-around text-center mt-6">
+      <div className="flex flex-col">
+        <span className="text-2xl md:text-4xl font-serif text-rose-400 dark:text-rose-300">{time.days}</span>
+        <span className="text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">Hari</span>
+      </div>
+      <div className="flex flex-col">
+        <span className="text-2xl md:text-4xl font-serif text-rose-400 dark:text-rose-300">{time.hours}</span>
+        <span className="text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">Jam</span>
+      </div>
+      <div className="flex flex-col">
+        <span className="text-2xl md:text-4xl font-serif text-rose-400 dark:text-rose-300">{time.minutes}</span>
+        <span className="text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">Menit</span>
+      </div>
+      <div className="flex flex-col">
+        <span className="text-2xl md:text-4xl font-serif text-rose-400 dark:text-rose-300">{time.seconds}</span>
+        <span className="text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">Detik</span>
+      </div>
+    </div>
+  );
+}
+
 export default function Dashboard() {
   const { profile, coupleId } = useAuth();
   const [moments, setMoments] = useState([]);
@@ -41,6 +85,9 @@ export default function Dashboard() {
           <p className="font-sans text-sm md:text-base text-on-surface-variant dark:text-zinc-400 max-w-lg mx-auto leading-relaxed">
             Yuk bikin hari ini juga spesial ya.
           </p>
+          <div className="w-full max-w-lg mx-auto">
+            <RelationshipTimer />
+          </div>
         </section>
 
         {/* Bento Grid Layout */}
@@ -108,7 +155,6 @@ export default function Dashboard() {
               {[
                 { icon: 'add_a_photo', label: 'Tambah momen', bg: 'bg-primary-container', color: 'text-primary', to: '/momen/baru' },
                 { icon: 'edit_note', label: 'Tulis harapan', bg: 'bg-secondary-container', color: 'text-on-secondary-container', to: '/harapan' },
-                { icon: 'map', label: 'Buka peta kita', bg: 'bg-tertiary-container', color: 'text-on-tertiary-container', to: '/peta' },
               ].map((action) => (
                 <Link
                   key={action.label}

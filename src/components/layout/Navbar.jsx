@@ -5,13 +5,12 @@ import { useTheme } from '../../context/ThemeContext';
 const navItems = [
   { to: '/', label: 'Beranda', icon: 'home' },
   { to: '/momen', label: 'Momen', icon: 'auto_awesome_motion' },
-  { to: '/peta', label: 'Peta', icon: 'explore' },
   { to: '/harapan', label: 'Harapan', icon: 'favorite' },
   { to: '/fakta', label: 'Profil', icon: 'person' },
 ];
 
 export default function Navbar({ activePage = '/' }) {
-  const { isDark, toggleTheme } = useTheme();
+  const { isDark, toggleTheme, isPoppins, toggleFont } = useTheme();
 
 
   return (
@@ -41,6 +40,13 @@ export default function Navbar({ activePage = '/' }) {
 
         {/* Actions */}
         <div className="flex items-center gap-1">
+          <button
+            onClick={toggleFont}
+            className="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-rose-400 dark:text-rose-300 hover:bg-white/30 dark:hover:bg-white/10 transition-colors duration-300 shrink-0 font-serif font-bold text-lg"
+            aria-label="Toggle font"
+          >
+            {isPoppins ? 'S' : 'P'}
+          </button>
           <button
             onClick={toggleTheme}
             className="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-rose-400 dark:text-rose-300 hover:bg-white/30 dark:hover:bg-white/10 transition-colors duration-300 shrink-0"

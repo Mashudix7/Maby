@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 const navItems = [
   { to: '/', label: 'Beranda', icon: 'home' },
   { to: '/momen', label: 'Momen', icon: 'auto_awesome_motion' },
-  { to: '/peta', label: 'Peta', icon: 'explore' },
   { to: '/harapan', label: 'Harapan', icon: 'favorite' },
   { to: '/fakta', label: 'Profil', icon: 'person' },
 ];

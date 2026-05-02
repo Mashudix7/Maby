@@ -79,12 +79,13 @@ export function AuthProvider({ children }) {
         if (event === 'INITIAL_SESSION') return; // Sudah ditangani oleh getSession
         
         const currentUser = session?.user || null;
+        const isFirstLoad = !user && currentUser; // Hanya set loading jika user tadinya null
         if (mounted) setUser(currentUser);
         
         if (currentUser) {
-          if (mounted) setLoading(true);
+          if (mounted && isFirstLoad) setLoading(true);
           await loadUserData(currentUser.id);
-          if (mounted) setLoading(false);
+          if (mounted && isFirstLoad) setLoading(false);
         } else {
           if (mounted) {
             setProfile(null);
