@@ -107,7 +107,7 @@ export default function Dashboard() {
         {/* Bento Grid Layout */}
         <section className="grid grid-cols-1 md:grid-cols-12 gap-8">
           {/* Today's Memory */}
-          <div className="md:col-span-8 glass-panel rounded-2xl md:rounded-[2rem] p-5 md:p-8 flex flex-col relative overflow-hidden group min-h-[280px] md:min-h-[400px]">
+          <div className="md:col-span-8 glass-panel rounded-2xl md:rounded-[2rem] p-4 md:p-8 flex flex-col relative overflow-hidden group min-h-[280px] md:min-h-[400px]">
             {latestMoment?.image_url ? (
               <div className="absolute inset-0 z-0">
                 <img
@@ -143,8 +143,8 @@ export default function Dashboard() {
           {/* Side Column */}
           <div className="md:col-span-4 flex flex-col gap-8">
             {/* Mood Tracker */}
-            <GlassCard className="flex flex-col items-center justify-center text-center">
-              <h3 className="font-serif text-2xl text-on-surface dark:text-[#ede0df] mb-6">Mood Kamu Hari Ini</h3>
+            <GlassCard className="flex flex-col items-center justify-center text-center p-4 md:p-8">
+              <h3 className="font-serif text-xl md:text-2xl text-on-surface dark:text-[#ede0df] mb-4 md:mb-6">Mood Kamu Hari Ini</h3>
               <div className="flex gap-4 justify-center">
                 {MOOD_OPTIONS.map((mood) => {
                   const isActive = currentMood === mood.label;
@@ -185,25 +185,25 @@ export default function Dashboard() {
         </section>
 
         {/* Recent Moments */}
-        <section className="flex flex-col gap-8">
-          <div className="flex justify-between items-end">
-            <h2 className="font-serif text-2xl md:text-3xl text-on-surface dark:text-[#ede0df]">Momen Terakhir</h2>
+        <GlassCard className="flex flex-col gap-6 md:gap-8 p-4 md:p-8">
+          <div className="flex justify-between items-center border-b border-outline-variant/30 dark:border-white/10 pb-4">
+            <h2 className="font-serif text-xl md:text-2xl text-on-surface dark:text-[#ede0df]">Momen Terakhir</h2>
             <Link
               to="/momen"
-              className="font-sans text-xs font-semibold text-primary dark:text-rose-300 hover:text-on-surface transition-colors flex items-center gap-1"
+              className="font-sans text-xs font-semibold text-primary dark:text-rose-300 hover:text-on-surface transition-colors flex items-center gap-1 bg-primary-container/30 dark:bg-primary-container/10 px-3 py-1.5 rounded-full"
             >
               Lihat Semua <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
             </Link>
           </div>
           {loading ? (
-            <p className="text-center text-on-surface-variant dark:text-zinc-500 py-12 font-serif italic">Memuat momen...</p>
+            <p className="text-center text-on-surface-variant dark:text-zinc-500 py-8 font-serif italic">Memuat momen...</p>
           ) : moments.length === 0 ? (
-            <div className="text-center py-12">
-              <span className="material-symbols-outlined text-5xl text-outline-variant dark:text-zinc-700 mb-4 block">photo_camera</span>
-              <p className="text-on-surface-variant dark:text-zinc-500 font-serif italic">Belum ada momen. Yuk buat yang pertama!</p>
+            <div className="text-center py-8">
+              <span className="material-symbols-outlined text-4xl text-outline-variant dark:text-zinc-700 mb-3 block">photo_camera</span>
+              <p className="text-sm text-on-surface-variant dark:text-zinc-500 font-serif italic">Belum ada momen. Yuk buat yang pertama!</p>
             </div>
           ) : (
-            <div className="flex overflow-x-auto gap-6 pb-8 hide-scrollbar -mx-4 px-4">
+            <div className="flex overflow-x-auto gap-4 md:gap-6 pb-4 hide-scrollbar">
               {moments.map((moment) => (
                 <MomentCard
                   key={moment.id}
@@ -215,7 +215,7 @@ export default function Dashboard() {
               ))}
             </div>
           )}
-        </section>
+        </GlassCard>
       </div>
     </MainLayout>
   );
