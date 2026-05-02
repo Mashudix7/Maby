@@ -56,7 +56,8 @@ export default function CoupleSetup() {
       <div className="fixed w-80 h-80 bg-secondary-container rounded-full blur-[80px] opacity-30 bottom-20 left-10 pointer-events-none" />
 
       <div className="w-full max-w-lg">
-        <div className="text-center mb-10">
+        <div className="text-center mb-10 flex flex-col items-center">
+          <img src="/logo.jpg" alt="Maby Logo" className="w-24 h-24 rounded-full object-cover shadow-[0_10px_30px_rgba(244,63,94,0.3)] mb-4 border-4 border-white/50 dark:border-white/10" />
           <h1 className="text-4xl font-serif italic text-rose-400 dark:text-rose-300 mb-2">Maby</h1>
           <p className="text-on-surface-variant dark:text-zinc-400 font-serif italic">
             Hubungkan dirimu dengan pasanganmu 💗
