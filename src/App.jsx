@@ -3,7 +3,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
-import CoupleSetup from './pages/CoupleSetup';
+
 import Dashboard from './pages/Dashboard';
 import FactsAboutUs from './pages/FactsAboutUs';
 import StolenMoments from './pages/StolenMoments';
@@ -22,7 +22,7 @@ export default function App() {
           <Routes>
             {/* Public routes */}
             <Route path="/login" element={<Login />} />
-            <Route path="/couple-setup" element={<CoupleSetup />} />
+
 
             {/* Protected routes */}
             <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />

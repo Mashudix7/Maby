@@ -21,12 +21,31 @@ export function AuthProvider({ children }) {
       setProfile(prof);
 
       // Fetch couple membership
-      const { data: membership } = await supabase
+      let { data: membership } = await supabase
         .from('couple_members')
         .select('couple_id')
         .eq('user_id', userId)
         .single();
-      setCoupleId(membership?.couple_id || null);
+        
+      let finalCoupleId = membership?.couple_id;
+
+      // AUTO-COUPLE LOGIC FOR MABY
+      if (!finalCoupleId) {
+         const { data: existingCouples } = await supabase.from('couples').select('id').limit(1);
+         if (existingCouples && existingCouples.length > 0) {
+            const cId = existingCouples[0].id;
+            await supabase.from('couple_members').insert({ user_id: userId, couple_id: cId });
+            finalCoupleId = cId;
+         } else {
+            const { data: newCouple } = await supabase.from('couples').insert({}).select('id').single();
+            if (newCouple) {
+              await supabase.from('couple_members').insert({ user_id: userId, couple_id: newCouple.id });
+              finalCoupleId = newCouple.id;
+            }
+         }
+      }
+
+      setCoupleId(finalCoupleId || null);
     } catch (err) {
       console.error('Error loading user data:', err);
     }

@@ -20,7 +20,14 @@ export default function ProtectedRoute({ children }) {
   }
 
   if (!coupleId) {
-    return <Navigate to="/couple-setup" replace />;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background dark:bg-[#1a1517]">
+        <div className="text-center">
+          <span className="material-symbols-outlined text-5xl text-rose-400 animate-pulse">favorite</span>
+          <p className="mt-4 font-serif italic text-on-surface-variant dark:text-zinc-400">Menyiapkan Ruang...</p>
+        </div>
+      </div>
+    );
   }
 
   return children;

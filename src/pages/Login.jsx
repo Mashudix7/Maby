@@ -11,7 +11,6 @@ export default function Login() {
 
   // Redirect if already logged in
   if (user && coupleId) return <Navigate to="/" replace />;
-  if (user && !coupleId) return <Navigate to="/couple-setup" replace />;
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -20,7 +19,7 @@ export default function Login() {
     
     // Konversi nama menjadi email dummy untuk Supabase Auth
     const email = `${name}@ourspace.com`;
-    const displayName = name === 'feby' ? 'Feby' : 'Mashudi';
+    const displayName = name === 'feby' ? 'Feby Zahara' : 'Mashudi';
 
     try {
       // Coba login
@@ -76,7 +75,7 @@ export default function Login() {
                 onChange={(e) => setName(e.target.value)}
                 className="glass-input cursor-pointer"
               >
-                <option value="feby">Feby 🌸</option>
+                <option value="feby">Feby Zahara 🌸</option>
                 <option value="mashudi">Mashudi 🗿</option>
               </select>
             </div>
