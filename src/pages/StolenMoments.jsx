@@ -145,7 +145,7 @@ export default function StolenMoments() {
         {!loading && (
           <Link
             to="/momen/baru"
-            className="fixed bottom-8 right-8 w-14 h-14 bg-gradient-to-br from-primary to-secondary text-on-primary rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform active:scale-95 z-50 md:bottom-10 md:right-10 group"
+            className="fixed bottom-28 right-6 md:bottom-10 md:right-10 w-14 h-14 bg-gradient-to-br from-primary to-secondary text-on-primary rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform active:scale-95 z-50 group"
           >
             <span className="material-symbols-outlined text-3xl transition-transform group-hover:rotate-90">add</span>
           </Link>
