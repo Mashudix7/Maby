@@ -99,6 +99,7 @@ export default function Dashboard() {
   }, [coupleId, user]);
 
   const handleSetMood = async (moodLabel) => {
+    if (currentMood) return; // Mood already set for today
     setCurrentMood(moodLabel);
     try {
       await setMoodToday(coupleId, user.uid, moodLabel);
@@ -225,9 +226,12 @@ export default function Dashboard() {
                   <button
                     key={mood.emoji}
                     onClick={() => handleSetMood(mood.label)}
-                    className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl transition-transform hover:scale-110 shadow-sm ${isActive
+                    disabled={!!currentMood}
+                    className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl transition-transform shadow-sm ${isActive
                         ? 'bg-primary-container/50 border border-primary/20 ring-2 ring-primary/30'
-                        : 'bg-white/50 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 border border-white/40 dark:border-white/10'
+                        : currentMood 
+                          ? 'opacity-40 grayscale cursor-not-allowed'
+                          : 'bg-white/50 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 border border-white/40 dark:border-white/10 hover:scale-110'
                       }`}
                   >
                     {mood.emoji}
@@ -235,7 +239,7 @@ export default function Dashboard() {
                 )})}
               </div>
               <p className="font-sans text-xs font-semibold text-outline dark:text-zinc-500 mt-6 h-4">
-                {currentMood ? `Kamu lagi merasa ${currentMood.toLowerCase()} ${MOOD_OPTIONS.find(m => m.label === currentMood)?.emoji}` : 'Gimana perasaanmu hari ini?'}
+                {currentMood ? `Mood sudah terkunci hari ini: ${currentMood.toLowerCase()} ${MOOD_OPTIONS.find(m => m.label === currentMood)?.emoji}` : 'Gimana perasaanmu hari ini?'}
               </p>
             </GlassCard>
 
