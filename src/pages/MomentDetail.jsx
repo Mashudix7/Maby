@@ -158,7 +158,7 @@ export default function MomentDetail() {
 
 
         {/* Actions */}
-        <div className="flex justify-center gap-4 pt-4">
+        <div className="flex flex-wrap justify-center gap-3 md:gap-4 pt-6 pb-12 px-4">
           <button
             onClick={() => navigate('/momen')}
             className="ghost-btn"

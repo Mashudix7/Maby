@@ -249,7 +249,7 @@ export default function Dashboard() {
           )}
 
           {/* Today's Memory */}
-          <ScrollReveal className="md:col-span-8 glass-panel rounded-2xl md:rounded-[2rem] p-4 md:p-8 flex flex-col relative overflow-hidden group min-h-[280px] md:min-h-[400px]" delay={200}>
+          <ScrollReveal className="md:col-span-8 glass-panel rounded-2xl md:rounded-[2rem] p-4 md:p-8 flex flex-col relative overflow-hidden group min-h-[280px] md:min-h-[400px]" delay={50}>
             {latestMoment?.image_url ? (
               <div className="absolute inset-0 z-0">
                 <img
@@ -284,7 +284,7 @@ export default function Dashboard() {
           </ScrollReveal>
 
           {/* Side Column */}
-          <ScrollReveal className="md:col-span-4 flex flex-col gap-8" delay={400}>
+          <ScrollReveal className="md:col-span-4 flex flex-col gap-8" delay={100}>
             {/* Mood Tracker */}
             <GlassCard className="flex flex-col items-center justify-center text-center p-4 md:p-8">
               <h3 className="font-serif text-xl md:text-2xl text-on-surface dark:text-[#ede0df] mb-4 md:mb-6">{t('dashboard.mood_title')}</h3>
