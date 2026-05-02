@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '../components/layout/MainLayout';
 import { useAuth } from '../context/AuthContext';
-import { createMoment, uploadMomentImage } from '../services/momentService';
+import { createMoment } from '../services/momentService';
 
 export default function AddMoment() {
   const { user, coupleId } = useAuth();
@@ -23,6 +23,43 @@ export default function AddMoment() {
     setImagePreview(URL.createObjectURL(file));
   }
 
+  const compressImage = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const max_size = 800;
+
+          if (width > height) {
+            if (width > max_size) {
+              height *= max_size / width;
+              width = max_size;
+            }
+          } else {
+            if (height > max_size) {
+              width *= max_size / height;
+              height = max_size;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', 0.6));
+        };
+        img.onerror = error => reject(error);
+      };
+      reader.onerror = error => reject(error);
+    });
+  };
+
   async function handleSubmit(e) {
     e.preventDefault();
     if (!title.trim()) {
@@ -34,7 +71,7 @@ export default function AddMoment() {
     try {
       let imageUrl = '';
       if (imageFile) {
-        imageUrl = await uploadMomentImage(imageFile);
+        imageUrl = await compressImage(imageFile);
       }
       await createMoment(coupleId, user.uid, {
         title: title.trim(),
@@ -160,7 +197,7 @@ export default function AddMoment() {
               {loading ? (
                 <span className="material-symbols-outlined animate-spin">progress_activity</span>
               ) : (
-                <span className="material-symbols-outlined">auto_awesome</span>
+                <span className="material-symbols-outlined">check</span>
               )}
               {loading ? 'Menyimpan...' : 'Simpan Kenangan'}
             </button>

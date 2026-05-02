@@ -1,6 +1,5 @@
-import { db, storage } from '../lib/firebase';
+import { db } from '../lib/firebase';
 import { collection, query, where, getDocs, doc, getDoc, addDoc, deleteDoc, orderBy } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 export async function getMoments(coupleId) {
   try {
@@ -43,12 +42,3 @@ export async function deleteMoment(id) {
   await deleteDoc(doc(db, 'moments', id));
 }
 
-export async function uploadMomentImage(file) {
-  const ext = file.name.split('.').pop();
-  const fileName = `moments/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-  const storageRef = ref(storage, fileName);
-  
-  await uploadBytes(storageRef, file);
-  const url = await getDownloadURL(storageRef);
-  return url;
-}
