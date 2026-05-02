@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import MainLayout from '../components/layout/MainLayout';
 import GlassCard from '../components/ui/GlassCard';
 import MomentCard, { MomentCardSkeleton } from '../components/ui/MomentCard';
@@ -134,16 +134,16 @@ export default function Dashboard() {
     };
   }, [coupleId, user, t]);
 
-  const handleSendNudge = async () => {
+  const handleSendNudge = useCallback(async () => {
     const success = await sendNudge(coupleId, user.uid);
     if (success) {
       showSuccess(t, t('sweetalert.success_title'), t('streak.remind_button'));
     } else {
       showError(t, t('sweetalert.error_title'), t('sweetalert.error_text'));
     }
-  };
+  }, [coupleId, user?.uid, t]);
 
-  const handleSetMood = async (moodLabel) => {
+  const handleSetMood = useCallback(async (moodLabel) => {
     if (currentMood) return; // Mood already set for today
     setCurrentMood(moodLabel);
     try {
@@ -151,7 +151,7 @@ export default function Dashboard() {
     } catch (err) {
       console.error('Gagal menyimpan mood', err);
     }
-  };
+  }, [currentMood, coupleId, user?.uid]);
 
   const latestMoment = moments[0];
 
