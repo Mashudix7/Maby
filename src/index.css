@@ -246,19 +246,20 @@
 
 @layer utilities {
   .page-transition {
-    animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: slideFadeIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    will-change: transform, opacity;
   }
 
   .reveal {
     opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(20px) scale(0.98);
+    transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
     will-change: opacity, transform;
   }
 
   .reveal.active {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 
   .skeleton {
@@ -268,7 +269,7 @@
       rgba(0, 0, 0, 0.05) 75%
     );
     background-size: 200% 100%;
-    animation: skeleton-loading 1.5s infinite ease-in-out;
+    animation: skeleton-loading 1.5s infinite linear;
   }
 
   .dark .skeleton {
@@ -278,6 +279,24 @@
       rgba(255, 255, 255, 0.05) 75%
     );
     background-size: 200% 100%;
+  }
+
+  /* Force Hardware Acceleration */
+  .gpu-accel {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+}
+
+@keyframes slideFadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(10px) scale(0.99);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0) scale(1);
   }
 }
 

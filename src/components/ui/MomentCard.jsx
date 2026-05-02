@@ -1,6 +1,7 @@
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
 
-export function MomentCardSkeleton() {
+export const MomentCardSkeleton = memo(function MomentCardSkeleton() {
   return (
     <div className="w-[240px] md:w-[320px] bg-white/80 dark:bg-white/10 backdrop-blur-xl rounded-3xl p-3 md:p-4 flex flex-col gap-3 shrink-0 border border-white/40 dark:border-white/5">
       <div className="relative h-[200px] rounded-xl overflow-hidden skeleton" />
@@ -10,9 +11,9 @@ export function MomentCardSkeleton() {
       </div>
     </div>
   );
-}
+});
 
-export default function MomentCard({ id, image, date, title, alt = '' }) {
+export const MomentCard = memo(function MomentCard({ id, image, date, title, alt = '' }) {
   return (
     <Link
       to={`/momen/${id || '1'}`}
@@ -35,4 +36,6 @@ export default function MomentCard({ id, image, date, title, alt = '' }) {
       </div>
     </Link>
   );
-}
+});
+
+export default MomentCard;
