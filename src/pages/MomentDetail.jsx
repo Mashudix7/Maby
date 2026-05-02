@@ -10,6 +10,7 @@ export default function MomentDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isFavorite, setIsFavorite] = useState(false);
+  const [isZoomed, setIsZoomed] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -24,6 +25,17 @@ export default function MomentDetail() {
       })
       .finally(() => setLoading(false));
   }, [id]);
+
+  useEffect(() => {
+    if (isZoomed) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isZoomed]);
 
   async function handleDelete() {
     if (!window.confirm('Yakin ingin menghapus momen ini?')) return;
@@ -72,8 +84,15 @@ export default function MomentDetail() {
       <div className="max-w-[900px] mx-auto">
         {/* Hero Image */}
         {moment.image_url && (
-          <section className="relative w-full h-[280px] md:h-[500px] rounded-2xl md:rounded-[2rem] overflow-hidden mb-8 md:mb-10 shadow-[0_20px_40px_rgba(74,69,69,0.05)]">
-            <img alt={moment.title} className="w-full h-full object-cover" src={moment.image_url} />
+          <section 
+            onClick={() => setIsZoomed(true)}
+            className="relative w-full h-[280px] md:h-[500px] rounded-2xl md:rounded-[2rem] overflow-hidden mb-8 md:mb-10 shadow-[0_20px_40px_rgba(74,69,69,0.05)] cursor-zoom-in group"
+          >
+            <img 
+              alt={moment.title} 
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+              src={moment.image_url} 
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             <div className="absolute bottom-6 md:bottom-12 left-6 md:left-12 text-white">
               <div className="flex items-center gap-3 mb-4 flex-wrap">
@@ -89,6 +108,11 @@ export default function MomentDetail() {
                 )}
               </div>
               <h1 className="font-serif text-2xl md:text-5xl text-white">{moment.title}</h1>
+            </div>
+            
+            {/* Zoom Icon Hint */}
+            <div className="absolute top-6 right-6 w-10 h-10 rounded-full bg-black/20 backdrop-blur-md flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="material-symbols-outlined text-[20px]">fullscreen</span>
             </div>
           </section>
         )}
@@ -153,6 +177,33 @@ export default function MomentDetail() {
           </button>
         </div>
       </div>
+
+      {/* Zoom Modal Overlay */}
+      {isZoomed && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 md:p-10 transition-all duration-300 animate-in fade-in"
+          onClick={() => setIsZoomed(false)}
+        >
+          <button 
+            className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+            onClick={(e) => { e.stopPropagation(); setIsZoomed(false); }}
+          >
+            <span className="material-symbols-outlined">close</span>
+          </button>
+          
+          <img 
+            src={moment.image_url} 
+            alt={moment.title} 
+            className="max-w-full max-h-full object-contain rounded-lg shadow-2xl animate-in zoom-in-95 duration-300"
+            onClick={(e) => e.stopPropagation()}
+          />
+
+          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/60 text-sm font-sans flex items-center gap-2 bg-black/40 px-4 py-2 rounded-full backdrop-blur-md">
+            <span className="material-symbols-outlined text-[16px]">touch_app</span>
+            Klik di mana saja untuk menutup
+          </div>
+        </div>
+      )}
     </MainLayout>
   );
 }
