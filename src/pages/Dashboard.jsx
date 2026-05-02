@@ -20,30 +20,23 @@ const MOOD_OPTIONS = [
 function StreakIndicator({ streak, activity }) {
   const { t } = useLanguage();
   const isCompleted = activity?.completed;
-  const showHint = !isCompleted && (activity?.user1_active || activity?.user2_active);
 
   return (
-    <GlassCard className="p-4 md:p-6 flex flex-col items-center text-center gap-2 h-full justify-center">
-      <div className={`w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center mb-1 transition-all duration-700 ${isCompleted ? 'bg-orange-500 text-white shadow-[0_0_25px_rgba(249,115,22,0.5)] scale-110' : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-600'}`}>
-        <span className="material-symbols-outlined text-2xl md:text-3xl" style={isCompleted ? { fontVariationSettings: "'FILL' 1" } : undefined}>
-          local_fire_department
-        </span>
+    <div 
+      title={isCompleted ? t('streak.completed') : t('streak.hint')}
+      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border transition-all duration-700 ${
+        isCompleted 
+          ? 'bg-orange-500/10 border-orange-500/30 text-orange-600 dark:text-orange-400 shadow-[0_0_15px_rgba(249,115,22,0.15)]' 
+          : 'bg-zinc-100 dark:bg-white/5 border-zinc-200 dark:border-white/10 text-zinc-400 dark:text-zinc-500'
+      }`}
+    >
+      <span className="material-symbols-outlined text-[20px]" style={isCompleted ? { fontVariationSettings: "'FILL' 1" } : undefined}>
+        local_fire_department
+      </span>
+      <div className="flex flex-col items-start leading-none">
+        <span className="text-sm font-serif font-bold">{streak} {t('streak.days')}</span>
       </div>
-      <div>
-        <h3 className="font-serif text-xl md:text-2xl text-on-surface dark:text-[#ede0df] leading-none">{streak} {t('streak.days')}</h3>
-        <p className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-outline dark:text-zinc-500 mt-1.5">{t('streak.title')}</p>
-      </div>
-      {showHint && (
-        <p className="text-[9px] text-rose-500 dark:text-rose-400 font-semibold animate-pulse mt-1">
-          {t('streak.hint')}
-        </p>
-      )}
-      {isCompleted && (
-         <p className="text-[9px] text-orange-500 font-bold mt-1">
-           {t('streak.completed')}
-         </p>
-      )}
-    </GlassCard>
+    </div>
   );
 }
 
@@ -180,10 +173,13 @@ export default function Dashboard() {
     <MainLayout activePage="/">
       <div className="max-w-[1140px] mx-auto flex flex-col gap-12 md:gap-20">
         {/* Hero Greeting */}
-        <section className="flex flex-col items-center text-center mt-8">
-          <span className="font-sans text-xs font-semibold tracking-widest uppercase text-primary mb-4">
-            {new Date('2026-02-21').toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
-          </span>
+        <section className="flex flex-col items-center text-center mt-8 px-4">
+          <div className="w-full max-w-lg flex justify-between items-center mb-6">
+            <span className="font-sans text-[10px] font-semibold tracking-widest uppercase text-primary/60">
+              {new Date('2026-02-21').toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
+            </span>
+            <StreakIndicator streak={streakData.total_streak} activity={dailyActivity} />
+          </div>
           <h1 className="font-serif text-3xl md:text-5xl text-on-surface dark:text-[#ede0df] mb-2 md:mb-4">
             {t('dashboard.hai')}, {profile?.display_name || t('dashboard.sayangku')} 👋
           </h1>
@@ -266,9 +262,6 @@ export default function Dashboard() {
 
           {/* Side Column */}
           <div className="md:col-span-4 flex flex-col gap-8">
-            {/* Streak Indicator */}
-            <StreakIndicator streak={streakData.total_streak} activity={dailyActivity} />
-
             {/* Mood Tracker */}
             <GlassCard className="flex flex-col items-center justify-center text-center p-4 md:p-8">
               <h3 className="font-serif text-xl md:text-2xl text-on-surface dark:text-[#ede0df] mb-4 md:mb-6">{t('dashboard.mood_title')}</h3>
