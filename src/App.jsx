@@ -18,6 +18,7 @@ const WishesAffirmations = lazy(() => import('./pages/WishesAffirmations'));
 const DateIdeas = lazy(() => import('./pages/DateIdeas'));
 const RelationshipJourney = lazy(() => import('./pages/RelationshipJourney'));
 const PrivateNotes = lazy(() => import('./pages/PrivateNotes'));
+const Photobooth = lazy(() => import('./pages/Photobooth'));
 
 // Loading component
 const PageLoader = () => (
@@ -68,6 +69,7 @@ export default function App() {
               <Route path="/ide-kencan" element={<ProtectedRoute><DateIdeas /></ProtectedRoute>} />
               <Route path="/perjalanan" element={<ProtectedRoute><RelationshipJourney /></ProtectedRoute>} />
               <Route path="/rahasia" element={<ProtectedRoute><PrivateNotes /></ProtectedRoute>} />
+              <Route path="/photobooth" element={<ProtectedRoute><Photobooth /></ProtectedRoute>} />
             </Routes>
           </Suspense>
         </BrowserRouter>

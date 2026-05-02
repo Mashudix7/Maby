@@ -47,6 +47,13 @@ const Navbar = memo(function Navbar({ activePage = '/' }) {
               {item.label}
             </Link>
           ))}
+          <Link
+            to="/photobooth"
+            className="flex items-center gap-2 bg-gradient-to-r from-primary to-secondary dark:from-rose-500 dark:to-purple-600 text-white px-4 py-2 rounded-full font-bold shadow-md hover:scale-105 active:scale-95 transition-all not-italic"
+          >
+            <span className="material-symbols-outlined text-[18px]">photo_camera</span>
+            Photobooth
+          </Link>
         </nav>
 
         {/* Actions */}

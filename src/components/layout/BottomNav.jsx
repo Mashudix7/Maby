@@ -17,7 +17,40 @@ const BottomNav = memo(function BottomNav({ activePage = '/' }) {
       className="md:hidden fixed left-1/2 -translate-x-1/2 flex items-center justify-around gap-1 z-50 glass-panel backdrop-blur-xl bg-white/70 dark:bg-[#1a1517]/70 w-[calc(100%-2rem)] max-w-sm rounded-2xl px-2 py-2 shadow-[0_20px_40px_rgba(248,215,218,0.2)] dark:shadow-[0_20px_40px_rgba(0,0,0,0.3)]"
       style={{ bottom: 'calc(1.25rem + env(safe-area-inset-bottom, 0px))' }}
     >
-      {navItems.map((item) => {
+      {navItems.slice(0, 2).map((item) => {
+        const isActive = activePage === item.to;
+        return (
+          <Link
+            key={item.to}
+            to={item.to}
+            className={`flex flex-col items-center justify-center flex-1 py-1.5 rounded-xl transition-all duration-300 ${
+              isActive
+                ? 'text-rose-600 dark:text-rose-300 bg-rose-50/60 dark:bg-rose-900/30'
+                : 'text-zinc-400 dark:text-zinc-500 hover:text-rose-400 active:scale-95'
+            }`}
+          >
+            <span
+              className="material-symbols-outlined text-[20px]"
+              style={isActive ? { fontVariationSettings: "'FILL' 1" } : undefined}
+            >
+              {item.icon}
+            </span>
+            <span className={`font-serif text-[10px] italic mt-0.5 ${isActive ? 'font-bold' : ''}`}>
+              {item.label}
+            </span>
+          </Link>
+        );
+      })}
+
+      {/* Central Photobooth Button */}
+      <Link
+        to="/photobooth"
+        className="relative -top-5 w-14 h-14 bg-gradient-to-br from-primary to-secondary dark:from-rose-500 dark:to-purple-600 text-white rounded-full flex items-center justify-center shadow-[0_8px_20px_rgba(225,29,72,0.3)] hover:scale-110 active:scale-95 transition-all shrink-0 border-4 border-background dark:border-[#1a1517] z-10"
+      >
+        <span className="material-symbols-outlined text-[28px]">photo_camera</span>
+      </Link>
+
+      {navItems.slice(2, 4).map((item) => {
         const isActive = activePage === item.to;
         return (
           <Link
