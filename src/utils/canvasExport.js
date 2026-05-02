@@ -34,8 +34,37 @@ export const generatePhotoboothStrip = async (photoUrls, frame) => {
         const x = PADDING;
         const y = PADDING + (index * (PHOTO_HEIGHT + SPACING));
         
-        // Draw image
-        ctx.drawImage(img, x, y, PHOTO_WIDTH, PHOTO_HEIGHT);
+        // Apply versatile beauty filter
+        ctx.filter = 'brightness(1.05) contrast(1.05) saturate(1.1) sepia(0.08)';
+
+        if (frame.clipShape === 'heart') {
+          ctx.save();
+          // Define heart clipping path
+          ctx.beginPath();
+          const cx = x + PHOTO_WIDTH / 2;
+          const cy = y;
+          const w = PHOTO_WIDTH;
+          const h = PHOTO_HEIGHT;
+          
+          ctx.translate(cx, cy);
+          ctx.moveTo(0, h/4);
+          ctx.bezierCurveTo(0, 0, -w/2, 0, -w/2, h/4);
+          ctx.bezierCurveTo(-w/2, h/2, 0, h*3/4, 0, h*0.85); // Pointed bottom
+          ctx.bezierCurveTo(0, h*3/4, w/2, h/2, w/2, h/4);
+          ctx.bezierCurveTo(w/2, 0, 0, 0, 0, h/4);
+          ctx.clip();
+          
+          // Reset transform so image draws in correct absolute coords
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.drawImage(img, x, y, PHOTO_WIDTH, PHOTO_HEIGHT);
+          ctx.restore();
+        } else {
+          // Normal rectangular draw
+          ctx.drawImage(img, x, y, PHOTO_WIDTH, PHOTO_HEIGHT);
+        }
+        
+        // Reset filter for subsequent drawings (like frame text)
+        ctx.filter = 'none';
         
         // Draw inner border/shadow if needed
         if (frame.id === 'polaroid-stack') {

@@ -90,35 +90,30 @@ export default function Photobooth() {
     return canvas.toDataURL('image/jpeg', 0.9);
   };
 
-  const startCaptureSequence = async () => {
+  const startCaptureSingle = async () => {
     setIsCapturing(true);
-    setPhotos([]);
-    let captured = [];
     
-    for (let shot = 1; shot <= TOTAL_SHOTS; shot++) {
-      setCurrentShot(shot);
-      
-      // Countdown
-      for (let i = timerDuration; i > 0; i--) {
-        setCountdown(i);
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }
-      setCountdown(null);
-      
-      // Capture
-      const photoUrl = takePhoto();
-      if (photoUrl) {
-        captured.push(photoUrl);
-        setPhotos([...captured]);
-      }
-      
-      // Short pause between shots
-      if (shot < TOTAL_SHOTS) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-      }
+    // Countdown
+    for (let i = timerDuration; i > 0; i--) {
+      setCountdown(i);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    setCountdown(null);
+    
+    // Capture
+    const photoUrl = takePhoto();
+    if (photoUrl) {
+      setPhotos(prev => [...prev, photoUrl]);
     }
     
     setIsCapturing(false);
+  };
+
+  const removeLastPhoto = () => {
+    setPhotos(prev => prev.slice(0, -1));
+  };
+
+  const handleNext = () => {
     setMode('preview');
   };
 
@@ -178,6 +173,7 @@ export default function Photobooth() {
           playsInline 
           muted 
           className={`h-full w-full object-cover ${facingMode === 'user' ? 'scale-x-[-1]' : ''}`}
+          style={{ filter: 'brightness(1.05) contrast(1.05) saturate(1.1) sepia(0.08)' }}
         />
         
         {/* Countdown Overlay */}
@@ -190,31 +186,59 @@ export default function Photobooth() {
         )}
 
         {/* Shot Progress Indicator */}
-        {isCapturing && (
-          <div className="absolute top-20 w-full flex justify-center gap-2 z-20">
-            {Array.from({ length: TOTAL_SHOTS }).map((_, idx) => (
-              <div 
-                key={idx} 
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  idx < photos.length ? 'bg-primary scale-110' : 
-                  idx === currentShot - 1 ? 'bg-white scale-125 animate-pulse' : 'bg-white/30'
-                }`}
-              />
-            ))}
-          </div>
-        )}
+        <div className="absolute top-20 w-full flex justify-center gap-2 z-20">
+          {Array.from({ length: TOTAL_SHOTS }).map((_, idx) => (
+            <div 
+              key={idx} 
+              className={`w-3 h-3 rounded-full transition-all duration-300 shadow-sm ${
+                idx < photos.length ? 'bg-primary' : 'bg-white/40 backdrop-blur-sm'
+              }`}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Bottom Controls */}
-      <div className="h-32 bg-black pb-safe-bottom flex items-center justify-center relative z-20">
-        {!isCapturing && (
-          <button 
-            onClick={startCaptureSequence}
-            className="w-20 h-20 rounded-full border-4 border-white flex items-center justify-center p-1 active:scale-95 transition-transform"
-          >
-            <div className="w-full h-full rounded-full bg-white hover:bg-zinc-200 transition-colors" />
-          </button>
+      <div className="h-48 bg-black pb-safe-bottom flex flex-col items-center justify-center relative z-20 gap-4 pt-4">
+        {/* Thumbnails */}
+        {photos.length > 0 && !isCapturing && (
+          <div className="flex gap-3 h-20 items-center justify-center">
+            {photos.map((url, idx) => (
+              <div key={idx} className="relative w-12 h-16 rounded border-2 border-white/80 overflow-visible shadow-md">
+                <img src={url} alt={`Shot ${idx+1}`} className="w-full h-full object-cover rounded-[2px]" style={{ filter: 'brightness(1.05) contrast(1.05) saturate(1.1) sepia(0.08)' }} />
+                {idx === photos.length - 1 && (
+                  <button 
+                    onClick={removeLastPhoto}
+                    className="absolute -top-3 -right-3 w-6 h-6 bg-rose-500 rounded-full flex items-center justify-center text-white shadow-lg hover:scale-110 transition-transform z-10"
+                  >
+                    <span className="material-symbols-outlined text-[14px]">close</span>
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
         )}
+
+        {/* Shutter / Next Button */}
+        <div className="flex items-center justify-center h-20">
+          {photos.length < TOTAL_SHOTS && !isCapturing && (
+            <button 
+              onClick={startCaptureSingle}
+              className="w-16 h-16 rounded-full border-4 border-white flex items-center justify-center p-1 active:scale-95 transition-transform"
+            >
+              <div className="w-full h-full rounded-full bg-white hover:bg-zinc-200 transition-colors" />
+            </button>
+          )}
+
+          {photos.length === TOTAL_SHOTS && !isCapturing && (
+            <button 
+              onClick={handleNext}
+              className="bg-primary text-white px-8 py-3 rounded-full font-bold shadow-[0_0_20px_rgba(225,29,72,0.5)] animate-pulse hover:scale-105 active:scale-95 transition-all"
+            >
+              Lanjut
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
