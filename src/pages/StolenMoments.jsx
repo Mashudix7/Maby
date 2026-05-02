@@ -97,7 +97,6 @@ export default function StolenMoments() {
   return (
     <MainLayout activePage="/momen" fab={fab}>
       <div className="max-w-[1140px] mx-auto">
-        {/* Header */}
         <div className="text-center mb-10 md:mb-16 flex flex-col items-center">
           <span className="font-sans text-xs font-semibold text-on-surface-variant dark:text-zinc-500 uppercase tracking-widest mb-4 inline-flex items-center gap-2">
             <span className="material-symbols-outlined text-[16px] text-primary dark:text-rose-300">favorite</span>
@@ -109,7 +108,6 @@ export default function StolenMoments() {
           </p>
         </div>
 
-        {/* Search & Filter */}
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <div className="flex-1 relative">
             <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant dark:text-zinc-500">search</span>
@@ -138,7 +136,6 @@ export default function StolenMoments() {
           </div>
         </div>
 
-        {/* Content */}
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
             {[...Array(6)].map((_, i) => <MomentGridSkeleton key={i} />)}
