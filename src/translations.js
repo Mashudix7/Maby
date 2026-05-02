@@ -74,8 +74,8 @@ export const translations = {
       request_text: 'Dapatkan pemberitahuan saat pasanganmu mengirim harapan!',
       allow: 'Izinkan',
       denied: 'Notifikasi diblokir. Silakan aktifkan di pengaturan browser.',
-      new_wish_title: 'Harapan Baru!',
-      new_wish_body: 'Pasanganmu baru saja mengirim harapan buat kamu 💕',
+      streak_reminder_title: 'Ingat Streak Kita! 🔥',
+      streak_reminder_body: 'Pasanganmu sudah kirim harapan. Ayo kirim balik biar streak bertambah!',
     },
     moments: {
       title: 'Momen Indah Bersamamu',
@@ -243,8 +243,8 @@ export const translations = {
       request_text: 'Get notified when your partner sends a wish!',
       allow: 'Allow',
       denied: 'Notifications blocked. Please enable them in browser settings.',
-      new_wish_title: 'New Wish!',
-      new_wish_body: 'Your partner just sent you a wish 💕',
+      streak_reminder_title: 'Our Streak! 🔥',
+      streak_reminder_body: 'Your partner has sent a wish. Send one back to increase the streak!',
     },
     moments: {
       title: 'Beautiful Moments Together',

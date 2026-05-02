@@ -139,16 +139,6 @@ export default function Dashboard() {
     };
   }, [coupleId, user, t]);
 
-  const handleTestNotification = async () => {
-    const { requestNotificationPermission, showLocalNotification } = await import('../services/notificationService');
-    const granted = await requestNotificationPermission(t);
-    if (granted) {
-      showLocalNotification(t('notifications.new_wish_title'), t('notifications.new_wish_body'));
-    } else {
-      alert(t('notifications.denied'));
-    }
-  };
-
   const handleSetMood = async (moodLabel) => {
     if (currentMood) return; // Mood already set for today
     setCurrentMood(moodLabel);
@@ -337,28 +327,6 @@ export default function Dashboard() {
                 </div>
               </GlassCard>
             )}
-
-            {/* Notification Settings / Guide */}
-            <GlassCard className="p-4 md:p-6 flex flex-col gap-4">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary dark:text-rose-300 text-sm">notifications_active</span>
-                <span className="font-sans text-[10px] font-bold uppercase tracking-wider text-outline dark:text-zinc-500">Notifications</span>
-              </div>
-              
-              <button 
-                onClick={handleTestNotification}
-                className="w-full py-2 px-4 rounded-xl border border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary dark:text-rose-300 text-xs font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer relative z-10"
-              >
-                <span className="material-symbols-outlined text-[16px]">notifications</span>
-                Test Notification
-              </button>
-
-              <div className="pt-2 border-t border-outline-variant/30 dark:border-white/5">
-                <p className="text-[9px] text-on-surface-variant dark:text-zinc-500 leading-relaxed italic">
-                  * Untuk iPhone/iOS: Klik <span className="material-symbols-outlined text-[12px] align-middle">share</span> lalu "Add to Home Screen" agar notifikasi aktif.
-                </p>
-              </div>
-            </GlassCard>
           </div>
         </section>
 

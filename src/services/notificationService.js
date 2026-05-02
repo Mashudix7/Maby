@@ -62,8 +62,8 @@ export const listenForPartnerWishes = (coupleId, userId, t) => {
         // Notify only if it's from the partner
         if (wish.user_id !== userId) {
           showLocalNotification(
-            t('notifications.new_wish_title'),
-            t('notifications.new_wish_body')
+            t('notifications.streak_reminder_title'),
+            t('notifications.streak_reminder_body')
           );
         }
       }
