@@ -19,19 +19,32 @@ export function AuthProvider({ children }) {
       let userData = null;
       const FIXED_COUPLE_ID = 'maby-space-1';
 
-      const defaultName = firebaseUser.email?.includes('feby') ? 'Feby Zahara' : 'Mashudi';
+      const isFeby = firebaseUser.email?.includes('feby');
+      const defaultName = isFeby ? 'Feby Zahara' : 'Mashudi';
+      const defaultAvatar = isFeby ? '/feby.jpg' : '/mashudi.jpg';
 
       if (userSnap.exists()) {
         userData = userSnap.data();
+        let needsUpdate = false;
+
         // Paksa update jika namanya masih 'Pengguna' (akibat bug sebelumnya)
         if (userData.display_name === 'Pengguna' || userData.display_name === 'Aku') {
           userData.display_name = defaultName;
-          await setDoc(userRef, { display_name: defaultName }, { merge: true });
+          needsUpdate = true;
+        }
+
+        if (!userData.avatar_url) {
+          userData.avatar_url = defaultAvatar;
+          needsUpdate = true;
+        }
+
+        if (needsUpdate) {
+          await setDoc(userRef, { display_name: userData.display_name, avatar_url: userData.avatar_url }, { merge: true });
         }
       } else {
         userData = {
           display_name: firebaseUser.displayName || defaultName,
-          avatar_url: '',
+          avatar_url: defaultAvatar,
           couple_id: FIXED_COUPLE_ID
         };
         await setDoc(userRef, userData);

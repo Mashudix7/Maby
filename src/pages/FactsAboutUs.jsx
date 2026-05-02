@@ -28,15 +28,19 @@ export default function FactsAboutUs() {
       const partner = members?.find((m) => m.user_id !== user.uid);
       
       const myDisplayName = user?.displayName || (user?.email?.includes('feby') ? 'Feby Zahara' : 'Mashudi');
+      const myAvatar = myDisplayName.includes('Feby') ? '/feby.jpg' : '/mashudi.jpg';
       
-      setMyProfile(me?.profiles || { display_name: myDisplayName, avatar_url: '' });
+      setMyProfile(me?.profiles || { display_name: myDisplayName, avatar_url: myAvatar });
       
       if (partner?.profiles) {
-        setPartnerProfile(partner.profiles);
+        setPartnerProfile({
+          ...partner.profiles,
+          avatar_url: partner.profiles.avatar_url || (myDisplayName.includes('Feby') ? '/mashudi.jpg' : '/feby.jpg')
+        });
       } else {
         // Fallback for Maby if partner hasn't logged in yet
         const partnerName = myDisplayName.toLowerCase().includes('feby') ? 'Mashudi' : 'Feby Zahara';
-        setPartnerProfile({ display_name: partnerName, avatar_url: '' });
+        setPartnerProfile({ display_name: partnerName, avatar_url: partnerName.includes('Feby') ? '/feby.jpg' : '/mashudi.jpg' });
       }
 
       // Get all facts for this couple
