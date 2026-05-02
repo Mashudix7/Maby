@@ -102,7 +102,6 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [currentMood, setCurrentMood] = useState(null);
   const [latestWish, setLatestWish] = useState(null);
-  const [onThisDayMoments, setOnThisDayMoments] = useState([]);
   const [streakData, setStreakData] = useState({ total_streak: 0 });
   const [dailyActivity, setDailyActivity] = useState(null);
 
@@ -112,15 +111,6 @@ export default function Dashboard() {
     getMoments(coupleId)
       .then((data) => {
         setMoments(data.slice(0, 3));
-        const today = new Date();
-        const otd = data.filter(m => {
-          if (!m.date) return false;
-          const mDate = new Date(m.date);
-          return mDate.getDate() === today.getDate() && 
-                 mDate.getMonth() === today.getMonth() && 
-                 mDate.getFullYear() !== today.getFullYear();
-        });
-        setOnThisDayMoments(otd);
       })
       .catch((err) => console.error('Gagal memuat momen:', err))
       .finally(() => setLoading(false));
@@ -218,36 +208,6 @@ export default function Dashboard() {
         {/* Bento Grid Layout */}
         <section className="grid grid-cols-1 md:grid-cols-12 gap-8">
           
-          {/* On This Day (If exists) */}
-          {onThisDayMoments.length > 0 && (
-            <div className="md:col-span-12 glass-panel bg-gradient-to-r from-rose-50 to-orange-50 dark:from-[#322024] dark:to-[#38221b] border-rose-200 dark:border-rose-900/50 rounded-2xl md:rounded-[2rem] p-4 md:p-6 shadow-sm">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="material-symbols-outlined text-rose-500">history</span>
-                <h3 className="font-serif text-lg text-rose-800 dark:text-rose-200">{t('dashboard.on_this_day')}</h3>
-              </div>
-              <div className="flex overflow-x-auto gap-4 hide-scrollbar">
-                {onThisDayMoments.map(m => {
-                  const yearsAgo = new Date().getFullYear() - new Date(m.date).getFullYear();
-                  return (
-                    <Link key={m.id} to={`/momen/${m.id}`} className="flex-shrink-0 w-[240px] bg-white/60 dark:bg-black/20 rounded-xl p-3 flex gap-3 items-center group">
-                      {m.image_url ? (
-                        <img src={m.image_url} alt="" className="w-16 h-16 rounded-lg object-cover" loading="lazy" />
-                      ) : (
-                        <div className="w-16 h-16 rounded-lg bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center">
-                          <span className="material-symbols-outlined text-rose-300">photo</span>
-                        </div>
-                      )}
-                      <div>
-                        <p className="text-[10px] font-bold text-rose-500 uppercase tracking-wider">{yearsAgo} {t('dashboard.years_ago')}</p>
-                        <p className="font-serif text-sm text-on-surface dark:text-[#ede0df] line-clamp-2 group-hover:text-rose-500 transition-colors">{m.title}</p>
-                      </div>
-                    </Link>
-                  )
-                })}
-              </div>
-            </div>
-          )}
-
           {/* Today's Memory */}
           <ScrollReveal className="md:col-span-8 glass-panel rounded-2xl md:rounded-[2rem] p-4 md:p-8 flex flex-col relative overflow-hidden group min-h-[280px] md:min-h-[400px]" delay={50}>
             {latestMoment?.image_url ? (
@@ -354,7 +314,7 @@ export default function Dashboard() {
         </section>
 
         {/* Recent Moments */}
-        <GlassCard className="flex flex-col gap-6 md:gap-8 p-4 md:p-8">
+        <GlassCard className="flex flex-col gap-4 md:gap-6 p-4 md:p-6">
           <div className="flex justify-between items-center border-b border-outline-variant/30 dark:border-white/10 pb-4">
             <h2 className="font-serif text-xl md:text-2xl text-on-surface dark:text-[#ede0df]">{t('dashboard.see_all')}</h2>
             <Link

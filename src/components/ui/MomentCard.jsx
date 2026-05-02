@@ -19,7 +19,7 @@ export const MomentCard = memo(function MomentCard({ id, image, date, title, alt
       to={`/momen/${id || '1'}`}
       className="w-[240px] md:w-[320px] bg-white/80 dark:bg-white/10 backdrop-blur-xl rounded-3xl p-3 md:p-4 flex flex-col gap-3 shrink-0 group block border border-white/40 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.2)]"
     >
-      <div className="relative h-[200px] rounded-xl overflow-hidden">
+      <div className="relative h-[180px] rounded-xl overflow-hidden">
         <img
           alt={alt || title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
