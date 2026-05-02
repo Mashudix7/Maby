@@ -19,10 +19,16 @@ export function AuthProvider({ children }) {
       let userData = null;
       const FIXED_COUPLE_ID = 'maby-space-1';
 
+      const defaultName = firebaseUser.email?.includes('feby') ? 'Feby Zahara' : 'Mashudi';
+
       if (userSnap.exists()) {
         userData = userSnap.data();
+        // Paksa update jika namanya masih 'Pengguna' (akibat bug sebelumnya)
+        if (userData.display_name === 'Pengguna' || userData.display_name === 'Aku') {
+          userData.display_name = defaultName;
+          await setDoc(userRef, { display_name: defaultName }, { merge: true });
+        }
       } else {
-        const defaultName = firebaseUser.email?.includes('feby') ? 'Feby Zahara' : 'Mashudi';
         userData = {
           display_name: firebaseUser.displayName || defaultName,
           avatar_url: '',
