@@ -11,6 +11,8 @@ export default function MomentCard({ id, image, date, title, alt = '' }) {
           alt={alt || title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           src={image}
+          loading="lazy"
+          fetchpriority="low"
         />
       </div>
       <div className="px-1 pb-1">

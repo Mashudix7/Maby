@@ -161,7 +161,7 @@ export default function Dashboard() {
                   return (
                     <Link key={m.id} to={`/momen/${m.id}`} className="flex-shrink-0 w-[240px] bg-white/60 dark:bg-black/20 rounded-xl p-3 flex gap-3 items-center group">
                       {m.image_url ? (
-                        <img src={m.image_url} alt="" className="w-16 h-16 rounded-lg object-cover" />
+                        <img src={m.image_url} alt="" className="w-16 h-16 rounded-lg object-cover" loading="lazy" />
                       ) : (
                         <div className="w-16 h-16 rounded-lg bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center">
                           <span className="material-symbols-outlined text-rose-300">photo</span>
@@ -186,6 +186,7 @@ export default function Dashboard() {
                   alt="Kenangan Terakhir"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-60"
                   src={latestMoment.image_url}
+                  loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-surface-container-low/90 via-surface-container-low/40 to-transparent" />
               </div>
