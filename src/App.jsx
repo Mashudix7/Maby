@@ -13,7 +13,6 @@ import StolenMoments from './pages/StolenMoments';
 import MomentDetail from './pages/MomentDetail';
 import AddMoment from './pages/AddMoment';
 import WishesAffirmations from './pages/WishesAffirmations';
-import InteractiveMap from './pages/InteractiveMap';
 import DateIdeas from './pages/DateIdeas';
 import RelationshipJourney from './pages/RelationshipJourney';
 
@@ -45,7 +44,6 @@ export default function App() {
             <Route path="/momen/baru" element={<ProtectedRoute><AddMoment /></ProtectedRoute>} />
             <Route path="/momen/:id" element={<ProtectedRoute><MomentDetail /></ProtectedRoute>} />
             <Route path="/harapan" element={<ProtectedRoute><WishesAffirmations /></ProtectedRoute>} />
-            <Route path="/peta" element={<ProtectedRoute><InteractiveMap /></ProtectedRoute>} />
             <Route path="/ide-kencan" element={<ProtectedRoute><DateIdeas /></ProtectedRoute>} />
             <Route path="/perjalanan" element={<ProtectedRoute><RelationshipJourney /></ProtectedRoute>} />
           </Routes>
