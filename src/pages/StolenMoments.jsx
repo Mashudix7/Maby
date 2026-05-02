@@ -8,6 +8,8 @@ export default function StolenMoments() {
   const { coupleId } = useAuth();
   const [moments, setMoments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     if (!coupleId) return;
@@ -16,6 +18,18 @@ export default function StolenMoments() {
       .catch((err) => console.error('Gagal memuat momen:', err))
       .finally(() => setLoading(false));
   }, [coupleId]);
+
+  const filteredMoments = moments.filter(m => {
+    if (activeTab === 'favorite' && !m.is_favorite) return false;
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const titleMatch = m.title?.toLowerCase().includes(q);
+      const storyMatch = m.story?.toLowerCase().includes(q);
+      const locationMatch = m.location?.toLowerCase().includes(q);
+      if (!titleMatch && !storyMatch && !locationMatch) return false;
+    }
+    return true;
+  });
 
   return (
     <MainLayout activePage="/momen">
@@ -30,6 +44,35 @@ export default function StolenMoments() {
           <p className="text-lg text-on-surface-variant dark:text-zinc-400 max-w-2xl mx-auto opacity-80">
             Kumpulan hal-hal kecil yang berarti segalanya.
           </p>
+        </div>
+
+        {/* Search & Filter */}
+        <div className="flex flex-col md:flex-row gap-4 mb-8">
+          <div className="flex-1 relative">
+            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant dark:text-zinc-500">search</span>
+            <input
+              type="text"
+              placeholder="Cari kata di judul, cerita, atau lokasi..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 bg-white/50 dark:bg-[#1e1a1b]/50 border border-outline-variant/30 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all text-on-surface dark:text-[#ede0df]"
+            />
+          </div>
+          <div className="flex bg-white/50 dark:bg-[#1e1a1b]/50 rounded-2xl p-1 border border-outline-variant/30 dark:border-white/10 shrink-0">
+            <button
+              onClick={() => setActiveTab('all')}
+              className={`px-6 py-2 rounded-xl text-sm font-semibold transition-all ${activeTab === 'all' ? 'bg-primary text-on-primary shadow-sm' : 'text-on-surface-variant dark:text-zinc-400 hover:text-primary dark:hover:text-rose-300'}`}
+            >
+              Semua
+            </button>
+            <button
+              onClick={() => setActiveTab('favorite')}
+              className={`px-6 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-1 ${activeTab === 'favorite' ? 'bg-rose-500 text-white shadow-sm' : 'text-on-surface-variant dark:text-zinc-400 hover:text-rose-500'}`}
+            >
+              <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
+              Favorit
+            </button>
+          </div>
         </div>
 
         {/* Content */}
@@ -47,9 +90,16 @@ export default function StolenMoments() {
               Tambah Momen Pertama
             </Link>
           </div>
+        ) : filteredMoments.length === 0 ? (
+          <div className="text-center py-20">
+            <span className="material-symbols-outlined text-5xl text-outline-variant dark:text-zinc-700 mb-4 block">search_off</span>
+            <p className="text-on-surface-variant dark:text-zinc-500 font-serif italic text-lg mb-6">
+              Tidak ada momen yang cocok dengan pencarianmu.
+            </p>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
-            {moments.map((moment) => (
+            {filteredMoments.map((moment) => (
               <Link
                 key={moment.id}
                 to={`/momen/${moment.id}`}
@@ -76,7 +126,12 @@ export default function StolenMoments() {
                       {new Date(moment.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </time>
                   )}
-                  <h3 className="font-serif text-xl text-primary dark:text-rose-300 italic">{moment.title}</h3>
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="font-serif text-xl text-primary dark:text-rose-300 italic">{moment.title}</h3>
+                    {moment.is_favorite && (
+                      <span className="material-symbols-outlined text-rose-500 text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
+                    )}
+                  </div>
                   {moment.story && (
                     <p className="text-sm text-on-surface-variant dark:text-zinc-400 mt-2 line-clamp-2">{moment.story}</p>
                   )}

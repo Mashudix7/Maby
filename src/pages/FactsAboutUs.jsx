@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import MainLayout from '../components/layout/MainLayout';
 import FactCard from '../components/ui/FactCard';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getFacts, upsertFact, FACT_CATEGORIES } from '../services/factService';
 import { db } from '../lib/firebase';
@@ -133,6 +134,12 @@ export default function FactsAboutUs() {
         <div className="text-center mb-10 md:mb-16 space-y-4">
           <h1 className="font-serif text-3xl md:text-5xl text-primary dark:text-rose-300">Fakta Tentang Kita</h1>
           <p className="text-lg text-on-surface-variant dark:text-zinc-400 font-serif italic">Hal-hal kecil yang bikin kita utuh, tercatat di sini.</p>
+          <div className="flex justify-center pt-2">
+            <Link to="/rahasia" className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-zinc-900 dark:bg-black text-zinc-300 hover:text-white border border-zinc-700 dark:border-zinc-800 transition-colors shadow-sm">
+              <span className="material-symbols-outlined text-[18px]">lock</span>
+              <span className="text-sm font-semibold tracking-wide">Ruang Rahasia</span>
+            </Link>
+          </div>
           <div className="w-16 h-[1px] bg-gradient-to-r from-transparent via-primary-container to-transparent mx-auto mt-8" />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">

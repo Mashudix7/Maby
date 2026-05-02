@@ -1,5 +1,5 @@
 import { db } from '../lib/firebase';
-import { collection, query, where, getDocs, doc, getDoc, addDoc, deleteDoc, orderBy } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc, addDoc, deleteDoc, updateDoc, orderBy } from 'firebase/firestore';
 
 export async function getMoments(coupleId) {
   try {
@@ -40,5 +40,10 @@ export async function createMoment(coupleId, userId, momentData) {
 
 export async function deleteMoment(id) {
   await deleteDoc(doc(db, 'moments', id));
+}
+
+export async function toggleFavoriteMoment(id, isFavorite) {
+  const docRef = doc(db, 'moments', id);
+  await updateDoc(docRef, { is_favorite: isFavorite });
 }
 

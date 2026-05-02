@@ -15,6 +15,7 @@ import AddMoment from './pages/AddMoment';
 import WishesAffirmations from './pages/WishesAffirmations';
 import DateIdeas from './pages/DateIdeas';
 import RelationshipJourney from './pages/RelationshipJourney';
+import PrivateNotes from './pages/PrivateNotes';
 
 function RouteChangeListener() {
   const location = useLocation();
@@ -46,6 +47,7 @@ export default function App() {
             <Route path="/harapan" element={<ProtectedRoute><WishesAffirmations /></ProtectedRoute>} />
             <Route path="/ide-kencan" element={<ProtectedRoute><DateIdeas /></ProtectedRoute>} />
             <Route path="/perjalanan" element={<ProtectedRoute><RelationshipJourney /></ProtectedRoute>} />
+            <Route path="/rahasia" element={<ProtectedRoute><PrivateNotes /></ProtectedRoute>} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

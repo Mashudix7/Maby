@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '../components/layout/MainLayout';
-import { getMomentById, deleteMoment } from '../services/momentService';
+import { getMomentById, deleteMoment, toggleFavoriteMoment } from '../services/momentService';
 
 export default function MomentDetail() {
   const { id } = useParams();
@@ -9,11 +9,15 @@ export default function MomentDetail() {
   const [moment, setMoment] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
     if (!id) return;
     getMomentById(id)
-      .then(setMoment)
+      .then(data => {
+        setMoment(data);
+        setIsFavorite(data.is_favorite || false);
+      })
       .catch((err) => {
         console.error('Gagal memuat detail:', err);
         setError('Momen tidak ditemukan');
@@ -28,6 +32,17 @@ export default function MomentDetail() {
       navigate('/momen');
     } catch (err) {
       console.error('Gagal menghapus:', err);
+    }
+  }
+
+  async function handleToggleFavorite() {
+    try {
+      const newStatus = !isFavorite;
+      setIsFavorite(newStatus);
+      await toggleFavoriteMoment(id, newStatus);
+    } catch (err) {
+      console.error('Gagal toggle favorit:', err);
+      setIsFavorite(!isFavorite); // revert
     }
   }
 
@@ -119,6 +134,15 @@ export default function MomentDetail() {
           >
             <span className="material-symbols-outlined text-[16px]">arrow_back</span>
             Kembali
+          </button>
+          <button
+            onClick={handleToggleFavorite}
+            className={`ghost-btn ${isFavorite ? 'text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20' : 'text-on-surface-variant dark:text-zinc-400 hover:bg-surface-variant'}`}
+          >
+            <span className="material-symbols-outlined text-[16px]" style={isFavorite ? { fontVariationSettings: "'FILL' 1" } : undefined}>
+              favorite
+            </span>
+            {isFavorite ? 'Favorit' : 'Jadikan Favorit'}
           </button>
           <button
             onClick={handleDelete}

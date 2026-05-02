@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '../components/layout/MainLayout';
 import { useAuth } from '../context/AuthContext';
@@ -15,6 +15,28 @@ export default function AddMoment() {
   const [imagePreview, setImagePreview] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Load draft from localStorage on mount
+  useEffect(() => {
+    const draft = localStorage.getItem('moment_draft');
+    if (draft) {
+      try {
+        const parsed = JSON.parse(draft);
+        if (parsed.title) setTitle(parsed.title);
+        if (parsed.story) setStory(parsed.story);
+        if (parsed.date) setDate(parsed.date);
+        if (parsed.location) setLocation(parsed.location);
+      } catch (e) {
+        console.error('Failed to parse draft', e);
+      }
+    }
+  }, []);
+
+  // Save to localStorage on change
+  useEffect(() => {
+    const draft = { title, story, date, location };
+    localStorage.setItem('moment_draft', JSON.stringify(draft));
+  }, [title, story, date, location]);
 
   function handleImageChange(e) {
     const file = e.target.files?.[0];
@@ -92,6 +114,7 @@ export default function AddMoment() {
         date: date || null,
         location: location || '',
       });
+      localStorage.removeItem('moment_draft'); // Clear draft on success
       navigate('/momen');
     } catch (err) {
       console.error('Gagal menyimpan:', err);

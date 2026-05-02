@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getMoments } from '../services/momentService';
 import { getMoodToday, setMoodToday } from '../services/moodService';
+import { getWishes } from '../services/wishService';
 
 const MOOD_OPTIONS = [
   { emoji: '🥰', label: 'Bahagia' },
@@ -17,11 +18,18 @@ function RelationshipTimer() {
   const [time, setTime] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
-    const startDate = new Date('2026-02-21T00:00:00+07:00').getTime();
-    
+    const getNextTarget = () => {
+      const now = new Date();
+      let target = new Date(now.getFullYear(), 1, 21, 0, 0, 0); // Feb 21
+      if (now.getTime() > target.getTime()) {
+        target.setFullYear(now.getFullYear() + 1);
+      }
+      return target.getTime();
+    };
+
     const interval = setInterval(() => {
       const now = new Date().getTime();
-      const diff = now - startDate;
+      const diff = getNextTarget() - now;
       
       if (diff > 0) {
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -60,18 +68,32 @@ function RelationshipTimer() {
 export default function Dashboard() {
   const { profile, coupleId, user } = useAuth();
   const [moments, setMoments] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [currentMood, setCurrentMood] = useState(null);
+  const [latestWish, setLatestWish] = useState(null);
+  const [onThisDayMoments, setOnThisDayMoments] = useState([]);
 
   useEffect(() => {
     if (!coupleId || !user) return;
     
     getMoments(coupleId)
-      .then((data) => setMoments(data.slice(0, 3)))
+      .then((data) => {
+        setMoments(data.slice(0, 3));
+        const today = new Date();
+        const otd = data.filter(m => {
+          if (!m.date) return false;
+          const mDate = new Date(m.date);
+          return mDate.getDate() === today.getDate() && 
+                 mDate.getMonth() === today.getMonth() && 
+                 mDate.getFullYear() !== today.getFullYear();
+        });
+        setOnThisDayMoments(otd);
+      })
       .catch((err) => console.error('Gagal memuat momen:', err))
       .finally(() => setLoading(false));
       
     getMoodToday(coupleId, user.uid).then(setCurrentMood);
+    getWishes(coupleId).then(wishes => {
+      if (wishes && wishes.length > 0) setLatestWish(wishes[0]);
+    });
   }, [coupleId, user]);
 
   const handleSetMood = async (moodLabel) => {
@@ -85,6 +107,22 @@ export default function Dashboard() {
 
   const latestMoment = moments[0];
 
+  const getRelationshipDuration = () => {
+    const start = new Date('2026-02-21');
+    const now = new Date();
+    let years = now.getFullYear() - start.getFullYear();
+    let months = now.getMonth() - start.getMonth();
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+    if (years === 0 && months === 0) return 'Baru saja dimulai 💗';
+    let text = 'Sudah bersama ';
+    if (years > 0) text += `${years} tahun `;
+    if (months > 0) text += `${months} bulan`;
+    return text + ' 💗';
+  };
+
   return (
     <MainLayout activePage="/">
       <div className="max-w-[1140px] mx-auto flex flex-col gap-12 md:gap-20">
@@ -93,19 +131,51 @@ export default function Dashboard() {
           <span className="font-sans text-xs font-semibold tracking-widest uppercase text-primary mb-4">
             21 Februari 2026
           </span>
-          <h1 className="font-serif text-3xl md:text-5xl text-on-surface dark:text-[#ede0df] mb-4 md:mb-6">
-            Hai, {profile?.display_name || 'sayangku'} <span className="text-rose-400">💗</span>
+          <h1 className="font-serif text-3xl md:text-5xl text-on-surface dark:text-[#ede0df] mb-2 md:mb-4">
+            Hai, {profile?.display_name || 'sayangku'} 👋
           </h1>
-          <p className="font-sans text-sm md:text-base text-on-surface-variant dark:text-zinc-400 max-w-lg mx-auto leading-relaxed">
-            Yuk bikin hari ini juga spesial ya.
+          <p className="font-sans text-sm md:text-base font-semibold text-rose-500 dark:text-rose-400 mb-6">
+            {getRelationshipDuration()}
           </p>
-          <div className="w-full max-w-lg mx-auto">
+          <div className="w-full max-w-lg mx-auto bg-primary-container/20 dark:bg-rose-900/10 rounded-3xl p-4 border border-primary/10">
+            <p className="text-xs font-semibold text-primary dark:text-rose-300 mb-2 tracking-widest uppercase">Menuju Anniversary 💍</p>
             <RelationshipTimer />
           </div>
         </section>
 
         {/* Bento Grid Layout */}
         <section className="grid grid-cols-1 md:grid-cols-12 gap-8">
+          
+          {/* On This Day (If exists) */}
+          {onThisDayMoments.length > 0 && (
+            <div className="md:col-span-12 glass-panel bg-gradient-to-r from-rose-50 to-orange-50 dark:from-[#322024] dark:to-[#38221b] border-rose-200 dark:border-rose-900/50 rounded-2xl md:rounded-[2rem] p-4 md:p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="material-symbols-outlined text-rose-500">history</span>
+                <h3 className="font-serif text-lg text-rose-800 dark:text-rose-200">On This Day</h3>
+              </div>
+              <div className="flex overflow-x-auto gap-4 hide-scrollbar">
+                {onThisDayMoments.map(m => {
+                  const yearsAgo = new Date().getFullYear() - new Date(m.date).getFullYear();
+                  return (
+                    <Link key={m.id} to={`/momen/${m.id}`} className="flex-shrink-0 w-[240px] bg-white/60 dark:bg-black/20 rounded-xl p-3 flex gap-3 items-center group">
+                      {m.image_url ? (
+                        <img src={m.image_url} alt="" className="w-16 h-16 rounded-lg object-cover" />
+                      ) : (
+                        <div className="w-16 h-16 rounded-lg bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center">
+                          <span className="material-symbols-outlined text-rose-300">photo</span>
+                        </div>
+                      )}
+                      <div>
+                        <p className="text-[10px] font-bold text-rose-500 uppercase tracking-wider">{yearsAgo} Tahun Lalu</p>
+                        <p className="font-serif text-sm text-on-surface dark:text-[#ede0df] line-clamp-2 group-hover:text-rose-500 transition-colors">{m.title}</p>
+                      </div>
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Today's Memory */}
           <div className="md:col-span-8 glass-panel rounded-2xl md:rounded-[2rem] p-4 md:p-8 flex flex-col relative overflow-hidden group min-h-[280px] md:min-h-[400px]">
             {latestMoment?.image_url ? (
@@ -181,6 +251,28 @@ export default function Dashboard() {
                 <span className="font-serif text-sm font-semibold text-on-surface dark:text-[#ede0df]">Tulis<br/>Harapan</span>
               </Link>
             </div>
+
+            {/* Latest Note */}
+            {latestWish && (
+              <GlassCard className="p-4 md:p-6 flex flex-col gap-3 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-16 h-16 bg-secondary-container/30 rounded-bl-[100px] -z-10 group-hover:scale-110 transition-transform" />
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-secondary dark:text-purple-300 text-sm">edit_note</span>
+                  <span className="font-sans text-[10px] font-bold uppercase tracking-wider text-outline dark:text-zinc-500">Catatan Terbaru</span>
+                </div>
+                <p className="font-serif text-sm md:text-base italic text-on-surface dark:text-[#ede0df] line-clamp-3">
+                  &quot;{latestWish.text}&quot;
+                </p>
+                <div className="flex items-center gap-2 mt-auto pt-2">
+                  <div className="w-5 h-5 rounded-full bg-primary-container flex items-center justify-center text-[10px] font-bold text-primary">
+                    {latestWish.profiles?.display_name?.[0] || '?'}
+                  </div>
+                  <span className="text-[10px] text-on-surface-variant dark:text-zinc-400">
+                    {new Date(latestWish.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                  </span>
+                </div>
+              </GlassCard>
+            )}
           </div>
         </section>
 
