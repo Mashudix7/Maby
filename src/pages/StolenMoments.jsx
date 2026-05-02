@@ -175,7 +175,7 @@ export default function StolenMoments() {
             )}
           </>
         )}
-
+      </div>
     </MainLayout>
   );
 }
