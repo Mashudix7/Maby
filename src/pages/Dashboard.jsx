@@ -352,6 +352,19 @@ export default function Dashboard() {
                 <span className="font-serif text-sm font-semibold text-on-surface dark:text-[#ede0df]" dangerouslySetInnerHTML={{ __html: t('dashboard.write_wish').replace(' ', '<br/>') }} />
               </Link>
             </div>
+
+            {/* Games Section */}
+            <Link to="/games" className="glass-panel p-4 md:p-6 rounded-2xl flex items-center gap-4 group hover:scale-105 transition-all duration-300 hover:border-primary/30 border border-primary/5 relative overflow-hidden">
+               <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+               <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform shrink-0">
+                  <span className="material-symbols-outlined text-2xl">casino</span>
+               </div>
+               <div className="flex flex-col">
+                  <span className="font-serif text-lg font-bold text-on-surface dark:text-[#ede0df]">Truth or Dare</span>
+                  <span className="text-[10px] uppercase tracking-widest font-bold text-outline dark:text-zinc-500">Play Together</span>
+               </div>
+               <span className="material-symbols-outlined ml-auto text-primary opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">chevron_right</span>
+            </Link>
           </div>
         </section>
 
