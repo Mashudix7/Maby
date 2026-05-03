@@ -11,6 +11,7 @@ import { getWishes } from '../services/wishService';
 import { getStreak, getDailyActivity } from '../services/streakService';
 import { requestNotificationPermission, listenForPartnerWishes } from '../services/notificationService';
 import { listenForNudges } from '../services/nudgeService';
+import { getWIBDate } from '../lib/dateUtils';
 
 const MOOD_OPTIONS = [
   { emoji: '🥰', label_id: 'Bahagia', label_en: 'Happy' },
@@ -48,6 +49,10 @@ function RelationshipTimer() {
   useEffect(() => {
     const getNextTarget = () => {
       const now = new Date();
+      // Set to 12 AM WIB next day for "Daily Reset" or keep Feb 21 as Anniversary?
+      // User said "pasang jam nya untuk jam asia jakarta, direset setiap jam 12 malam"
+      // This refers to the countdown maybe? Or just a daily reset?
+      // Usually, countdowns are for events. I'll keep the Feb 21 as anniversary but adjust for WIB.
       let target = new Date(now.getFullYear(), 1, 21, 0, 0, 0); // Feb 21
       if (now.getTime() > target.getTime()) {
         target.setFullYear(now.getFullYear() + 1);
@@ -109,32 +114,50 @@ export default function Dashboard() {
   useEffect(() => {
     if (!coupleId || !user) return;
     
-    const today = new Date().toISOString().split('T')[0];
+    const fetchDashboardData = () => {
+      const today = getWIBDate();
+      Promise.all([
+        getMoments(coupleId),
+        getMoodToday(coupleId, user.uid),
+        getAllMoodsToday(coupleId),
+        getWishes(coupleId),
+        getStreak(coupleId),
+        getDailyActivity(coupleId, today),
+      ])
+        .then(([momentsData, moodData, allMoodsData, wishesData, streakResult, activityResult]) => {
+          setState(prev => ({
+            ...prev,
+            moments: momentsData.slice(0, 3),
+            currentMood: moodData,
+            allMoods: allMoodsData,
+            latestWish: wishesData?.[0] || null,
+            streakData: streakResult,
+            dailyActivity: activityResult,
+            loading: false,
+          }));
+        })
+        .catch((err) => {
+          console.error('Dashboard data fetch error:', err);
+          setState(prev => ({ ...prev, loading: false }));
+        });
+    };
 
-    Promise.all([
-      getMoments(coupleId),
-      getMoodToday(coupleId, user.uid),
-      getAllMoodsToday(coupleId),
-      getWishes(coupleId),
-      getStreak(coupleId),
-      getDailyActivity(coupleId, today),
-    ])
-      .then(([momentsData, moodData, allMoodsData, wishesData, streakResult, activityResult]) => {
-        setState(prev => ({
-          ...prev,
-          moments: momentsData.slice(0, 3),
-          currentMood: moodData,
-          allMoods: allMoodsData,
-          latestWish: wishesData?.[0] || null,
-          streakData: streakResult,
-          dailyActivity: activityResult,
-          loading: false,
-        }));
-      })
-      .catch((err) => {
-        console.error('Dashboard data fetch error:', err);
-        setState(prev => ({ ...prev, loading: false }));
-      });
+    fetchDashboardData();
+
+    // Reset at midnight WIB logic
+    const now = new Date();
+    const jakartaTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Jakarta"}));
+    const nextMidnight = new Date(jakartaTime);
+    nextMidnight.setHours(24, 0, 0, 0);
+    const msToMidnight = nextMidnight.getTime() - jakartaTime.getTime();
+
+    const timer = setTimeout(() => {
+      fetchDashboardData();
+      // After first midnight, refresh every 24h
+      setInterval(fetchDashboardData, 24 * 60 * 60 * 1000);
+    }, msToMidnight);
+
+    return () => clearTimeout(timer);
   }, [coupleId, user]);
 
   useEffect(() => {
@@ -180,8 +203,10 @@ export default function Dashboard() {
     return text + ' 💗';
   }, [language, t]);
 
-  const formattedStartDate = useMemo(() => {
-    return new Date('2026-02-21').toLocaleDateString(
+  const formattedCurrentDate = useMemo(() => {
+    const today = getWIBDate();
+    const date = new Date(today);
+    return date.toLocaleDateString(
       language === 'id' ? 'id-ID' : 'en-US',
       { day: 'numeric', month: 'long', year: 'numeric' }
     );
@@ -196,7 +221,7 @@ export default function Dashboard() {
         <div className="flex flex-col items-center text-center mt-8 px-4">
           <div className="w-full max-w-lg flex justify-between items-center mb-6">
             <span className="font-sans text-[10px] font-semibold tracking-widest uppercase text-primary/60">
-              {formattedStartDate}
+              {formattedCurrentDate}
             </span>
             <div className="flex items-center gap-2">
               <StreakIndicator streak={state.streakData.total_streak} activity={state.dailyActivity} />

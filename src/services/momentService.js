@@ -1,6 +1,7 @@
 import { db } from '../lib/firebase';
 import { collection, query, where, getDocs, doc, getDoc, addDoc, deleteDoc, updateDoc, orderBy, limit } from 'firebase/firestore';
 import { getCached, setCached, invalidatePrefix } from '../lib/queryCache';
+import { updateStreakActivity } from './streakService';
 
 const CACHE_KEY = 'moments';
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
@@ -57,6 +58,10 @@ export async function createMoment(coupleId, userId, momentData) {
   };
 
   const docRef = await addDoc(collection(db, 'moments'), docData);
+  
+  // Trigger streak update
+  updateStreakActivity(coupleId, userId).catch(err => console.error('Streak update failed:', err));
+  
   invalidateMomentsCache();
   return { id: docRef.id, ...docData };
 }
@@ -69,4 +74,6 @@ export async function deleteMoment(id) {
 export async function toggleFavoriteMoment(id, isFavorite) {
   const docRef = doc(db, 'moments', id);
   await updateDoc(docRef, { is_favorite: isFavorite });
+  // Fix: Invalidate cache so the filtered lists (like "Favorites" tab) update immediately
+  invalidateMomentsCache();
 }

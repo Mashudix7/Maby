@@ -1,17 +1,12 @@
 import { db } from '../lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { getCached, setCached, invalidate } from '../lib/queryCache';
+import { getCached, setCached } from '../lib/queryCache';
+import { getWIBDate } from '../lib/dateUtils';
 
 const MOOD_TTL = 10 * 60 * 1000; // 10 minutes
 
-function getLocalDateString() {
-  const d = new Date();
-  // Format as YYYY-MM-DD using local time
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
-
 export async function getMoodToday(coupleId, userId) {
-  const dateStr = getLocalDateString();
+  const dateStr = getWIBDate();
   const cacheKey = `mood:${coupleId}:${userId}:${dateStr}`;
   
   const cached = getCached(cacheKey);
@@ -27,7 +22,7 @@ export async function getMoodToday(coupleId, userId) {
 }
 
 export async function setMoodToday(coupleId, userId, mood) {
-  const dateStr = getLocalDateString();
+  const dateStr = getWIBDate();
   const id = `${coupleId}_${userId}_${dateStr}`;
   const docRef = doc(db, 'moods', id);
   await setDoc(docRef, {
@@ -44,7 +39,7 @@ export async function setMoodToday(coupleId, userId, mood) {
 }
 
 export async function getAllMoodsToday(coupleId) {
-  const dateStr = getLocalDateString();
+  const dateStr = getWIBDate();
   const cacheKey = `moods_all:${coupleId}:${dateStr}`;
   
   const cached = getCached(cacheKey);
@@ -67,4 +62,3 @@ export async function getAllMoodsToday(coupleId) {
   setCached(cacheKey, moods, MOOD_TTL);
   return moods;
 }
-

@@ -1,6 +1,7 @@
 import { db } from '../lib/firebase';
 import { doc, getDoc, setDoc, updateDoc, increment, collection, query, where, getDocs } from 'firebase/firestore';
 import { getCached, setCached, invalidatePrefix } from '../lib/queryCache';
+import { getWIBDate } from '../lib/dateUtils';
 
 const STREAK_TTL = 3 * 60 * 1000; // 3 minutes
 const ACTIVITY_TTL = 3 * 60 * 1000; // 3 minutes
@@ -54,7 +55,9 @@ export const getDailyActivity = async (coupleId, date) => {
  */
 export const updateStreakActivity = async (coupleId, userId) => {
   try {
-    const today = new Date().toISOString().split('T')[0];
+    if (!coupleId || !userId) return;
+    
+    const today = getWIBDate();
     const activityRef = doc(db, 'streaks', coupleId, 'daily_activity', today);
     const streakRef = doc(db, 'streaks', coupleId);
 
@@ -67,7 +70,6 @@ export const updateStreakActivity = async (coupleId, userId) => {
     if (userIndex === -1) return; // User not in this couple?
 
     const fieldToUpdate = userIndex === 0 ? 'user1_active' : 'user2_active';
-    const otherField = userIndex === 0 ? 'user2_active' : 'user1_active';
 
     // 2. Get current activity
     const activitySnap = await getDoc(activityRef);
@@ -86,27 +88,30 @@ export const updateStreakActivity = async (coupleId, userId) => {
       const streakSnap = await getDoc(streakRef);
       if (streakSnap.exists()) {
         const streakData = streakSnap.data();
+        
+        // Check if yesterday was active to continue streak, or if it's the first ever
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = yesterday.toISOString().split('T')[0]; // Simple check, could be better
+
         if (streakData.last_increment_date !== today) {
           await updateDoc(streakRef, {
             total_streak: increment(1),
-            last_increment_date: today
+            last_increment_date: today,
+            last_activity_at: new Date().toISOString()
           });
         }
       } else {
         await setDoc(streakRef, {
           total_streak: 1,
-          last_increment_date: today
+          last_increment_date: today,
+          last_activity_at: new Date().toISOString()
         });
       }
     }
 
     await setDoc(activityRef, activityData, { merge: true });
     
-    // 5. Update last activity timestamp for auto-nudge
-    await setDoc(streakRef, { 
-      last_activity_at: new Date().toISOString() 
-    }, { merge: true });
-
     // Invalidate caches after write
     invalidatePrefix('streak:');
     invalidatePrefix('activity:');

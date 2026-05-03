@@ -1,5 +1,6 @@
 import { db } from '../lib/firebase';
-import { collection, query, where, getDocs, doc, addDoc, deleteDoc, orderBy } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc, addDoc, deleteDoc, orderBy } from 'firebase/firestore';
+import { updateStreakActivity } from './streakService';
 
 export async function getPrivateNotes(userId) {
   try {
@@ -26,6 +27,20 @@ export async function createPrivateNote(userId, text) {
     created_at: new Date().toISOString()
   };
   const docRef = await addDoc(collection(db, 'private_notes'), docData);
+
+  // Trigger streak update
+  try {
+    const userSnap = await getDoc(doc(db, 'users', userId));
+    if (userSnap.exists()) {
+      const coupleId = userSnap.data().couple_id;
+      if (coupleId) {
+        updateStreakActivity(coupleId, userId).catch(err => console.error('Streak update failed:', err));
+      }
+    }
+  } catch (err) {
+    console.error('Failed to get coupleId for streak update:', err);
+  }
+
   return { id: docRef.id, ...docData };
 }
 
