@@ -3,7 +3,7 @@ import MainLayout from '../components/layout/MainLayout';
 import WishCard from '../components/ui/WishCard';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { getWishes, createWish, getRandomWish } from '../services/wishService';
+import { getWishes, createWish } from '../services/wishService';
 import { showSuccess, showError } from '../lib/alerts';
 import { WishCardSkeleton } from '../components/ui/Skeleton';
 import VirtualGrid from '../components/ui/VirtualGrid';
@@ -15,8 +15,6 @@ export default function WishesAffirmations() {
   const [loading, setLoading] = useState(true);
   const [newWish, setNewWish] = useState('');
   const [saving, setSaving] = useState(false);
-  const [randomWish, setRandomWish] = useState(null);
-  const [showRandom, setShowRandom] = useState(false);
 
   useEffect(() => {
     if (!coupleId) return;
@@ -43,14 +41,8 @@ export default function WishesAffirmations() {
     }
   };
 
-  const handleShowRandom = async () => {
-    const wish = await getRandomWish(coupleId);
-    setRandomWish(wish);
-    setShowRandom(true);
-  };
-
   const renderWish = useCallback((wish) => (
-    <WishCard key={wish.id} className="flex flex-col justify-between h-full">
+    <WishCard key={wish.id} className="flex flex-col justify-between h-full group hover:scale-[1.02] transition-all duration-300">
       <p className="font-serif text-lg text-on-surface-variant dark:text-zinc-300 italic leading-relaxed mb-4">
         &quot;{wish.text}&quot;
       </p>
@@ -62,7 +54,7 @@ export default function WishesAffirmations() {
           {wish.profiles?.display_name || t('wishes.anonymous')}
         </span>
         <span className="text-xs text-outline dark:text-zinc-600 ml-auto shrink-0">
-          {new Date(wish.created_at).toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'short' })} • {new Date(wish.created_at).toLocaleTimeString(language === 'id' ? 'id-ID' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
+          {new Date(wish.created_at).toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'short' })}
         </span>
       </div>
     </WishCard>
@@ -74,19 +66,12 @@ export default function WishesAffirmations() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="font-serif text-3xl md:text-5xl text-primary dark:text-rose-300 italic mb-4">{t('wishes.title')}</h1>
-          <p className="text-on-surface-variant dark:text-zinc-400 font-sans">{t('wishes.subtitle')}</p>
-          <button
-            onClick={handleShowRandom}
-            className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-full bg-secondary-container text-on-secondary-container font-semibold text-sm hover:opacity-90 transition-opacity"
-          >
-            <span className="material-symbols-outlined text-lg">casino</span>
-            {t('wishes.random')}
-          </button>
+          <p className="text-on-surface-variant dark:text-zinc-400 font-sans max-w-lg mx-auto">{t('wishes.subtitle')}</p>
         </div>
 
         {/* Input Form */}
-        <form onSubmit={handleSubmit} className="glass-panel p-6 rounded-3xl mb-12 border border-primary/10">
-          <div className="flex gap-4">
+        <form onSubmit={handleSubmit} className="glass-panel p-4 md:p-6 rounded-[2rem] mb-12 border border-primary/10 shadow-lg relative overflow-hidden group">
+          <div className="flex gap-4 items-center">
             <input
               type="text"
               value={newWish}
@@ -97,12 +82,13 @@ export default function WishesAffirmations() {
             <button
               type="submit"
               disabled={saving || !newWish.trim()}
-              className="w-12 h-12 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg disabled:opacity-50 transition-all hover:scale-105"
+              className="w-14 h-14 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-[0_8px_20px_rgba(176,0,77,0.3)] disabled:opacity-50 transition-all hover:scale-110 active:scale-95 group/btn relative overflow-hidden"
             >
+              <div className="absolute inset-0 bg-white/10 opacity-0 group-hover/btn:opacity-100 transition-opacity" />
               {saving ? (
                 <span className="material-symbols-outlined animate-spin text-lg">progress_activity</span>
               ) : (
-                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>send</span>
+                <span className="material-symbols-outlined text-2xl transition-transform group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1" style={{ fontVariationSettings: "'FILL' 1" }}>send</span>
               )}
             </button>
           </div>
@@ -127,32 +113,6 @@ export default function WishesAffirmations() {
           />
         )}
       </div>
-
-      {/* Random Wish Modal */}
-      {showRandom && randomWish && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-          <div className="glass-panel max-w-lg w-full p-8 rounded-[2.5rem] relative text-center animate-slideFadeIn">
-            <button
-              onClick={() => setShowRandom(false)}
-              className="absolute top-6 right-6 text-outline hover:text-on-surface transition-colors"
-            >
-              <span className="material-symbols-outlined">close</span>
-            </button>
-            <span className="material-symbols-outlined text-primary text-5xl mb-6">format_quote</span>
-            <p className="font-serif text-2xl text-on-surface dark:text-[#ede0df] italic leading-relaxed mb-8">
-              &quot;{randomWish.text}&quot;
-            </p>
-            <div className="flex flex-col items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-primary font-serif font-bold">
-                {(randomWish.profiles?.display_name || '?')[0].toUpperCase()}
-              </div>
-              <span className="text-xs font-bold text-primary tracking-widest uppercase">
-                {randomWish.profiles?.display_name || t('wishes.anonymous')}
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
     </MainLayout>
   );
 }

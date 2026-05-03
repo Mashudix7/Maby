@@ -301,14 +301,14 @@ export default function Dashboard() {
 
             {/* Action Boxes */}
             <div className="grid grid-cols-2 gap-4">
-              <Link to="/momen/baru" className="glass-panel p-4 md:p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center text-primary">
+              <Link to="/momen/baru" className="glass-panel p-4 md:p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-3 group/box hover:scale-105 transition-all duration-300 hover:border-primary/30">
+                <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center shadow-[0_4px_12px_rgba(176,0,77,0.2)] group-hover/box:scale-110 transition-transform">
                   <span className="material-symbols-outlined text-2xl">add_a_photo</span>
                 </div>
                 <span className="font-serif text-sm font-semibold text-on-surface dark:text-[#ede0df]" dangerouslySetInnerHTML={{ __html: t('dashboard.new_moment').replace(' ', '<br/>') }} />
               </Link>
-              <Link to="/harapan" className="glass-panel p-4 md:p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container">
+              <Link to="/harapan" className="glass-panel p-4 md:p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-3 group/box hover:scale-105 transition-all duration-300 hover:border-primary/30">
+                <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center shadow-[0_4px_12px_rgba(176,0,77,0.2)] group-hover/box:scale-110 transition-transform">
                   <span className="material-symbols-outlined text-2xl">favorite</span>
                 </div>
                 <span className="font-serif text-sm font-semibold text-on-surface dark:text-[#ede0df]" dangerouslySetInnerHTML={{ __html: t('dashboard.write_wish').replace(' ', '<br/>') }} />

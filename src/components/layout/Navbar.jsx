@@ -49,9 +49,10 @@ const Navbar = memo(function Navbar({ activePage = '/' }) {
           ))}
           <Link
             to="/photobooth"
-            className="flex items-center gap-2 bg-gradient-to-r from-pink-700 to-rose-900 text-white px-4 py-2 rounded-full font-bold shadow-[0_4px_14px_rgba(136,19,55,0.39)] hover:scale-105 active:scale-95 transition-all not-italic"
+            className="flex items-center gap-2 bg-primary text-white px-5 py-2 rounded-full font-bold shadow-[0_8px_20px_rgba(176,0,77,0.3)] hover:scale-110 active:scale-95 transition-all not-italic group/btn relative overflow-hidden"
           >
-            <span className="material-symbols-outlined text-[18px]">photo_camera</span>
+            <div className="absolute inset-0 bg-white/10 opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+            <span className="material-symbols-outlined text-[20px] transition-transform group-hover/btn:rotate-12">photo_camera</span>
             Photobooth
           </Link>
         </nav>
