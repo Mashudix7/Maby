@@ -33,15 +33,30 @@ export default function TruthOrDare() {
   const spinTurn = () => {
     if (spinning) return;
     
-    const extraRotation = 1080 + Math.floor(Math.random() * 360);
-    const newRotation = rotation + extraRotation;
+    // Pick winner first
+    const players = [myInfo, partnerInfo];
+    const pickedIndex = Math.floor(Math.random() * players.length);
+    const picked = players[pickedIndex];
+
+    // Calculate rotation to land on the winner
+    // Index 0 (Me) is at top half (0 deg)
+    // Index 1 (Partner) is at bottom half (180 deg)
+    // We want to land the pointer (at top) on the winner
+    // If winner is Partner (180deg initial), we need to rotate 180deg to bring them to top
+    // Base target: Index 0 -> 0deg or 360deg, Index 1 -> 180deg
+    const targetBase = pickedIndex === 0 ? 0 : 180;
     
-    setRotation(newRotation);
+    // Add small random offset within the half (avoiding the edge)
+    const offset = Math.floor(Math.random() * 100) - 50; // +/- 50deg
+    
+    // Ensure we always spin forward and at least 3-4 full rotations
+    const currentRotBase = rotation - (rotation % 360);
+    const extraSpins = 1440; // 4 full spins
+    const finalRotation = currentRotBase + extraSpins + (360 - targetBase) + offset;
+    
+    setRotation(finalRotation);
     setSpinning(true);
     setTurnResult(null);
-    
-    const players = [myInfo, partnerInfo];
-    const picked = players[Math.floor(Math.random() * players.length)];
     
     setTimeout(() => {
       setSpinning(false);
