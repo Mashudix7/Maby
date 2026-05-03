@@ -14,9 +14,9 @@ import { listenForNudges } from '../services/nudgeService';
 import { getWIBDate } from '../lib/dateUtils';
 
 const MOOD_OPTIONS = [
-  { emoji: '🥰', label_id: 'Bahagia', label_en: 'Happy' },
-  { emoji: '😌', label_id: 'Damai', label_en: 'Peaceful' },
-  { emoji: '🥺', label_id: 'Rindu', label_en: 'Missing' },
+  { id: 'happy', emoji: '🥰', label_id: 'Bahagia', label_en: 'Happy' },
+  { id: 'peaceful', emoji: '😌', label_id: 'Damai', label_en: 'Peaceful' },
+  { id: 'missing', emoji: '🥺', label_id: 'Rindu', label_en: 'Missing' },
 ];
 
 function StreakIndicator({ streak, activity }) {
@@ -169,23 +169,22 @@ export default function Dashboard() {
     };
   }, [coupleId, user, t]);
 
-  const handleSetMood = useCallback(async (moodLabel) => {
+  const handleSetMood = useCallback(async (moodId) => {
     if (state.currentMood) return;
     
-    // Mood emoji is updated by listener automatically, but we can do a local update for snappiness
-    const moodEmoji = MOOD_OPTIONS.find(m => (language === 'id' ? m.label_id : m.label_en) === moodLabel)?.emoji;
+    // Optimistic update
     setState(prev => ({ 
       ...prev, 
-      currentMood: moodLabel,
-      allMoods: { ...prev.allMoods, [user.uid]: moodEmoji }
+      currentMood: moodId,
+      allMoods: { ...prev.allMoods, [user.uid]: moodId }
     }));
 
     try {
-      await setMoodToday(coupleId, user.uid, moodLabel);
+      await setMoodToday(coupleId, user.uid, moodId);
     } catch (err) {
       console.error('Gagal menyimpan mood', err);
     }
-  }, [state.currentMood, coupleId, user?.uid, language]);
+  }, [state.currentMood, coupleId, user?.uid]);
 
   const relationshipDuration = useMemo(() => {
     const start = new Date('2026-02-21');
@@ -291,12 +290,11 @@ export default function Dashboard() {
               
               <div className="flex gap-4 justify-center mb-6">
                 {MOOD_OPTIONS.map((mood) => {
-                  const moodLabel = language === 'id' ? mood.label_id : mood.label_en;
-                  const isActive = state.currentMood === moodLabel;
+                  const isActive = state.currentMood === mood.id || state.currentMood === mood.label_id || state.currentMood === mood.label_en;
                   return (
                   <button
-                    key={mood.emoji}
-                    onClick={() => handleSetMood(moodLabel)}
+                    key={mood.id}
+                    onClick={() => handleSetMood(mood.id)}
                     disabled={!!state.currentMood}
                     className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-sm transition-all duration-300 hover:scale-110 active:scale-95 ${isActive
                         ? 'bg-primary text-white ring-4 ring-primary/20 scale-110'
@@ -316,14 +314,20 @@ export default function Dashboard() {
                   <span className="text-[10px] block font-bold uppercase tracking-tighter text-outline dark:text-zinc-500 mb-1">
                     {profile?.display_name?.split(' ')[0] || 'Kamu'}
                   </span>
-                  <span className="text-xl">{state.allMoods[user?.uid] || '—'}</span>
+                  <span className="text-xl">
+                    {MOOD_OPTIONS.find(m => m.id === state.allMoods[user?.uid] || m.label_id === state.allMoods[user?.uid] || m.label_en === state.allMoods[user?.uid])?.emoji || '—'}
+                  </span>
                 </div>
                 <div className={`flex-1 p-2 rounded-xl border transition-all ${Object.keys(state.allMoods).find(id => id !== user?.uid) ? 'bg-primary/5 border-primary/20' : 'bg-zinc-100/50 dark:bg-white/5 border-zinc-200/50 dark:border-white/10 opacity-50'}`}>
                   <span className="text-[10px] block font-bold uppercase tracking-tighter text-outline dark:text-zinc-500 mb-1">
                     {profile?.display_name?.includes('Feby') ? 'Mashudi' : 'Feby Zahara'}
                   </span>
                   <span className="text-xl">
-                    {state.allMoods[Object.keys(state.allMoods).find(id => id !== user?.uid)] || '—'}
+                    {(() => {
+                      const partnerId = Object.keys(state.allMoods).find(id => id !== user?.uid);
+                      const partnerMood = state.allMoods[partnerId];
+                      return MOOD_OPTIONS.find(m => m.id === partnerMood || m.label_id === partnerMood || m.label_en === partnerMood)?.emoji || '—';
+                    })()}
                   </span>
                 </div>
               </div>
