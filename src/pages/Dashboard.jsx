@@ -295,7 +295,7 @@ export default function Dashboard() {
                 </div>
                 <div className={`flex-1 p-2 rounded-xl border transition-all ${Object.keys(state.allMoods).find(id => id !== user?.uid) ? 'bg-primary/5 border-primary/20' : 'bg-zinc-100/50 dark:bg-white/5 border-zinc-200/50 dark:border-white/10 opacity-50'}`}>
                   <span className="text-[10px] block font-bold uppercase tracking-tighter text-outline dark:text-zinc-500 mb-1">
-                    Partner
+                    {profile?.display_name?.includes('Feby') ? 'Mashudi' : 'Feby Zahara'}
                   </span>
                   <span className="text-xl">
                     {state.allMoods[Object.keys(state.allMoods).find(id => id !== user?.uid)] || '—'}
