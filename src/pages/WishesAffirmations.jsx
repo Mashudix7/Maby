@@ -19,6 +19,9 @@ export default function WishesAffirmations() {
   const [newWish, setNewWish] = useState('');
   const [saving, setSaving] = useState(false);
 
+  const [visibleCount, setVisibleCount] = useState(12);
+  const [hasMore, setHasMore] = useState(true);
+
   useEffect(() => {
     if (!coupleId) return;
 
@@ -41,6 +44,7 @@ export default function WishesAffirmations() {
     const unsubscribe = listenWishes(coupleId, (data) => {
       setWishes(data);
       setLoading(false);
+      if (data.length <= visibleCount) setHasMore(false);
     });
 
     return () => unsubscribe();
@@ -63,11 +67,20 @@ export default function WishesAffirmations() {
   };
 
   const wishesWithProfiles = useMemo(() => {
-    return wishes.map(w => ({
+    const data = wishes.map(w => ({
       ...w,
       profiles: profiles[w.user_id] || null
     }));
-  }, [wishes, profiles]);
+    return data.slice(0, visibleCount);
+  }, [wishes, profiles, visibleCount]);
+
+  const loadMore = useCallback(() => {
+    if (visibleCount < wishes.length) {
+      setVisibleCount(prev => prev + 12);
+    } else {
+      setHasMore(false);
+    }
+  }, [visibleCount, wishes.length]);
 
   const renderWish = useCallback((wish) => (
     <WishCard key={wish.id} className="flex flex-col justify-between h-full group hover:scale-[1.02] transition-all duration-300 will-change-transform contain-paint">
@@ -90,7 +103,7 @@ export default function WishesAffirmations() {
 
   return (
     <MainLayout activePage="/harapan">
-      <div className="max-w-[1140px] mx-auto">
+      <div className="max-w-[1140px] mx-auto pb-20">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="font-serif text-3xl md:text-5xl text-primary dark:text-rose-300 italic mb-4">{t('wishes.title')}</h1>
@@ -133,12 +146,25 @@ export default function WishesAffirmations() {
             <p className="text-on-surface-variant dark:text-zinc-500 font-serif italic">{t('wishes.empty')}</p>
           </div>
         ) : (
-          <VirtualGrid
-            items={wishesWithProfiles}
-            itemHeight={220}
-            minColumnWidth={320}
-            renderItem={renderWish}
-          />
+          <div className="flex flex-col gap-10">
+            <VirtualGrid
+              items={wishesWithProfiles}
+              itemHeight={220}
+              minColumnWidth={320}
+              renderItem={renderWish}
+            />
+            
+            {visibleCount < wishes.length && (
+              <div className="flex justify-center">
+                <button
+                  onClick={loadMore}
+                  className="px-8 py-3 bg-white/50 dark:bg-white/5 border border-primary/20 rounded-full text-primary dark:text-rose-300 font-bold text-sm hover:bg-primary hover:text-white transition-all"
+                >
+                  Lihat Lebih Banyak
+                </button>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </MainLayout>
