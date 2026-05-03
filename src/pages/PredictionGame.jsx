@@ -6,20 +6,34 @@ import { useAuth } from '../context/AuthContext';
 
 export default function PredictionGame() {
   const { profile } = useAuth();
-  const [step, setStep] = useState('start'); // start, playerA, transition, playerB, result
+  const [step, setStep] = useState('pickRole'); // pickRole, start, playerA, transition, playerB, result
   const [category, setCategory] = useState('all');
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [answerA, setAnswerA] = useState(null);
   const [answerB, setAnswerB] = useState(null);
   const [score, setScore] = useState(0);
+  
+  // Roles
+  const [roles, setRoles] = useState({
+    answerer: null, // { name, id }
+    predictor: null
+  });
 
   const partnerName = profile?.display_name?.includes('Feby') ? 'Mashudi' : 'Feby Zahara';
-  const currentPlayerName = profile?.display_name || 'Kamu';
+  const myName = profile?.display_name || 'Kamu';
 
   const filteredQuestions = useMemo(() => {
     if (category === 'all') return PREDICTION_QUESTIONS;
     return PREDICTION_QUESTIONS.filter(q => q.category === category);
   }, [category]);
+
+  const handlePickRole = (answererName, predictorName) => {
+    setRoles({
+      answerer: answererName,
+      predictor: predictorName
+    });
+    setStep('start');
+  };
 
   const startNewRound = useCallback(() => {
     const randomIndex = Math.floor(Math.random() * filteredQuestions.length);
@@ -41,15 +55,60 @@ export default function PredictionGame() {
   };
 
   const resetGame = () => {
-    setStep('start');
+    setStep('pickRole');
     setAnswerA(null);
     setAnswerB(null);
+    setScore(0);
   };
 
   return (
     <MainLayout activePage="/games">
       <div className="max-w-md mx-auto flex flex-col gap-8 pb-20 pt-4 px-4 min-h-[70vh] justify-center">
         
+        {step === 'pickRole' && (
+          <div className="animate-in fade-in zoom-in duration-500 space-y-8 text-center">
+            <div className="space-y-2">
+              <div className="w-20 h-20 bg-indigo-500 rounded-[2rem] flex items-center justify-center text-white mx-auto shadow-lg">
+                <span className="material-symbols-outlined text-4xl">groups</span>
+              </div>
+              <h1 className="font-serif text-3xl text-on-surface dark:text-[#ede0df]">Pilih Peran</h1>
+              <p className="text-on-surface-variant dark:text-zinc-500 font-serif italic text-sm">
+                Siapa yang mau menjawab & menebak?
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4">
+              <button
+                onClick={() => handlePickRole(myName, partnerName)}
+                className="p-6 glass-panel border border-indigo-500/20 rounded-2xl text-left flex items-center justify-between group hover:border-indigo-500 transition-all"
+              >
+                <div className="flex flex-col">
+                  <span className="text-xs font-bold text-indigo-500 uppercase tracking-widest">Opsi 1</span>
+                  <p className="text-on-surface dark:text-zinc-300 font-medium">
+                    <span className="font-bold">{myName}</span> Menjawab <br/>
+                    <span className="font-bold">{partnerName}</span> Menebak
+                  </p>
+                </div>
+                <span className="material-symbols-outlined text-indigo-500 opacity-0 group-hover:opacity-100 transition-all">arrow_forward</span>
+              </button>
+
+              <button
+                onClick={() => handlePickRole(partnerName, myName)}
+                className="p-6 glass-panel border border-indigo-500/20 rounded-2xl text-left flex items-center justify-between group hover:border-indigo-500 transition-all"
+              >
+                <div className="flex flex-col">
+                  <span className="text-xs font-bold text-indigo-500 uppercase tracking-widest">Opsi 2</span>
+                  <p className="text-on-surface dark:text-zinc-300 font-medium">
+                    <span className="font-bold">{partnerName}</span> Menjawab <br/>
+                    <span className="font-bold">{myName}</span> Menebak
+                  </p>
+                </div>
+                <span className="material-symbols-outlined text-indigo-500 opacity-0 group-hover:opacity-100 transition-all">arrow_forward</span>
+              </button>
+            </div>
+          </div>
+        )}
+
         {step === 'start' && (
           <div className="animate-in fade-in zoom-in duration-500 space-y-8 text-center">
             <div className="space-y-2">
@@ -57,8 +116,8 @@ export default function PredictionGame() {
                 <span className="material-symbols-outlined text-4xl">psychology</span>
               </div>
               <h1 className="font-serif text-4xl text-on-surface dark:text-[#ede0df] italic">Prediction Game</h1>
-              <p className="text-on-surface-variant dark:text-zinc-500 font-serif italic text-sm">
-                Seberapa kenal kamu sama dia? 🧐
+              <p className="text-on-surface-variant dark:text-zinc-400 font-serif italic text-sm">
+                Pilih kategori pertanyaan ✨
               </p>
             </div>
 
@@ -78,16 +137,20 @@ export default function PredictionGame() {
               ))}
             </div>
 
-            <button
-              onClick={startNewRound}
-              className="w-full py-4 bg-indigo-500 text-white rounded-2xl font-bold shadow-xl hover:scale-105 active:scale-95 transition-all text-lg"
-            >
-              Mulai Game
-            </button>
-            
-            <p className="text-[10px] text-outline dark:text-zinc-600 uppercase tracking-widest font-bold">
-              Main bareng di satu HP ya!
-            </p>
+            <div className="space-y-4">
+              <button
+                onClick={startNewRound}
+                className="w-full py-4 bg-indigo-500 text-white rounded-2xl font-bold shadow-xl hover:scale-105 active:scale-95 transition-all text-lg"
+              >
+                Mulai
+              </button>
+              <button
+                onClick={() => setStep('pickRole')}
+                className="text-xs text-indigo-500 font-bold uppercase tracking-widest hover:underline"
+              >
+                Ganti Peran
+              </button>
+            </div>
           </div>
         )}
 
@@ -95,7 +158,7 @@ export default function PredictionGame() {
           <div className="animate-in slide-in-from-right fade-in duration-500 space-y-8">
             <div className="text-center space-y-1">
               <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 rounded-full text-[10px] font-bold uppercase tracking-widest">
-                Giliran {currentPlayerName}
+                Giliran {roles.answerer}
               </span>
               <h2 className="text-lg font-serif italic text-on-surface-variant dark:text-zinc-400">Jawab diam-diam ya..</h2>
             </div>
@@ -126,7 +189,7 @@ export default function PredictionGame() {
             </div>
             <div className="space-y-2">
               <h2 className="text-2xl font-serif italic text-on-surface dark:text-[#ede0df]">Selesai!</h2>
-              <p className="text-on-surface-variant dark:text-zinc-400">Sekarang kasih HP-nya ke <span className="font-bold text-indigo-500">{partnerName}</span></p>
+              <p className="text-on-surface-variant dark:text-zinc-400">Sekarang kasih HP-nya ke <span className="font-bold text-indigo-500">{roles.predictor}</span></p>
             </div>
             <button
               onClick={() => setStep('playerB')}
@@ -141,9 +204,9 @@ export default function PredictionGame() {
           <div className="animate-in slide-in-from-right fade-in duration-500 space-y-8">
             <div className="text-center space-y-1">
               <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 rounded-full text-[10px] font-bold uppercase tracking-widest">
-                Giliran {partnerName}
+                Giliran {roles.predictor}
               </span>
-              <h2 className="text-lg font-serif italic text-on-surface-variant dark:text-zinc-400">Tebak jawaban pasanganmu!</h2>
+              <h2 className="text-lg font-serif italic text-on-surface-variant dark:text-zinc-400">Tebak jawaban {roles.answerer}!</h2>
             </div>
 
             <GlassCard className="p-8 border-purple-500/20 text-center space-y-6">
@@ -180,11 +243,11 @@ export default function PredictionGame() {
 
             <div className="space-y-4">
               <div className="glass-panel p-6 rounded-2xl border border-indigo-500/10 flex flex-col items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-500">Jawaban {currentPlayerName}</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-500">Jawaban {roles.answerer}</span>
                 <p className="text-lg font-medium text-on-surface dark:text-zinc-300">{answerA}</p>
               </div>
               <div className="glass-panel p-6 rounded-2xl border border-purple-500/10 flex flex-col items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-purple-500">Tebakan {partnerName}</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-purple-500">Tebakan {roles.predictor}</span>
                 <p className="text-lg font-medium text-on-surface dark:text-zinc-300">{answerB}</p>
               </div>
             </div>
@@ -192,9 +255,9 @@ export default function PredictionGame() {
             <div className="flex gap-4">
               <button
                 onClick={resetGame}
-                className="flex-1 py-4 bg-white/50 dark:bg-white/5 text-on-surface dark:text-zinc-400 border border-outline-variant/20 rounded-2xl font-bold transition-all"
+                className="flex-1 py-4 bg-white/50 dark:bg-white/5 text-on-surface dark:text-zinc-400 border border-outline-variant/20 rounded-2xl font-bold transition-all text-xs"
               >
-                Menu
+                Menu Utama
               </button>
               <button
                 onClick={startNewRound}
@@ -204,8 +267,14 @@ export default function PredictionGame() {
               </button>
             </div>
             
-            <div className="text-center">
+            <div className="text-center flex justify-between items-center px-4">
               <p className="text-xs font-serif italic text-outline dark:text-zinc-500">Total Match: {score}</p>
+              <button
+                onClick={() => setStep('pickRole')}
+                className="text-[10px] text-indigo-500 font-bold uppercase tracking-widest"
+              >
+                Ganti Peran
+              </button>
             </div>
           </div>
         )}

@@ -1,219 +1,84 @@
 export const PREDICTION_QUESTIONS = [
   // ROMANTIC
-  {
-    id: 1,
-    category: 'romantic',
-    text: 'Aku paling suka dipanggil apa?',
-    options: ['Sayang', 'Ayang', 'Cintaku', 'Nama Panggilan Lucu']
-  },
-  {
-    id: 2,
-    category: 'romantic',
-    text: 'Momen kita yang paling aku suka?',
-    options: ['First Date', 'Jalan Sore', 'Deep Talk Malam Hari', 'Waktu Masak Bareng']
-  },
-  {
-    id: 3,
-    category: 'romantic',
-    text: 'Hal kecil dari kamu yang paling aku perhatiin?',
-    options: ['Cara Senyum', 'Wangi Kamu', 'Cara Kamu Dengerin Aku', 'Perhatian Kecil Kamu']
-  },
-  {
-    id: 4,
-    category: 'romantic',
-    text: 'Aku paling seneng kalau kita lagi ngapain?',
-    options: ['Nonton Film', 'Makan Enak', 'Cuma Duduk Berdua', 'Cerita Apapun']
-  },
-  {
-    id: 5,
-    category: 'romantic',
-    text: 'Lagu yang paling ngingetin aku ke kamu?',
-    options: ['Lagu Galau', 'Lagu Romantis Kita', 'Lagu yang Sering Diputer', 'Lagu Baru yang Enak']
-  },
-  {
-    id: 6,
-    category: 'romantic',
-    text: 'Aku lebih suka kamu manja atau cuek?',
-    options: ['Manja Banget', 'Cuek tapi Sayang', 'Setengah-setengah', 'Tergantung Mood']
-  },
-  {
-    id: 7,
-    category: 'romantic',
-    text: 'Hal yang paling bikin aku kangen kamu?',
-    options: ['Ketawa Kamu', 'Suara Kamu', 'Kehadiran Kamu', 'Chat Random Kamu']
-  },
-  {
-    id: 8,
-    category: 'romantic',
-    text: 'Aku lebih suka ketemu atau VC?',
-    options: ['Ketemu Langsung', 'Video Call Lama', 'Dua-duanya Suka', 'Chat Aja Cukup']
-  },
-  {
-    id: 9,
-    category: 'romantic',
-    text: 'Hal yang paling aku suka dari kamu?',
-    options: ['Sifat Sabar Kamu', 'Penampilan Kamu', 'Cara Kamu Sayang Aku', 'Kecerdasan Kamu']
-  },
-  {
-    id: 10,
-    category: 'romantic',
-    text: 'Tempat favorit kita bareng?',
-    options: ['Cafe Langganan', 'Taman', 'Mall', 'Di Rumah Aja']
-  },
+  { id: 1, category: 'romantic', text: 'Aku paling suka dipanggil apa?', options: ['Sayang', 'Ayang', 'Cintaku', 'Nama Panggilan Lucu'] },
+  { id: 2, category: 'romantic', text: 'Momen kita yang paling aku suka?', options: ['First Date', 'Jalan Sore', 'Deep Talk Malam Hari', 'Waktu Masak Bareng'] },
+  { id: 3, category: 'romantic', text: 'Hal kecil dari kamu yang paling aku perhatiin?', options: ['Cara Senyum', 'Wangi Kamu', 'Cara Kamu Dengerin Aku', 'Perhatian Kecil Kamu'] },
+  { id: 4, category: 'romantic', text: 'Aku paling seneng kalau kita lagi ngapain?', options: ['Nonton Film', 'Makan Enak', 'Cuma Duduk Berdua', 'Cerita Apapun'] },
+  { id: 5, category: 'romantic', text: 'Lagu yang paling ngingetin aku ke kamu?', options: ['Lagu Galau', 'Lagu Romantis Kita', 'Lagu yang Sering Diputer', 'Lagu Baru yang Enak'] },
+  { id: 6, category: 'romantic', text: 'Aku lebih suka kamu manja atau cuek?', options: ['Manja Banget', 'Cuek tapi Sayang', 'Setengah-setengah', 'Tergantung Mood'] },
+  { id: 7, category: 'romantic', text: 'Hal yang paling bikin aku kangen kamu?', options: ['Ketawa Kamu', 'Suara Kamu', 'Kehadiran Kamu', 'Chat Random Kamu'] },
+  { id: 8, category: 'romantic', text: 'Aku lebih suka ketemu atau VC?', options: ['Ketemu Langsung', 'Video Call Lama', 'Dua-duanya Suka', 'Chat Aja Cukup'] },
+  { id: 9, category: 'romantic', text: 'Hal yang paling aku suka dari kamu?', options: ['Sifat Sabar Kamu', 'Penampilan Kamu', 'Cara Kamu Sayang Aku', 'Kecerdasan Kamu'] },
+  { id: 10, category: 'romantic', text: 'Tempat favorit kita bareng?', options: ['Cafe Langganan', 'Taman', 'Mall', 'Di Rumah Aja'] },
+  { id: 41, category: 'romantic', text: 'Aku paling suka kalau kamu ngapain ke aku?', options: ['Ucapin Love You', 'Pegang Tangan', 'Kasih Surprise Kecil', 'Dengerin Curhatku'] },
+  { id: 42, category: 'romantic', text: 'Aku paling seneng dapet perhatian kayak gimana?', options: ['Ditanya Kabar', 'Dikasih Makanan', 'Ditemenin Terus', 'Dikasih Semangat'] },
+  { id: 43, category: 'romantic', text: 'Aku lebih suka kamu ngucapin apa ke aku?', options: ['Kalimat Semangat', 'Pujian Tulus', 'Ungkapan Sayang', 'Candaan Lucu'] },
+  { id: 44, category: 'romantic', text: 'Hal romantis yang paling aku pengen dari kamu?', options: ['Makan Malam Berdua', 'Jalan-jalan Sore', 'Ditulisin Pesan Panjang', 'Dinyanyiin Lagu'] },
+  { id: 45, category: 'romantic', text: 'Aku paling suka quality time yang kayak gimana?', options: ['Ngobrol Serius', 'Bercanda Sampai Capek', 'Nonton Film Seru', 'Keliling Kota'] },
+  { id: 46, category: 'romantic', text: 'Aku lebih suka kamu spontan atau direncanakan?', options: ['Spontan Aja', 'Harus Direncanakan', 'Mix Keduanya', 'Terserah Kamu'] },
+  { id: 47, category: 'romantic', text: 'Aku paling seneng kalau kamu inget apa tentang aku?', options: ['Makanan Kesukaanku', 'Tanggal Penting Kita', 'Hal Kecil yang Kupengen', 'Cerita Masalalu'] },
+  { id: 48, category: 'romantic', text: 'Aku lebih suka dipuji di bagian apa?', options: ['Kepintaranku', 'Penampilanku', 'Sifat Baikku', 'Kerja Kerasku'] },
+  { id: 49, category: 'romantic', text: 'Aku paling suka kamu kalau lagi gimana?', options: ['Lagi Manja', 'Lagi Serius', 'Lagi Fokus Sesuatu', 'Lagi Ketawa Lepas'] },
+  { id: 50, category: 'romantic', text: 'Aku paling ngerasa dicintai saat kamu ngapain?', options: ['Diprioritaskan', 'Dimengerti', 'Diberi Waktu Kamu', 'Dibantu Masalahku'] },
 
   // FUN / RANDOM
-  {
-    id: 11,
-    category: 'fun',
-    text: 'Aku paling sering ngambek gara-gara apa?',
-    options: ['Laper', 'Ngantuk', 'Dicuekin', 'Hal Random']
-  },
-  {
-    id: 12,
-    category: 'fun',
-    text: 'Aku tipe yang telat atau tepat waktu?',
-    options: ['Selalu Telat', 'Tepat Waktu Banget', 'Kadang Telat', 'Gimana Situasi']
-  },
-  {
-    id: 13,
-    category: 'fun',
-    text: 'Aku lebih suka makan apa?',
-    options: ['Nasi Padang', 'Mie Ayam / Bakso', 'Fast Food', 'Cemilan Aja']
-  },
-  {
-    id: 14,
-    category: 'fun',
-    text: 'Aku kalau bosen biasanya ngapain?',
-    options: ['Main HP / Scroll TikTok', 'Tidur', 'Cari Makan', 'Chat Kamu Terus']
-  },
-  {
-    id: 15,
-    category: 'fun',
-    text: 'Aku paling sering chat kamu jam berapa?',
-    options: ['Pagi Buta', 'Siang Hari', 'Malam Banget', 'Sepanjang Hari']
-  },
-  {
-    id: 16,
-    category: 'fun',
-    text: 'Aku tipe orang yang rapi atau berantakan?',
-    options: ['Rapi Banget', 'Berantakan Dikit', 'Berantakan Banget', 'Rapi Kalau Mau Ketemu']
-  },
-  {
-    id: 17,
-    category: 'fun',
-    text: 'Aku lebih suka nonton atau main?',
-    options: ['Nonton Film/Series', 'Main Game', 'Nonton YouTube', 'Jalan-jalan']
-  },
-  {
-    id: 18,
-    category: 'fun',
-    text: 'Aku kalau lagi bad mood biasanya gimana?',
-    options: ['Diem Aja', 'Ngomel Dikit', 'Pengen Dimanja', 'Butuh Waktu Sendiri']
-  },
-  {
-    id: 19,
-    category: 'fun',
-    text: 'Aku lebih sering pake emoji apa?',
-    options: ['Emoji Love ❤️', 'Emoji Lucu 😂', 'Emoji Sedih 🥺', 'Emoji Flat 😐']
-  },
-  {
-    id: 20,
-    category: 'fun',
-    text: 'Aku paling males ngapain?',
-    options: ['Mandi', 'Beresin Kamar', 'Bangun Pagi', 'Olahraga']
-  },
+  { id: 11, category: 'fun', text: 'Aku paling sering ngambek gara-gara apa?', options: ['Laper', 'Ngantuk', 'Dicuekin', 'Hal Random'] },
+  { id: 12, category: 'fun', text: 'Aku tipe yang telat atau tepat waktu?', options: ['Selalu Telat', 'Tepat Waktu Banget', 'Kadang Telat', 'Gimana Situasi'] },
+  { id: 13, category: 'fun', text: 'Aku lebih suka makan apa?', options: ['Nasi Padang', 'Mie Ayam / Bakso', 'Fast Food', 'Cemilan Aja'] },
+  { id: 14, category: 'fun', text: 'Aku kalau bosen biasanya ngapain?', options: ['Main HP / Scroll TikTok', 'Tidur', 'Cari Makan', 'Chat Kamu Terus'] },
+  { id: 15, category: 'fun', text: 'Aku paling sering chat kamu jam berapa?', options: ['Pagi Buta', 'Siang Hari', 'Malam Banget', 'Sepanjang Hari'] },
+  { id: 16, category: 'fun', text: 'Aku tipe orang yang rapi atau berantakan?', options: ['Rapi Banget', 'Berantakan Dikit', 'Berantakan Banget', 'Rapi Kalau Mau Ketemu'] },
+  { id: 17, category: 'fun', text: 'Aku lebih suka nonton atau main?', options: ['Nonton Film/Series', 'Main Game', 'Nonton YouTube', 'Jalan-jalan'] },
+  { id: 18, category: 'fun', text: 'Aku kalau lagi bad mood biasanya gimana?', options: ['Diem Aja', 'Ngomel Dikit', 'Pengen Dimanja', 'Butuh Waktu Sendiri'] },
+  { id: 19, category: 'fun', text: 'Aku lebih sering pake emoji apa?', options: ['Emoji Love ❤️', 'Emoji Lucu 😂', 'Emoji Sedih 🥺', 'Emoji Flat 😐'] },
+  { id: 20, category: 'fun', text: 'Aku paling males ngapain?', options: ['Mandi', 'Beresin Kamar', 'Bangun Pagi', 'Olahraga'] },
+  { id: 51, category: 'fun', text: 'Aku kalau lapar biasanya jadi gimana?', options: ['Sensitif / Galak', 'Diem Banget', 'Pusing', 'Tetep Ceria'] },
+  { id: 52, category: 'fun', text: 'Aku lebih sering lupa atau inget?', options: ['Pelupa Banget', 'Daya Inget Kuat', 'Inget yang Penting Aja', 'Lupa Kalau Lagi Capek'] },
+  { id: 53, category: 'fun', text: 'Aku tipe yang rebahan atau aktif?', options: ['Tim Rebahan', 'Tim Aktif Gerak', 'Bisa Keduanya', 'Lagi Males Aktif'] },
+  { id: 54, category: 'fun', text: 'Aku lebih suka begadang atau tidur cepat?', options: ['Kelelawar (Begadang)', 'Tidur Teratur', 'Tergantung Tugas', 'Suka Tidur Aja'] },
+  { id: 55, category: 'fun', text: 'Aku kalau nonton biasanya fokus atau sambil main HP?', options: ['Fokus Banget', 'Sambil Scroll HP', 'Sambil Makan', 'Sambil Ngobrol'] },
+  { id: 56, category: 'fun', text: 'Aku tipe yang boros atau hemat?', options: ['Boros Banget 💸', 'Hemat Banget 💎', 'Boros di Makanan', 'Hemat Buat Masa Depan'] },
+  { id: 57, category: 'fun', text: 'Aku kalau lagi kesel biasanya diem atau ngomel?', options: ['Diem Seribu Bahasa', 'Ngomel Terus', 'Diem Terus Nangis', 'Langsung Bilang Kesel'] },
+  { id: 58, category: 'fun', text: 'Aku lebih suka ngaret atau on time?', options: ['On Time Banget', 'Ngaret Dikit 15 Menit', 'Ngaret Parah 1 Jam', 'Gak Tentu'] },
+  { id: 59, category: 'fun', text: 'Aku kalau disuruh foto biasanya gimana?', options: ['PD Banget', 'Malu-malu', 'Muka Flat', 'Gaya Random'] },
+  { id: 60, category: 'fun', text: 'Aku lebih sering ketawa atau serius?', options: ['Ketawa Terus', 'Serius Banget', 'Humoris Receh', 'Pendiem tapi Lucu'] },
 
   // DEEP
-  {
-    id: 21,
-    category: 'deep',
-    text: 'Hal yang paling aku takutkan di hubungan ini?',
-    options: ['Kehilangan Kamu', 'Kita Berubah', 'Masalah Komunikasi', 'Jarak']
-  },
-  {
-    id: 22,
-    category: 'deep',
-    text: 'Apa arti hubungan ini buat aku?',
-    options: ['Segalanya', 'Prioritas Utama', 'Rumah Tempat Pulang', 'Masa Depan']
-  },
-  {
-    id: 23,
-    category: 'deep',
-    text: 'Aku pengen hubungan kita ke arah mana?',
-    options: ['Serius Ke Depan', 'Jalanin Dulu', 'Selalu Bahagia', 'Saling Mendukung']
-  },
-  {
-    id: 24,
-    category: 'deep',
-    text: 'Hal yang paling aku hargai dari kamu?',
-    options: ['Kesetiaan Kamu', 'Pengorbanan Kamu', 'Kejujuran Kamu', 'Sifat Dewasa Kamu']
-  },
-  {
-    id: 25,
-    category: 'deep',
-    text: 'Aku pernah insecure soal apa?',
-    options: ['Penampilan', 'Masa Depan', 'Sifat Sendiri', 'Hal Lain']
-  },
+  { id: 21, category: 'deep', text: 'Hal yang paling aku takutkan di hubungan ini?', options: ['Kehilangan Kamu', 'Kita Berubah', 'Masalah Komunikasi', 'Jarak'] },
+  { id: 22, category: 'deep', text: 'Apa arti hubungan ini buat aku?', options: ['Segalanya', 'Prioritas Utama', 'Rumah Tempat Pulang', 'Masa Depan'] },
+  { id: 23, category: 'deep', text: 'Aku pengen hubungan kita ke arah mana?', options: ['Serius Ke Depan', 'Jalanin Dulu', 'Selalu Bahagia', 'Saling Mendukung'] },
+  { id: 24, category: 'deep', text: 'Hal yang paling aku hargai dari kamu?', options: ['Kesetiaan Kamu', 'Pengorbanan Kamu', 'Kejujuran Kamu', 'Sifat Dewasa Kamu'] },
+  { id: 25, category: 'deep', text: 'Aku pernah insecure soal apa?', options: ['Penampilan', 'Masa Depan', 'Sifat Sendiri', 'Hal Lain'] },
+  { id: 61, category: 'deep', text: 'Hal yang paling aku butuhkan dari kamu?', options: ['Dukungan Moral', 'Waktu Kamu', 'Kepastian', 'Kejujuran'] },
+  { id: 62, category: 'deep', text: 'Aku pengen kita jadi apa ke depannya?', options: ['Pasangan Terbaik', 'Teman Hidup Selamanya', 'Saling Melengkapi', 'Jadi Versi Terbaik'] },
+  { id: 63, category: 'deep', text: 'Hal yang paling aku jaga di hubungan ini?', options: ['Kepercayaan', 'Kenyamanan', 'Komunikasi', 'Kesetiaan'] },
+  { id: 64, category: 'deep', text: 'Aku paling takut kamu berubah jadi gimana?', options: ['Jadi Cuek', 'Jadi Kasar', 'Jadi Gak Peduli', 'Jadi Orang Asing'] },
+  { id: 65, category: 'deep', text: 'Hal yang bikin aku merasa aman sama kamu?', options: ['Pelukan Kamu', 'Kata-kata Kamu', 'Sikap Kamu', 'Janji Kamu'] },
+  { id: 66, category: 'deep', text: 'Aku butuh kamu dalam bentuk apa?', options: ['Teman Cerita', 'Pelindung', 'Penyemangat', 'Pendengar'] },
+  { id: 67, category: 'deep', text: 'Aku paling menghargai usaha kamu di bagian apa?', options: ['Cari Waktu Buat Aku', 'Sabar Hadapi Aku', 'Kerja Kerasmu', 'Perhatian Kecilmu'] },
+  { id: 68, category: 'deep', text: 'Aku pengen kita lebih baik di bagian apa?', options: ['Komunikasi', 'Saling Terbuka', 'Kontrol Emosi', 'Waktu Bersama'] },
+  { id: 69, category: 'deep', text: 'Hal yang paling aku pelajari dari kamu?', options: ['Sikap Sabar', 'Cara Mencintai', 'Kedewasaan', 'Pantang Menyerah'] },
+  { id: 70, category: 'deep', text: 'Aku berharap kamu mengerti aku di bagian apa?', options: ['Sifat Moodyan-ku', 'Masa Laluku', 'Insecure-ku', 'Cita-citaku'] },
 
   // SIMPLE CHOICE
-  {
-    id: 31,
-    category: 'simple',
-    text: 'Aku pilih mana?',
-    options: ['Nonton', 'Jalan-jalan']
-  },
-  {
-    id: 32,
-    category: 'simple',
-    text: 'Aku lebih pilih:',
-    options: ['Chatting', 'Calling']
-  },
-  {
-    id: 33,
-    category: 'simple',
-    text: 'Waktu favorit aku:',
-    options: ['Siang Hari', 'Malam Hari']
-  },
-  {
-    id: 34,
-    category: 'simple',
-    text: 'Minuman favorit:',
-    options: ['Kopi', 'Teh']
-  },
-  {
-    id: 35,
-    category: 'simple',
-    text: 'Rasa favorit:',
-    options: ['Manis', 'Asin']
-  },
-  {
-    id: 36,
-    category: 'simple',
-    text: 'Lokasi favorit:',
-    options: ['Indoor', 'Outdoor']
-  },
-  {
-    id: 37,
-    category: 'simple',
-    text: 'Gaya liburan:',
-    options: ['Santai', 'Jalan-jalan Terus']
-  },
-  {
-    id: 38,
-    category: 'simple',
-    text: 'Abadikan momen:',
-    options: ['Foto', 'Video']
-  },
-  {
-    id: 39,
-    category: 'simple',
-    text: 'Cuaca favorit:',
-    options: ['Hujan', 'Panas']
-  },
-  {
-    id: 40,
-    category: 'simple',
-    text: 'Tipe pengeluaran:',
-    options: ['Hemat', 'Boros 😆']
-  }
+  { id: 31, category: 'simple', text: 'Aku pilih mana?', options: ['Nonton', 'Jalan-jalan'] },
+  { id: 32, category: 'simple', text: 'Aku lebih pilih:', options: ['Chatting', 'Calling'] },
+  { id: 33, category: 'simple', text: 'Waktu favorit aku:', options: ['Siang Hari', 'Malam Hari'] },
+  { id: 34, category: 'simple', text: 'Minuman favorit:', options: ['Kopi', 'Teh'] },
+  { id: 35, category: 'simple', text: 'Rasa favorit:', options: ['Manis', 'Asin'] },
+  { id: 36, category: 'simple', text: 'Lokasi favorit:', options: ['Indoor', 'Outdoor'] },
+  { id: 37, category: 'simple', text: 'Gaya liburan:', options: ['Santai', 'Jalan-jalan Terus'] },
+  { id: 38, category: 'simple', text: 'Abadikan momen:', options: ['Foto', 'Video'] },
+  { id: 39, category: 'simple', text: 'Cuaca favorit:', options: ['Hujan', 'Panas'] },
+  { id: 40, category: 'simple', text: 'Tipe pengeluaran:', options: ['Hemat', 'Boros 😆'] },
+  { id: 71, category: 'simple', text: 'Aku pilih:', options: ['Jalan Jauh', 'Deket Aja'] },
+  { id: 72, category: 'simple', text: 'Aku pilih:', options: ['Makan Berat', 'Snack Aja'] },
+  { id: 73, category: 'simple', text: 'Aku pilih:', options: ['Film Romantis', 'Komedi Kocak'] },
+  { id: 74, category: 'simple', text: 'Aku pilih:', options: ['Foto Lucu', 'Foto Aesthetic'] },
+  { id: 75, category: 'simple', text: 'Aku pilih:', options: ['Nongkrong Luar', 'Di Rumah Aja'] },
+  { id: 76, category: 'simple', text: 'Aku pilih:', options: ['Siang Bareng', 'Malam Bareng'] },
+  { id: 77, category: 'simple', text: 'Aku pilih:', options: ['Chat Panjang', 'Singkat Jelas'] },
+  { id: 78, category: 'simple', text: 'Aku pilih:', options: ['Surprise!', 'Direncanakan'] },
+  { id: 79, category: 'simple', text: 'Aku pilih:', options: ['Santai-santai', 'Produktif'] },
+  { id: 80, category: 'simple', text: 'Aku pilih:', options: ['Dengerin Musik', 'Nonton Sesuatu'] }
 ];
