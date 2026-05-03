@@ -109,6 +109,7 @@ export const translations = {
       confirm_delete: 'Yakin ingin menghapus momen ini?',
       zoom_close_hint: 'Klik di mana saja untuk menutup',
       zoom_hint: 'Klik untuk zoom',
+      found_count: 'Momen Ditemukan',
     },
     wishes: {
       title: 'Harapan & Afirmasi',
@@ -281,6 +282,7 @@ export const translations = {
       confirm_delete: 'Are you sure you want to delete this moment?',
       zoom_close_hint: 'Click anywhere to close',
       zoom_hint: 'Click to zoom',
+      found_count: 'Moments Found',
     },
     wishes: {
       title: 'Hopes & Affirmations',

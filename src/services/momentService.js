@@ -19,7 +19,7 @@ export async function getMoments(coupleId, useCache = true) {
       collection(db, 'moments'),
       where('couple_id', '==', coupleId),
       orderBy('date', 'desc'),
-      limit(50) // Basic pagination limit
+      limit(50)
     );
     const snap = await getDocs(q);
     const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -43,16 +43,19 @@ export function invalidateMomentsCache() {
 }
 
 export function listenMoments(coupleId, callback) {
+  // We use a simple query without orderBy to avoid index requirements for now, 
+  // sorting is handled in the component for reliability.
   const q = query(
     collection(db, 'moments'),
     where('couple_id', '==', coupleId),
-    orderBy('date', 'desc'),
     limit(100)
   );
   
   return onSnapshot(q, (snap) => {
     const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    callback(data);
+    // Sort client-side to ensure it works even if index is not created yet
+    const sorted = data.sort((a, b) => new Date(b.date) - new Date(a.date));
+    callback(sorted);
   }, (error) => {
     console.error("Real-time moments error:", error);
   });

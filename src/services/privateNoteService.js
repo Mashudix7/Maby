@@ -44,15 +44,17 @@ export async function createPrivateNote(userId, text) {
 }
 
 export function listenPrivateNotes(userId, callback) {
+  // Simple query to avoid index requirements
   const q = query(
     collection(db, 'private_notes'),
-    where('user_id', '==', userId),
-    orderBy('created_at', 'desc')
+    where('user_id', '==', userId)
   );
 
   return onSnapshot(q, (snap) => {
     const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    callback(data);
+    // Client-side sort
+    const sorted = data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    callback(sorted);
   }, (error) => {
     console.error("Real-time private notes error:", error);
   });

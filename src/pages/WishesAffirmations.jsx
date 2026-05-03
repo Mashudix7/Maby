@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import MainLayout from '../components/layout/MainLayout';
 import WishCard from '../components/ui/WishCard';
 import { useAuth } from '../context/AuthContext';
@@ -7,17 +7,35 @@ import { createWish, listenWishes } from '../services/wishService';
 import { showSuccess, showError } from '../lib/alerts';
 import { WishCardSkeleton } from '../components/ui/Skeleton';
 import VirtualGrid from '../components/ui/VirtualGrid';
+import { db } from '../lib/firebase';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 
 export default function WishesAffirmations() {
   const { user, coupleId } = useAuth();
   const { t, language } = useLanguage();
   const [wishes, setWishes] = useState([]);
+  const [profiles, setProfiles] = useState({});
   const [loading, setLoading] = useState(true);
   const [newWish, setNewWish] = useState('');
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!coupleId) return;
+
+    // Fetch profiles once
+    const fetchProfiles = async () => {
+      try {
+        const q = query(collection(db, 'users'), where('couple_id', '==', coupleId));
+        const snap = await getDocs(q);
+        const pMap = {};
+        snap.forEach(d => pMap[d.id] = d.data());
+        setProfiles(pMap);
+      } catch (err) {
+        console.error('Error fetching profiles:', err);
+      }
+    };
+
+    fetchProfiles();
     
     // Real-time listener
     const unsubscribe = listenWishes(coupleId, (data) => {
@@ -43,6 +61,13 @@ export default function WishesAffirmations() {
       setSaving(false);
     }
   };
+
+  const wishesWithProfiles = useMemo(() => {
+    return wishes.map(w => ({
+      ...w,
+      profiles: profiles[w.user_id] || null
+    }));
+  }, [wishes, profiles]);
 
   const renderWish = useCallback((wish) => (
     <WishCard key={wish.id} className="flex flex-col justify-between h-full group hover:scale-[1.02] transition-all duration-300">
@@ -109,7 +134,7 @@ export default function WishesAffirmations() {
           </div>
         ) : (
           <VirtualGrid
-            items={wishes}
+            items={wishesWithProfiles}
             itemHeight={220}
             minColumnWidth={320}
             renderItem={renderWish}

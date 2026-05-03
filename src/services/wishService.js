@@ -59,16 +59,18 @@ export function invalidateWishesCache() {
 }
 
 export function listenWishes(coupleId, callback) {
+  // Removing orderBy to avoid index requirement for real-time sync
   const q = query(
     collection(db, 'wishes'),
     where('couple_id', '==', coupleId),
-    orderBy('created_at', 'desc'),
     limit(100)
   );
 
   return onSnapshot(q, (snap) => {
     const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    callback(data);
+    // Client-side sort
+    const sorted = data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    callback(sorted);
   }, (error) => {
     console.error("Real-time wishes error:", error);
   });
