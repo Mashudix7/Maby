@@ -278,6 +278,27 @@ export default function Dashboard() {
 
           {/* Side Column */}
           <div className="md:col-span-4 flex flex-col gap-8">
+            {/* Games Section (Truth or Dare) */}
+            <Link to="/games" className="group relative h-32 md:h-40 rounded-[2rem] overflow-hidden shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] border border-rose-500/10 mb-2">
+               <div className="absolute inset-0 bg-gradient-to-br from-rose-400 to-pink-600 dark:from-rose-600 dark:to-pink-900" />
+               <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
+               <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all" />
+               <div className="absolute -left-2 -top-2 w-16 h-16 bg-white/5 rounded-full blur-xl" />
+               
+               <div className="relative h-full flex items-center p-6 md:p-8 gap-4 md:gap-6">
+                  <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-inner group-hover:rotate-12 transition-transform">
+                    <span className="material-symbols-outlined text-3xl md:text-4xl text-white drop-shadow-md">casino</span>
+                  </div>
+                  <div className="flex flex-col text-left">
+                    <h3 className="font-serif text-xl md:text-2xl font-bold text-white tracking-tight leading-none">Truth or Dare</h3>
+                    <p className="text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] text-white/80 mt-2">Let's Play Together!</p>
+                  </div>
+                  <div className="ml-auto w-10 h-10 rounded-full bg-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
+                    <span className="material-symbols-outlined text-white">arrow_forward</span>
+                  </div>
+               </div>
+            </Link>
+
             {/* Mood Tracker */}
             <GlassCard className="flex flex-col items-center justify-center text-center p-4 md:p-8 border border-primary/10">
               <div className="flex items-center justify-between w-full mb-6">
@@ -352,19 +373,6 @@ export default function Dashboard() {
                 <span className="font-serif text-sm font-semibold text-on-surface dark:text-[#ede0df]" dangerouslySetInnerHTML={{ __html: t('dashboard.write_wish').replace(' ', '<br/>') }} />
               </Link>
             </div>
-
-            {/* Games Section */}
-            <Link to="/games" className="glass-panel p-4 md:p-6 rounded-2xl flex items-center gap-4 group hover:scale-105 transition-all duration-300 hover:border-primary/30 border border-primary/5 relative overflow-hidden">
-               <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-               <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform shrink-0">
-                  <span className="material-symbols-outlined text-2xl">casino</span>
-               </div>
-               <div className="flex flex-col">
-                  <span className="font-serif text-lg font-bold text-on-surface dark:text-[#ede0df]">Truth or Dare</span>
-                  <span className="text-[10px] uppercase tracking-widest font-bold text-outline dark:text-zinc-500">Play Together</span>
-               </div>
-               <span className="material-symbols-outlined ml-auto text-primary opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">chevron_right</span>
-            </Link>
           </div>
         </section>
 
