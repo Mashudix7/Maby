@@ -4,6 +4,25 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { createPrivateNote, deletePrivateNote, listenPrivateNotes } from '../services/privateNoteService';
 import { showConfirmDelete, showSuccess, showError } from '../lib/alerts';
+import { memo } from 'react';
+
+const NoteItem = memo(({ note, language, t, onDelete }) => (
+  <div className="bg-[#1a1517]/40 border border-zinc-800/20 rounded-2xl p-5 relative group contain-layout contain-paint will-change-transform translate-z-0">
+    <p className="text-zinc-400 text-sm leading-relaxed whitespace-pre-wrap pr-8">{note.text}</p>
+    <div className="flex justify-between items-end mt-4">
+      <span className="text-[10px] text-zinc-600 font-serif italic">
+        {new Date(note.created_at).toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+      </span>
+      <button
+        onClick={() => onDelete(note.id)}
+        className="text-zinc-700 hover:text-red-900/80 transition-colors opacity-0 group-hover:opacity-100"
+        title={t('common.delete')}
+      >
+        <span className="material-symbols-outlined text-[16px]">delete</span>
+      </button>
+    </div>
+  </div>
+));
 
 export default function PrivateNotes() {
   const { user } = useAuth();
@@ -94,21 +113,13 @@ export default function PrivateNotes() {
             </div>
           ) : (
             notes.map(note => (
-              <div key={note.id} className="bg-[#1a1517]/50 border border-zinc-800/30 rounded-2xl p-5 relative group">
-                <p className="text-zinc-400 text-sm leading-relaxed whitespace-pre-wrap pr-8">{note.text}</p>
-                <div className="flex justify-between items-end mt-4">
-                  <span className="text-[10px] text-zinc-600 font-serif italic">
-                    {new Date(note.created_at).toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                  <button
-                    onClick={() => handleDelete(note.id)}
-                    className="text-zinc-700 hover:text-red-900/80 transition-colors opacity-0 group-hover:opacity-100"
-                    title={t('common.delete')}
-                  >
-                    <span className="material-symbols-outlined text-[16px]">delete</span>
-                  </button>
-                </div>
-              </div>
+              <NoteItem 
+                key={note.id} 
+                note={note} 
+                language={language} 
+                t={t} 
+                onDelete={handleDelete} 
+              />
             ))
           )}
         </div>

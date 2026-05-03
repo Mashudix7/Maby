@@ -131,18 +131,18 @@
 /* ===== COMPONENT UTILITIES ===== */
 @layer components {
   .glass-panel {
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 10px 30px rgba(74, 69, 69, 0.05);
     transition: background-color 0.2s;
     transform: translateZ(0); /* Force GPU */
-    contain: content;
+    contain: layout; /* Changed from content to allow overflow */
   }
 
   .dark .glass-panel {
-    background-color: rgba(30, 25, 27, 0.8);
+    background-color: rgba(26, 21, 23, 0.8);
     border-color: rgba(255, 255, 255, 0.05);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   }
