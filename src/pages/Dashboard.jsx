@@ -279,38 +279,38 @@ export default function Dashboard() {
           {/* Side Column */}
           <div className="md:col-span-4 flex flex-col gap-8">
             {/* Games Section */}
-            <div className="flex flex-col gap-4 mb-2">
+            <div className="flex flex-col gap-3 mb-2">
               {/* Truth or Dare Banner */}
-              <Link to="/games" className="group relative h-24 md:h-28 rounded-2xl overflow-hidden shadow-md transition-all hover:scale-[1.02] active:scale-[0.98] border border-rose-500/10">
-                 <div className="absolute inset-0 bg-gradient-to-br from-rose-400 to-pink-600 dark:from-rose-600 dark:to-pink-900" />
+              <Link to="/games" className="group relative h-20 md:h-22 rounded-2xl overflow-hidden shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98] border border-primary/10">
+                 <div className="absolute inset-0 bg-gradient-to-r from-primary/80 to-rose-500/80 dark:from-rose-900/40 dark:to-rose-800/40 backdrop-blur-sm" />
                  <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
                  
-                 <div className="relative h-full flex items-center p-4 md:p-6 gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-inner group-hover:rotate-12 transition-transform shrink-0">
-                      <span className="material-symbols-outlined text-2xl text-white drop-shadow-md">casino</span>
+                 <div className="relative h-full flex items-center p-4 md:p-5 gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-inner group-hover:rotate-12 transition-transform shrink-0">
+                      <span className="material-symbols-outlined text-xl text-white">casino</span>
                     </div>
                     <div className="flex flex-col text-left">
-                      <h3 className="font-serif text-lg md:text-xl font-bold text-white tracking-tight leading-none">Truth or Dare</h3>
-                      <p className="text-[9px] font-bold uppercase tracking-widest text-white/70 mt-1.5">Challenge Each Other</p>
+                      <h3 className="font-serif text-base md:text-lg font-bold text-white leading-none">Truth or Dare</h3>
+                      <p className="text-[8px] font-bold uppercase tracking-widest text-white/70 mt-1">Fun Challenge</p>
                     </div>
-                    <span className="material-symbols-outlined ml-auto text-white opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">chevron_right</span>
+                    <span className="material-symbols-outlined ml-auto text-white/50 group-hover:text-white transition-colors">chevron_right</span>
                  </div>
               </Link>
 
               {/* Prediction Game Banner */}
-              <Link to="/prediction" className="group relative h-24 md:h-28 rounded-2xl overflow-hidden shadow-md transition-all hover:scale-[1.02] active:scale-[0.98] border border-indigo-500/10">
-                 <div className="absolute inset-0 bg-gradient-to-br from-indigo-400 to-purple-600 dark:from-indigo-600 dark:to-purple-900" />
+              <Link to="/prediction" className="group relative h-20 md:h-22 rounded-2xl overflow-hidden shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98] border border-indigo-500/10">
+                 <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/80 to-purple-500/80 dark:from-indigo-900/40 dark:to-purple-800/40 backdrop-blur-sm" />
                  <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
                  
-                 <div className="relative h-full flex items-center p-4 md:p-6 gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-inner group-hover:-rotate-12 transition-transform shrink-0">
-                      <span className="material-symbols-outlined text-2xl text-white drop-shadow-md">psychology</span>
+                 <div className="relative h-full flex items-center p-4 md:p-5 gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-inner group-hover:-rotate-12 transition-transform shrink-0">
+                      <span className="material-symbols-outlined text-xl text-white">psychology</span>
                     </div>
                     <div className="flex flex-col text-left">
-                      <h3 className="font-serif text-lg md:text-xl font-bold text-white tracking-tight leading-none">Prediction Game</h3>
-                      <p className="text-[9px] font-bold uppercase tracking-widest text-white/70 mt-1.5">Do You Know Your Partner?</p>
+                      <h3 className="font-serif text-base md:text-lg font-bold text-white leading-none">Prediction Game</h3>
+                      <p className="text-[8px] font-bold uppercase tracking-widest text-white/70 mt-1">Deep Match</p>
                     </div>
-                    <span className="material-symbols-outlined ml-auto text-white opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">chevron_right</span>
+                    <span className="material-symbols-outlined ml-auto text-white/50 group-hover:text-white transition-colors">chevron_right</span>
                  </div>
               </Link>
             </div>

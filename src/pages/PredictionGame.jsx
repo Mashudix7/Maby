@@ -15,23 +15,21 @@ export default function PredictionGame() {
   
   // Roles
   const [roles, setRoles] = useState({
-    answerer: null, // { name, id }
+    answerer: null, // { name, avatar }
     predictor: null
   });
 
-  const partnerName = profile?.display_name?.includes('Feby') ? 'Mashudi' : 'Feby Zahara';
-  const myName = profile?.display_name || 'Kamu';
+  const isFeby = profile?.display_name?.includes('Feby');
+  const myInfo = { name: isFeby ? 'Feby Zahara' : 'Mashudi', avatar: isFeby ? '/feby.jpg' : '/mashudi.jpg' };
+  const partnerInfo = { name: isFeby ? 'Mashudi' : 'Feby Zahara', avatar: isFeby ? '/mashudi.jpg' : '/feby.jpg' };
 
   const filteredQuestions = useMemo(() => {
     if (category === 'all') return PREDICTION_QUESTIONS;
     return PREDICTION_QUESTIONS.filter(q => q.category === category);
   }, [category]);
 
-  const handlePickRole = (answererName, predictorName) => {
-    setRoles({
-      answerer: answererName,
-      predictor: predictorName
-    });
+  const handlePickRole = (answerer, predictor) => {
+    setRoles({ answerer, predictor });
     setStep('start');
   };
 
@@ -68,9 +66,6 @@ export default function PredictionGame() {
         {step === 'pickRole' && (
           <div className="animate-in fade-in zoom-in duration-500 space-y-8 text-center">
             <div className="space-y-2">
-              <div className="w-20 h-20 bg-indigo-500 rounded-[2rem] flex items-center justify-center text-white mx-auto shadow-lg">
-                <span className="material-symbols-outlined text-4xl">groups</span>
-              </div>
               <h1 className="font-serif text-3xl text-on-surface dark:text-[#ede0df]">Pilih Peran</h1>
               <p className="text-on-surface-variant dark:text-zinc-500 font-serif italic text-sm">
                 Siapa yang mau menjawab & menebak?
@@ -79,28 +74,36 @@ export default function PredictionGame() {
 
             <div className="grid grid-cols-1 gap-4">
               <button
-                onClick={() => handlePickRole(myName, partnerName)}
-                className="p-6 glass-panel border border-indigo-500/20 rounded-2xl text-left flex items-center justify-between group hover:border-indigo-500 transition-all"
+                onClick={() => handlePickRole(myInfo, partnerInfo)}
+                className="p-5 glass-panel border border-indigo-500/20 rounded-2xl text-left flex items-center gap-4 group hover:border-indigo-500 transition-all"
               >
-                <div className="flex flex-col">
-                  <span className="text-xs font-bold text-indigo-500 uppercase tracking-widest">Opsi 1</span>
-                  <p className="text-on-surface dark:text-zinc-300 font-medium">
-                    <span className="font-bold">{myName}</span> Menjawab <br/>
-                    <span className="font-bold">{partnerName}</span> Menebak
+                <div className="flex -space-x-3">
+                  <img src={myInfo.avatar} className="w-12 h-12 rounded-full border-2 border-white shadow-sm object-cover" alt={myInfo.name} />
+                  <img src={partnerInfo.avatar} className="w-12 h-12 rounded-full border-2 border-white shadow-sm object-cover" alt={partnerInfo.name} />
+                </div>
+                <div className="flex flex-col flex-1">
+                  <p className="text-xs font-bold text-indigo-500 uppercase tracking-widest">Opsi 1</p>
+                  <p className="text-sm text-on-surface dark:text-zinc-300">
+                    <span className="font-bold text-primary">{myInfo.name.split(' ')[0]}</span> Menjawab <br/>
+                    <span className="font-bold text-indigo-500">{partnerInfo.name.split(' ')[0]}</span> Menebak
                   </p>
                 </div>
                 <span className="material-symbols-outlined text-indigo-500 opacity-0 group-hover:opacity-100 transition-all">arrow_forward</span>
               </button>
 
               <button
-                onClick={() => handlePickRole(partnerName, myName)}
-                className="p-6 glass-panel border border-indigo-500/20 rounded-2xl text-left flex items-center justify-between group hover:border-indigo-500 transition-all"
+                onClick={() => handlePickRole(partnerInfo, myInfo)}
+                className="p-5 glass-panel border border-indigo-500/20 rounded-2xl text-left flex items-center gap-4 group hover:border-indigo-500 transition-all"
               >
-                <div className="flex flex-col">
-                  <span className="text-xs font-bold text-indigo-500 uppercase tracking-widest">Opsi 2</span>
-                  <p className="text-on-surface dark:text-zinc-300 font-medium">
-                    <span className="font-bold">{partnerName}</span> Menjawab <br/>
-                    <span className="font-bold">{myName}</span> Menebak
+                <div className="flex -space-x-3">
+                  <img src={partnerInfo.avatar} className="w-12 h-12 rounded-full border-2 border-white shadow-sm object-cover" alt={partnerInfo.name} />
+                  <img src={myInfo.avatar} className="w-12 h-12 rounded-full border-2 border-white shadow-sm object-cover" alt={myInfo.name} />
+                </div>
+                <div className="flex flex-col flex-1">
+                  <p className="text-xs font-bold text-indigo-500 uppercase tracking-widest">Opsi 2</p>
+                  <p className="text-sm text-on-surface dark:text-zinc-300">
+                    <span className="font-bold text-primary">{partnerInfo.name.split(' ')[0]}</span> Menjawab <br/>
+                    <span className="font-bold text-indigo-500">{myInfo.name.split(' ')[0]}</span> Menebak
                   </p>
                 </div>
                 <span className="material-symbols-outlined text-indigo-500 opacity-0 group-hover:opacity-100 transition-all">arrow_forward</span>
@@ -112,10 +115,11 @@ export default function PredictionGame() {
         {step === 'start' && (
           <div className="animate-in fade-in zoom-in duration-500 space-y-8 text-center">
             <div className="space-y-2">
-              <div className="w-20 h-20 bg-indigo-500 rounded-[2rem] flex items-center justify-center text-white mx-auto shadow-lg rotate-3">
-                <span className="material-symbols-outlined text-4xl">psychology</span>
+              <div className="w-20 h-20 bg-indigo-500 rounded-[2rem] flex items-center justify-center text-white mx-auto shadow-lg rotate-3 relative overflow-hidden">
+                <div className="absolute inset-0 bg-white/20 backdrop-blur-sm" />
+                <span className="material-symbols-outlined text-4xl relative z-10">psychology</span>
               </div>
-              <h1 className="font-serif text-4xl text-on-surface dark:text-[#ede0df] italic">Prediction Game</h1>
+              <h1 className="font-serif text-3xl text-on-surface dark:text-[#ede0df] italic">Prediction Game</h1>
               <p className="text-on-surface-variant dark:text-zinc-400 font-serif italic text-sm">
                 Pilih kategori pertanyaan ✨
               </p>
@@ -156,11 +160,14 @@ export default function PredictionGame() {
 
         {step === 'playerA' && (
           <div className="animate-in slide-in-from-right fade-in duration-500 space-y-8">
-            <div className="text-center space-y-1">
-              <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 rounded-full text-[10px] font-bold uppercase tracking-widest">
-                Giliran {roles.answerer}
-              </span>
-              <h2 className="text-lg font-serif italic text-on-surface-variant dark:text-zinc-400">Jawab diam-diam ya..</h2>
+            <div className="flex flex-col items-center text-center space-y-3">
+              <img src={roles.answerer.avatar} className="w-16 h-16 rounded-full border-4 border-white shadow-md object-cover" alt={roles.answerer.name} />
+              <div className="space-y-1">
+                <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                  Giliran {roles.answerer.name.split(' ')[0]}
+                </span>
+                <h2 className="text-lg font-serif italic text-on-surface-variant dark:text-zinc-400">Jawab diam-diam ya..</h2>
+              </div>
             </div>
 
             <GlassCard className="p-8 border-indigo-500/20 text-center space-y-6">
@@ -184,12 +191,14 @@ export default function PredictionGame() {
 
         {step === 'transition' && (
           <div className="animate-in fade-in zoom-in duration-500 text-center space-y-8">
-            <div className="w-24 h-24 bg-purple-500 rounded-full flex items-center justify-center text-white mx-auto shadow-2xl animate-pulse">
-              <span className="material-symbols-outlined text-5xl">sync</span>
+            <div className="w-24 h-24 bg-purple-500 rounded-full flex items-center justify-center text-white mx-auto shadow-2xl animate-pulse relative overflow-hidden">
+               <img src={roles.predictor.avatar} className="absolute inset-0 w-full h-full object-cover opacity-60" alt={roles.predictor.name} />
+               <div className="absolute inset-0 bg-purple-500/40 backdrop-blur-[1px]" />
+               <span className="material-symbols-outlined text-5xl relative z-10">sync</span>
             </div>
             <div className="space-y-2">
               <h2 className="text-2xl font-serif italic text-on-surface dark:text-[#ede0df]">Selesai!</h2>
-              <p className="text-on-surface-variant dark:text-zinc-400">Sekarang kasih HP-nya ke <span className="font-bold text-indigo-500">{roles.predictor}</span></p>
+              <p className="text-on-surface-variant dark:text-zinc-400">Sekarang kasih HP-nya ke <span className="font-bold text-indigo-500">{roles.predictor.name.split(' ')[0]}</span></p>
             </div>
             <button
               onClick={() => setStep('playerB')}
@@ -202,11 +211,14 @@ export default function PredictionGame() {
 
         {step === 'playerB' && (
           <div className="animate-in slide-in-from-right fade-in duration-500 space-y-8">
-            <div className="text-center space-y-1">
-              <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 rounded-full text-[10px] font-bold uppercase tracking-widest">
-                Giliran {roles.predictor}
-              </span>
-              <h2 className="text-lg font-serif italic text-on-surface-variant dark:text-zinc-400">Tebak jawaban {roles.answerer}!</h2>
+            <div className="flex flex-col items-center text-center space-y-3">
+              <img src={roles.predictor.avatar} className="w-16 h-16 rounded-full border-4 border-white shadow-md object-cover" alt={roles.predictor.name} />
+              <div className="space-y-1">
+                <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                  Giliran {roles.predictor.name.split(' ')[0]}
+                </span>
+                <h2 className="text-lg font-serif italic text-on-surface-variant dark:text-zinc-400">Tebak jawaban {roles.answerer.name.split(' ')[0]}!</h2>
+              </div>
             </div>
 
             <GlassCard className="p-8 border-purple-500/20 text-center space-y-6">
@@ -231,7 +243,13 @@ export default function PredictionGame() {
         {step === 'result' && (
           <div className="animate-in zoom-in fade-in duration-500 space-y-8">
             <div className="text-center">
-               <div className={`w-20 h-20 rounded-full flex items-center justify-center text-white mx-auto shadow-lg mb-4 ${answerA === answerB ? 'bg-green-500' : 'bg-rose-400'}`}>
+               <div className={`w-24 h-24 rounded-full flex items-center justify-center text-white mx-auto shadow-xl mb-4 relative ${answerA === answerB ? 'bg-green-500' : 'bg-rose-400'}`}>
+                  <div className="absolute -top-1 -right-1 w-10 h-10 rounded-full border-2 border-white overflow-hidden shadow-sm">
+                    <img src={roles.answerer.avatar} className="w-full h-full object-cover" alt="A" />
+                  </div>
+                  <div className="absolute -bottom-1 -left-1 w-10 h-10 rounded-full border-2 border-white overflow-hidden shadow-sm">
+                    <img src={roles.predictor.avatar} className="w-full h-full object-cover" alt="B" />
+                  </div>
                   <span className="material-symbols-outlined text-4xl">
                     {answerA === answerB ? 'celebration' : 'sentiment_dissatisfied'}
                   </span>
@@ -242,13 +260,19 @@ export default function PredictionGame() {
             </div>
 
             <div className="space-y-4">
-              <div className="glass-panel p-6 rounded-2xl border border-indigo-500/10 flex flex-col items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-500">Jawaban {roles.answerer}</span>
-                <p className="text-lg font-medium text-on-surface dark:text-zinc-300">{answerA}</p>
+              <div className="glass-panel p-5 rounded-2xl border border-indigo-500/10 flex items-center gap-4">
+                <img src={roles.answerer.avatar} className="w-12 h-12 rounded-full object-cover border-2 border-indigo-500/20" alt="A" />
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-500">Jawaban {roles.answerer.name.split(' ')[0]}</span>
+                  <p className="text-base font-medium text-on-surface dark:text-zinc-300">{answerA}</p>
+                </div>
               </div>
-              <div className="glass-panel p-6 rounded-2xl border border-purple-500/10 flex flex-col items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-purple-500">Tebakan {roles.predictor}</span>
-                <p className="text-lg font-medium text-on-surface dark:text-zinc-300">{answerB}</p>
+              <div className="glass-panel p-5 rounded-2xl border border-purple-500/10 flex items-center gap-4">
+                <img src={roles.predictor.avatar} className="w-12 h-12 rounded-full object-cover border-2 border-purple-500/20" alt="B" />
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-purple-500">Tebakan {roles.predictor.name.split(' ')[0]}</span>
+                  <p className="text-base font-medium text-on-surface dark:text-zinc-300">{answerB}</p>
+                </div>
               </div>
             </div>
 
@@ -273,7 +297,7 @@ export default function PredictionGame() {
                 onClick={() => setStep('pickRole')}
                 className="text-[10px] text-indigo-500 font-bold uppercase tracking-widest"
               >
-                Ganti Peran
+                Tukar Peran
               </button>
             </div>
           </div>
