@@ -20,6 +20,7 @@ const RelationshipJourney = lazy(() => import('./pages/RelationshipJourney'));
 const PrivateNotes = lazy(() => import('./pages/PrivateNotes'));
 const Photobooth = lazy(() => import('./pages/Photobooth'));
 const TruthOrDare = lazy(() => import('./pages/TruthOrDare'));
+const PredictionGame = lazy(() => import('./pages/PredictionGame'));
 
 // Loading component
 const PageLoader = () => (
@@ -72,6 +73,7 @@ export default function App() {
               <Route path="/rahasia" element={<ProtectedRoute><PrivateNotes /></ProtectedRoute>} />
               <Route path="/photobooth" element={<ProtectedRoute><Photobooth /></ProtectedRoute>} />
               <Route path="/games" element={<ProtectedRoute><TruthOrDare /></ProtectedRoute>} />
+              <Route path="/prediction" element={<ProtectedRoute><PredictionGame /></ProtectedRoute>} />
             </Routes>
           </Suspense>
         </BrowserRouter>

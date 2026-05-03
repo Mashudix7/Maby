@@ -278,26 +278,42 @@ export default function Dashboard() {
 
           {/* Side Column */}
           <div className="md:col-span-4 flex flex-col gap-8">
-            {/* Games Section (Truth or Dare) */}
-            <Link to="/games" className="group relative h-32 md:h-40 rounded-[2rem] overflow-hidden shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] border border-rose-500/10 mb-2">
-               <div className="absolute inset-0 bg-gradient-to-br from-rose-400 to-pink-600 dark:from-rose-600 dark:to-pink-900" />
-               <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
-               <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all" />
-               <div className="absolute -left-2 -top-2 w-16 h-16 bg-white/5 rounded-full blur-xl" />
-               
-               <div className="relative h-full flex items-center p-6 md:p-8 gap-4 md:gap-6">
-                  <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-inner group-hover:rotate-12 transition-transform">
-                    <span className="material-symbols-outlined text-3xl md:text-4xl text-white drop-shadow-md">casino</span>
-                  </div>
-                  <div className="flex flex-col text-left">
-                    <h3 className="font-serif text-xl md:text-2xl font-bold text-white tracking-tight leading-none">Truth or Dare</h3>
-                    <p className="text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] text-white/80 mt-2">Let's Play Together!</p>
-                  </div>
-                  <div className="ml-auto w-10 h-10 rounded-full bg-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
-                    <span className="material-symbols-outlined text-white">arrow_forward</span>
-                  </div>
-               </div>
-            </Link>
+            {/* Games Section */}
+            <div className="flex flex-col gap-4 mb-2">
+              {/* Truth or Dare Banner */}
+              <Link to="/games" className="group relative h-24 md:h-28 rounded-2xl overflow-hidden shadow-md transition-all hover:scale-[1.02] active:scale-[0.98] border border-rose-500/10">
+                 <div className="absolute inset-0 bg-gradient-to-br from-rose-400 to-pink-600 dark:from-rose-600 dark:to-pink-900" />
+                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
+                 
+                 <div className="relative h-full flex items-center p-4 md:p-6 gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-inner group-hover:rotate-12 transition-transform shrink-0">
+                      <span className="material-symbols-outlined text-2xl text-white drop-shadow-md">casino</span>
+                    </div>
+                    <div className="flex flex-col text-left">
+                      <h3 className="font-serif text-lg md:text-xl font-bold text-white tracking-tight leading-none">Truth or Dare</h3>
+                      <p className="text-[9px] font-bold uppercase tracking-widest text-white/70 mt-1.5">Challenge Each Other</p>
+                    </div>
+                    <span className="material-symbols-outlined ml-auto text-white opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">chevron_right</span>
+                 </div>
+              </Link>
+
+              {/* Prediction Game Banner */}
+              <Link to="/prediction" className="group relative h-24 md:h-28 rounded-2xl overflow-hidden shadow-md transition-all hover:scale-[1.02] active:scale-[0.98] border border-indigo-500/10">
+                 <div className="absolute inset-0 bg-gradient-to-br from-indigo-400 to-purple-600 dark:from-indigo-600 dark:to-purple-900" />
+                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
+                 
+                 <div className="relative h-full flex items-center p-4 md:p-6 gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-inner group-hover:-rotate-12 transition-transform shrink-0">
+                      <span className="material-symbols-outlined text-2xl text-white drop-shadow-md">psychology</span>
+                    </div>
+                    <div className="flex flex-col text-left">
+                      <h3 className="font-serif text-lg md:text-xl font-bold text-white tracking-tight leading-none">Prediction Game</h3>
+                      <p className="text-[9px] font-bold uppercase tracking-widest text-white/70 mt-1.5">Do You Know Your Partner?</p>
+                    </div>
+                    <span className="material-symbols-outlined ml-auto text-white opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">chevron_right</span>
+                 </div>
+              </Link>
+            </div>
 
             {/* Mood Tracker */}
             <GlassCard className="flex flex-col items-center justify-center text-center p-4 md:p-8 border border-primary/10">
