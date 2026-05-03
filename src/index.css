@@ -131,18 +131,20 @@
 /* ===== COMPONENT UTILITIES ===== */
 @layer components {
   .glass-panel {
-    background-color: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 20px 40px rgba(74, 69, 69, 0.05);
-    transition: background-color 0.3s, border-color 0.3s;
+    background-color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 10px 30px rgba(74, 69, 69, 0.05);
+    transition: background-color 0.2s;
+    transform: translateZ(0); /* Force GPU */
+    contain: content;
   }
 
   .dark .glass-panel {
-    background-color: rgba(40, 30, 32, 0.7);
-    border-color: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    background-color: rgba(30, 25, 27, 0.8);
+    border-color: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   }
 
   .glass-input {
@@ -331,3 +333,10 @@
 .delay-200 { animation-delay: 200ms; }
 .delay-300 { animation-delay: 300ms; }
 .delay-500 { animation-delay: 500ms; }
+
+/* Scroll Performance Utilities */
+.will-change-transform { will-change: transform; }
+.will-change-opacity { will-change: opacity; }
+.contain-paint { contain: paint; }
+.contain-layout { contain: layout; }
+.translate-z-0 { transform: translateZ(0); }

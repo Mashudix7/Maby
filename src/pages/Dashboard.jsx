@@ -242,19 +242,19 @@ export default function Dashboard() {
         <section className="grid grid-cols-1 md:grid-cols-12 gap-8">
           
           {/* Today's Memory */}
-          <div className="md:col-span-8 glass-panel rounded-2xl md:rounded-[2rem] p-4 md:p-8 flex flex-col relative overflow-hidden group min-h-[280px] md:min-h-[400px] border border-primary/5">
+          <div className="md:col-span-8 glass-panel rounded-2xl md:rounded-[2rem] p-4 md:p-8 flex flex-col relative overflow-hidden group min-h-[280px] md:min-h-[400px] border border-primary/5 will-change-transform">
             {state.moments[0]?.image_url ? (
-              <div className="absolute inset-0 z-0">
+              <div className="absolute inset-0 z-0 transform-gpu">
                 <img
                   alt={t('dashboard.last_memory')}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-60"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-60 translate-z-0"
                   src={state.moments[0].image_url}
                   loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-surface-container-low/90 dark:from-[#1a1517]/90 via-surface-container-low/40 dark:via-[#1a1517]/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-surface-container-low/90 dark:from-[#1a1517]/90 via-surface-container-low/40 dark:via-[#1a1517]/40 to-transparent pointer-events-none" />
               </div>
             ) : (
-              <div className="absolute inset-0 z-0 soft-gradient opacity-30" />
+              <div className="absolute inset-0 z-0 soft-gradient opacity-30 pointer-events-none" />
             )}
             <div className="relative z-10 flex flex-col h-full justify-between">
               <div className="flex justify-between items-start">

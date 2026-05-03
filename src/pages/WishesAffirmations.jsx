@@ -70,7 +70,7 @@ export default function WishesAffirmations() {
   }, [wishes, profiles]);
 
   const renderWish = useCallback((wish) => (
-    <WishCard key={wish.id} className="flex flex-col justify-between h-full group hover:scale-[1.02] transition-all duration-300">
+    <WishCard key={wish.id} className="flex flex-col justify-between h-full group hover:scale-[1.02] transition-all duration-300 will-change-transform contain-paint">
       <p className="font-serif text-lg text-on-surface-variant dark:text-zinc-300 italic leading-relaxed mb-4">
         &quot;{wish.text}&quot;
       </p>
