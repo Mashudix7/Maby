@@ -42,3 +42,29 @@ export async function setMoodToday(coupleId, userId, mood) {
   const cacheKey = `mood:${coupleId}:${userId}:${dateStr}`;
   setCached(cacheKey, mood, MOOD_TTL);
 }
+
+export async function getAllMoodsToday(coupleId) {
+  const dateStr = getLocalDateString();
+  const cacheKey = `moods_all:${coupleId}:${dateStr}`;
+  
+  const cached = getCached(cacheKey);
+  if (cached) return cached;
+
+  const { collection, query, where, getDocs } = await import('firebase/firestore');
+  const q = query(
+    collection(db, 'moods'),
+    where('couple_id', '==', coupleId),
+    where('date', '==', dateStr)
+  );
+  
+  const snap = await getDocs(q);
+  const moods = {};
+  snap.forEach(doc => {
+    const data = doc.data();
+    moods[data.user_id] = data.mood;
+  });
+  
+  setCached(cacheKey, moods, MOOD_TTL);
+  return moods;
+}
+

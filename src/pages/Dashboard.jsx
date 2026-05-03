@@ -2,17 +2,15 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import MainLayout from '../components/layout/MainLayout';
 import GlassCard from '../components/ui/GlassCard';
 import MomentCard, { MomentCardSkeleton } from '../components/ui/MomentCard';
-import ScrollReveal from '../components/ui/ScrollReveal';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { getMoments } from '../services/momentService';
-import { getMoodToday, setMoodToday } from '../services/moodService';
+import { getMoodToday, setMoodToday, getAllMoodsToday } from '../services/moodService';
 import { getWishes } from '../services/wishService';
 import { getStreak, getDailyActivity } from '../services/streakService';
 import { requestNotificationPermission, listenForPartnerWishes } from '../services/notificationService';
-import { sendNudge, listenForNudges } from '../services/nudgeService';
-import { showSuccess, showError } from '../lib/alerts';
+import { listenForNudges } from '../services/nudgeService';
 
 const MOOD_OPTIONS = [
   { emoji: '🥰', label_id: 'Bahagia', label_en: 'Happy' },
@@ -76,19 +74,19 @@ function RelationshipTimer() {
   return (
     <div className="glass-panel p-4 md:p-6 rounded-2xl md:rounded-[2rem] flex justify-between text-center mt-6">
       <div className="flex flex-col flex-1">
-        <span className="text-xl sm:text-2xl md:text-4xl font-serif text-rose-400 dark:text-rose-300">{time.days}</span>
+        <span className="text-xl sm:text-2xl md:text-4xl font-serif text-primary dark:text-rose-300">{time.days}</span>
         <span className="text-[9px] sm:text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">{t('dashboard.days')}</span>
       </div>
       <div className="flex flex-col flex-1">
-        <span className="text-xl sm:text-2xl md:text-4xl font-serif text-rose-400 dark:text-rose-300">{time.hours}</span>
+        <span className="text-xl sm:text-2xl md:text-4xl font-serif text-primary dark:text-rose-300">{time.hours}</span>
         <span className="text-[9px] sm:text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">{t('dashboard.hours')}</span>
       </div>
       <div className="flex flex-col flex-1">
-        <span className="text-xl sm:text-2xl md:text-4xl font-serif text-rose-400 dark:text-rose-300">{time.minutes}</span>
+        <span className="text-xl sm:text-2xl md:text-4xl font-serif text-primary dark:text-rose-300">{time.minutes}</span>
         <span className="text-[9px] sm:text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">{t('dashboard.minutes')}</span>
       </div>
       <div className="flex flex-col flex-1">
-        <span className="text-xl sm:text-2xl md:text-4xl font-serif text-rose-400 dark:text-rose-300">{time.seconds}</span>
+        <span className="text-xl sm:text-2xl md:text-4xl font-serif text-primary dark:text-rose-300">{time.seconds}</span>
         <span className="text-[9px] sm:text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">{t('dashboard.seconds')}</span>
       </div>
     </div>
@@ -98,11 +96,11 @@ function RelationshipTimer() {
 export default function Dashboard() {
   const { profile, coupleId, user } = useAuth();
   const { t, language } = useLanguage();
-  // Flattened state: data + UI in one object to reduce re-renders
   const [state, setState] = useState({
     moments: [],
     loading: true,
     currentMood: null,
+    allMoods: {},
     latestWish: null,
     streakData: { total_streak: 0 },
     dailyActivity: null,
@@ -116,16 +114,17 @@ export default function Dashboard() {
     Promise.all([
       getMoments(coupleId),
       getMoodToday(coupleId, user.uid),
+      getAllMoodsToday(coupleId),
       getWishes(coupleId),
       getStreak(coupleId),
       getDailyActivity(coupleId, today),
     ])
-      .then(([momentsData, moodData, wishesData, streakResult, activityResult]) => {
-        // Single setState batch — one render
+      .then(([momentsData, moodData, allMoodsData, wishesData, streakResult, activityResult]) => {
         setState(prev => ({
           ...prev,
           moments: momentsData.slice(0, 3),
           currentMood: moodData,
+          allMoods: allMoodsData,
           latestWish: wishesData?.[0] || null,
           streakData: streakResult,
           dailyActivity: activityResult,
@@ -138,49 +137,33 @@ export default function Dashboard() {
       });
   }, [coupleId, user]);
 
-  // Single combined realtime listener effect (reduces onSnapshot count)
   useEffect(() => {
     if (!coupleId || !user) return;
-
     requestNotificationPermission(t);
     const unsubscribeWishes = listenForPartnerWishes(coupleId, user.uid, t);
     const unsubscribeNudges = listenForNudges(coupleId, user.uid, t);
-
     return () => {
       if (unsubscribeWishes) unsubscribeWishes();
       if (unsubscribeNudges) unsubscribeNudges();
     };
   }, [coupleId, user, t]);
 
-  // Auto-Colek — runs only when streakData changes, no listener
-  useEffect(() => {
-    if (!coupleId || !user || !state.streakData.last_activity_at) return;
-    
-    const lastActivity = new Date(state.streakData.last_activity_at).getTime();
-    const lastNudge = state.streakData.last_nudge_at ? state.streakData.last_nudge_at.toMillis?.() || new Date(state.streakData.last_nudge_at).getTime() : 0;
-    const now = Date.now();
-    
-    const hoursSinceActivity = (now - lastActivity) / 3600000;
-    const hoursSinceNudge = (now - lastNudge) / 3600000;
-
-    if (hoursSinceActivity >= 18 && hoursSinceNudge >= 18) {
-      sendNudge(coupleId, user.uid);
-    }
-  }, [coupleId, user, state.streakData.last_activity_at, state.streakData.last_nudge_at]);
-
   const handleSetMood = useCallback(async (moodLabel) => {
     if (state.currentMood) return;
-    setState(prev => ({ ...prev, currentMood: moodLabel }));
+    const moodEmoji = MOOD_OPTIONS.find(m => (language === 'id' ? m.label_id : m.label_en) === moodLabel)?.emoji;
+    
+    setState(prev => ({ 
+      ...prev, 
+      currentMood: moodLabel,
+      allMoods: { ...prev.allMoods, [user.uid]: moodEmoji }
+    }));
     try {
       await setMoodToday(coupleId, user.uid, moodLabel);
     } catch (err) {
       console.error('Gagal menyimpan mood', err);
     }
-  }, [state.currentMood, coupleId, user?.uid]);
+  }, [state.currentMood, coupleId, user?.uid, language]);
 
-  const latestMoment = state.moments[0];
-
-  // Strategy 7: Precompute data with useMemo
   const relationshipDuration = useMemo(() => {
     const start = new Date('2026-02-21');
     const now = new Date();
@@ -190,9 +173,7 @@ export default function Dashboard() {
       years--;
       months += 12;
     }
-    
     if (years === 0 && months === 0) return t('dashboard.duration_just_started');
-    
     let text = t('dashboard.relationship_duration') + ' ';
     if (years > 0) text += `${years} ${t('dashboard.years')} `;
     if (months > 0) text += `${months} ${t('dashboard.months')}`;
@@ -205,6 +186,8 @@ export default function Dashboard() {
       { day: 'numeric', month: 'long', year: 'numeric' }
     );
   }, [language]);
+
+  const moodCount = Object.keys(state.allMoods).length;
 
   return (
     <MainLayout activePage="/">
@@ -222,10 +205,10 @@ export default function Dashboard() {
           <h1 className="font-serif text-3xl md:text-5xl text-on-surface dark:text-[#ede0df] mb-2 md:mb-4">
             {t('dashboard.hai')}, {profile?.display_name || t('dashboard.sayangku')} 👋
           </h1>
-          <p className="font-sans text-sm md:text-base font-semibold text-rose-500 dark:text-rose-400 mb-6">
+          <p className="font-sans text-sm md:text-base font-semibold text-primary dark:text-rose-400 mb-6">
             {relationshipDuration}
           </p>
-          <div className="w-full max-w-lg mx-auto bg-primary-container/20 dark:bg-rose-900/10 rounded-3xl p-4 border border-primary/10">
+          <div className="w-full max-w-lg mx-auto bg-primary-container/20 dark:bg-rose-900/10 rounded-3xl p-4 border border-primary/10 shadow-sm">
             <p className="text-xs font-semibold text-primary dark:text-rose-300 mb-2 tracking-widest uppercase">{t('dashboard.anniversary_countdown')}</p>
             <RelationshipTimer />
           </div>
@@ -235,13 +218,13 @@ export default function Dashboard() {
         <section className="grid grid-cols-1 md:grid-cols-12 gap-8">
           
           {/* Today's Memory */}
-          <div className="md:col-span-8 glass-panel rounded-2xl md:rounded-[2rem] p-4 md:p-8 flex flex-col relative overflow-hidden group min-h-[280px] md:min-h-[400px]">
-            {latestMoment?.image_url ? (
+          <div className="md:col-span-8 glass-panel rounded-2xl md:rounded-[2rem] p-4 md:p-8 flex flex-col relative overflow-hidden group min-h-[280px] md:min-h-[400px] border border-primary/5">
+            {state.moments[0]?.image_url ? (
               <div className="absolute inset-0 z-0">
                 <img
                   alt={t('dashboard.last_memory')}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-60"
-                  src={latestMoment.image_url}
+                  src={state.moments[0].image_url}
                   loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-surface-container-low/90 dark:from-[#1a1517]/90 via-surface-container-low/40 dark:via-[#1a1517]/40 to-transparent" />
@@ -253,16 +236,16 @@ export default function Dashboard() {
               <div className="flex justify-between items-start">
                 <span className="inline-flex items-center px-4 py-2 rounded-full bg-white/70 dark:bg-white/10 text-primary dark:text-rose-300 font-sans text-xs font-semibold tracking-wide backdrop-blur-md">
                   <span className="material-symbols-outlined mr-2 text-[16px]">photo_library</span>
-                  {latestMoment ? t('dashboard.last_memory') : t('dashboard.no_memory')}
+                  {state.moments[0] ? t('dashboard.last_memory') : t('dashboard.no_memory')}
                 </span>
               </div>
               <div className="mt-auto">
                 <h2 className="font-serif text-xl md:text-3xl text-on-surface dark:text-[#ede0df] mb-2">
-                  {latestMoment?.title || t('dashboard.add_first')}
+                  {state.moments[0]?.title || t('dashboard.add_first')}
                 </h2>
-                {latestMoment?.story && (
+                {state.moments[0]?.story && (
                   <p className="font-sans text-base text-on-surface-variant dark:text-zinc-400 font-serif italic line-clamp-2">
-                    &quot;{latestMoment.story.slice(0, 100)}...&quot;
+                    &quot;{state.moments[0].story.slice(0, 100)}...&quot;
                   </p>
                 )}
               </div>
@@ -272,9 +255,16 @@ export default function Dashboard() {
           {/* Side Column */}
           <div className="md:col-span-4 flex flex-col gap-8">
             {/* Mood Tracker */}
-            <GlassCard className="flex flex-col items-center justify-center text-center p-4 md:p-8">
-              <h3 className="font-serif text-xl md:text-2xl text-on-surface dark:text-[#ede0df] mb-4 md:mb-6">{t('dashboard.mood_title')}</h3>
-              <div className="flex gap-4 justify-center">
+            <GlassCard className="flex flex-col items-center justify-center text-center p-4 md:p-8 border border-primary/10">
+              <div className="flex items-center justify-between w-full mb-6">
+                <h3 className="font-serif text-xl md:text-2xl text-on-surface dark:text-[#ede0df]">{t('dashboard.mood_title')}</h3>
+                <div className="bg-primary/10 text-primary dark:text-rose-300 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>person</span>
+                  {moodCount}/2
+                </div>
+              </div>
+              
+              <div className="flex gap-4 justify-center mb-6">
                 {MOOD_OPTIONS.map((mood) => {
                   const moodLabel = language === 'id' ? mood.label_id : mood.label_en;
                   const isActive = state.currentMood === moodLabel;
@@ -283,64 +273,61 @@ export default function Dashboard() {
                     key={mood.emoji}
                     onClick={() => handleSetMood(moodLabel)}
                     disabled={!!state.currentMood}
-                    className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-sm ${isActive
-                        ? 'bg-primary-container/50 border border-primary/20 ring-2 ring-primary/30'
+                    className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-sm transition-all duration-300 hover:scale-110 active:scale-95 ${isActive
+                        ? 'bg-primary text-white ring-4 ring-primary/20 scale-110'
                         : state.currentMood 
                           ? 'opacity-40 grayscale cursor-not-allowed'
-                          : 'bg-white/50 dark:bg-white/5 border border-white/40 dark:border-white/10'
+                          : 'bg-white/50 dark:bg-white/5 border border-white/40 dark:border-white/10 hover:border-primary/40'
                       }`}
                   >
                     {mood.emoji}
                   </button>
                 )})}
               </div>
-              <p className="font-sans text-xs font-semibold text-outline dark:text-zinc-500 mt-6 h-4">
-                {state.currentMood ? `${t('dashboard.mood_locked')}: ${state.currentMood.toLowerCase()} ${MOOD_OPTIONS.find(m => (language === 'id' ? m.label_id : m.label_en) === state.currentMood)?.emoji}` : t('dashboard.mood_hint')}
+
+              {/* Individual Moods Status */}
+              <div className="flex w-full gap-2 mt-2">
+                <div className={`flex-1 p-2 rounded-xl border transition-all ${state.allMoods[user?.uid] ? 'bg-primary/5 border-primary/20' : 'bg-zinc-100/50 dark:bg-white/5 border-zinc-200/50 dark:border-white/10 opacity-50'}`}>
+                  <span className="text-[10px] block font-bold uppercase tracking-tighter text-outline dark:text-zinc-500 mb-1">
+                    {profile?.display_name?.split(' ')[0] || 'Kamu'}
+                  </span>
+                  <span className="text-xl">{state.allMoods[user?.uid] || '—'}</span>
+                </div>
+                <div className={`flex-1 p-2 rounded-xl border transition-all ${Object.keys(state.allMoods).find(id => id !== user?.uid) ? 'bg-primary/5 border-primary/20' : 'bg-zinc-100/50 dark:bg-white/5 border-zinc-200/50 dark:border-white/10 opacity-50'}`}>
+                  <span className="text-[10px] block font-bold uppercase tracking-tighter text-outline dark:text-zinc-500 mb-1">
+                    Partner
+                  </span>
+                  <span className="text-xl">
+                    {state.allMoods[Object.keys(state.allMoods).find(id => id !== user?.uid)] || '—'}
+                  </span>
+                </div>
+              </div>
+              
+              <p className="font-sans text-[10px] font-semibold text-outline dark:text-zinc-500 mt-4 italic">
+                {state.currentMood ? t('dashboard.mood_locked') : t('dashboard.mood_hint')}
               </p>
             </GlassCard>
 
             {/* Action Boxes */}
             <div className="grid grid-cols-2 gap-4">
-              <Link to="/momen/baru" className="glass-panel p-4 md:p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-3 group/box hover:scale-105 transition-all duration-300 hover:border-primary/30">
+              <Link to="/momen/baru" className="glass-panel p-4 md:p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-3 group/box hover:scale-105 transition-all duration-300 hover:border-primary/30 border border-primary/5">
                 <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center shadow-[0_4px_12px_rgba(176,0,77,0.2)] group-hover/box:scale-110 transition-transform">
                   <span className="material-symbols-outlined text-2xl">add_a_photo</span>
                 </div>
                 <span className="font-serif text-sm font-semibold text-on-surface dark:text-[#ede0df]" dangerouslySetInnerHTML={{ __html: t('dashboard.new_moment').replace(' ', '<br/>') }} />
               </Link>
-              <Link to="/harapan" className="glass-panel p-4 md:p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-3 group/box hover:scale-105 transition-all duration-300 hover:border-primary/30">
+              <Link to="/harapan" className="glass-panel p-4 md:p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-3 group/box hover:scale-105 transition-all duration-300 hover:border-primary/30 border border-primary/5">
                 <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center shadow-[0_4px_12px_rgba(176,0,77,0.2)] group-hover/box:scale-110 transition-transform">
                   <span className="material-symbols-outlined text-2xl">favorite</span>
                 </div>
                 <span className="font-serif text-sm font-semibold text-on-surface dark:text-[#ede0df]" dangerouslySetInnerHTML={{ __html: t('dashboard.write_wish').replace(' ', '<br/>') }} />
               </Link>
             </div>
-
-            {/* Latest Note */}
-            {state.latestWish && (
-              <GlassCard className="p-4 md:p-6 flex flex-col gap-3 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-16 h-16 bg-secondary-container/30 rounded-bl-[100px] -z-10" />
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-secondary dark:text-purple-300 text-sm">edit_note</span>
-                  <span className="font-sans text-[10px] font-bold uppercase tracking-wider text-outline dark:text-zinc-500">{t('dashboard.latest_note')}</span>
-                </div>
-                <p className="font-serif text-sm md:text-base italic text-on-surface dark:text-[#ede0df] line-clamp-3">
-                  &quot;{state.latestWish.text}&quot;
-                </p>
-                <div className="flex items-center gap-2 mt-auto pt-2">
-                  <div className="w-5 h-5 rounded-full bg-primary-container flex items-center justify-center text-[10px] font-bold text-primary">
-                    {state.latestWish.profiles?.display_name?.[0] || '?'}
-                  </div>
-                  <span className="text-[10px] text-on-surface-variant dark:text-zinc-400">
-                    {new Date(state.latestWish.created_at).toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'short' })}
-                  </span>
-                </div>
-              </GlassCard>
-            )}
           </div>
         </section>
 
         {/* Recent Moments */}
-        <GlassCard className="flex flex-col gap-4 md:gap-6 p-4 md:p-6">
+        <GlassCard className="flex flex-col gap-4 md:gap-6 p-4 md:p-6 border border-primary/5">
           <div className="flex justify-between items-center border-b border-outline-variant/30 dark:border-white/10 pb-4">
             <h2 className="font-serif text-xl md:text-2xl text-on-surface dark:text-[#ede0df]">{t('dashboard.see_all')}</h2>
             <Link
