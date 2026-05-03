@@ -12,6 +12,7 @@ export default function TruthOrDare() {
   // Turn Picker State
   const [spinning, setSpinning] = useState(false);
   const [turnResult, setTurnResult] = useState(null);
+  const [rotation, setRotation] = useState(0);
 
   const isFeby = profile?.display_name?.includes('Feby');
   const myInfo = { name: isFeby ? 'Feby Zahara' : 'Mashudi', avatar: isFeby ? '/feby.jpg' : '/mashudi.jpg' };
@@ -31,6 +32,11 @@ export default function TruthOrDare() {
 
   const spinTurn = () => {
     if (spinning) return;
+    
+    const extraRotation = 1080 + Math.floor(Math.random() * 360);
+    const newRotation = rotation + extraRotation;
+    
+    setRotation(newRotation);
     setSpinning(true);
     setTurnResult(null);
     
@@ -58,37 +64,43 @@ export default function TruthOrDare() {
         <div className="flex flex-col items-center gap-4">
           <div className="relative w-40 h-40 md:w-48 md:h-48">
             {/* Simple Visual Wheel */}
-            <div className={`w-full h-full rounded-full border-4 border-primary/20 relative overflow-hidden transition-transform duration-[1500ms] ease-out ${spinning ? 'rotate-[1080deg]' : 'rotate-0'}`}>
+            <div 
+              className="w-full h-full rounded-full border-4 border-primary/20 relative overflow-hidden transition-transform duration-[1500ms] cubic-bezier(0.15, 0, 0.15, 1) translate-z-0"
+              style={{ transform: `rotate(${rotation}deg)` }}
+            >
               <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-rose-500/10" />
               {/* Halves */}
               <div className="absolute top-0 left-0 w-full h-1/2 border-b border-primary/20 flex items-center justify-center p-4">
-                 <img src={myInfo.avatar} className="w-12 h-12 md:w-16 md:h-16 rounded-full border-2 border-white shadow-sm object-cover" alt="Me" />
+                 <img src={myInfo.avatar} className="w-12 h-12 md:w-16 md:h-16 rounded-full border-2 border-white shadow-sm object-cover rotate-0" alt="Me" />
               </div>
               <div className="absolute bottom-0 left-0 w-full h-1/2 flex items-center justify-center p-4">
-                 <img src={partnerInfo.avatar} className="w-12 h-12 md:w-16 md:h-16 rounded-full border-2 border-white shadow-sm object-cover" alt="Partner" />
+                 <img src={partnerInfo.avatar} className="w-12 h-12 md:w-16 md:h-16 rounded-full border-2 border-white shadow-sm object-cover rotate-0" alt="Partner" />
               </div>
             </div>
             {/* Pointer */}
             <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-6 bg-primary rounded-b-full shadow-lg z-10" />
           </div>
 
-          <div className="text-center min-h-[60px] flex flex-col items-center justify-center">
-            {turnResult ? (
+          <div className="text-center min-h-[80px] flex flex-col items-center justify-center gap-3">
+            {turnResult && !spinning && (
               <div className="animate-in zoom-in fade-in duration-300">
                 <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary mb-1">Hasil Spin:</p>
                 <h3 className="font-serif text-xl md:text-2xl text-on-surface dark:text-[#ede0df]">
                   Giliran <span className="text-primary font-bold">{turnResult.name.split(' ')[0]}</span>! 🎲
                 </h3>
               </div>
-            ) : (
-              <button
-                onClick={spinTurn}
-                disabled={spinning}
-                className={`px-8 py-2.5 rounded-full bg-primary text-white font-bold text-sm shadow-lg transition-all hover:scale-105 active:scale-95 ${spinning ? 'opacity-50 cursor-not-allowed' : ''}`}
-              >
-                {spinning ? 'Memilih...' : 'Siapa Giliran?'}
-              </button>
             )}
+            
+            <button
+              onClick={spinTurn}
+              disabled={spinning}
+              className={`px-8 py-2.5 rounded-full bg-primary text-white font-bold text-sm shadow-lg transition-all hover:scale-105 active:scale-95 flex items-center gap-2 ${spinning ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              <span className={`material-symbols-outlined text-sm ${spinning ? 'animate-spin' : ''}`}>
+                {spinning ? 'progress_activity' : 'autorenew'}
+              </span>
+              {spinning ? 'Memilih...' : turnResult ? 'Spin Lagi' : 'Siapa Giliran?'}
+            </button>
           </div>
         </div>
 
