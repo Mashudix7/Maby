@@ -1,5 +1,5 @@
 import { db } from '../lib/firebase';
-import { collection, query, where, getDocs, doc, getDoc, addDoc, deleteDoc, updateDoc, orderBy, limit } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc, addDoc, deleteDoc, updateDoc, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { getCached, setCached, invalidatePrefix } from '../lib/queryCache';
 import { updateStreakActivity } from './streakService';
 
@@ -42,6 +42,22 @@ export function invalidateMomentsCache() {
   invalidatePrefix(CACHE_KEY);
 }
 
+export function listenMoments(coupleId, callback) {
+  const q = query(
+    collection(db, 'moments'),
+    where('couple_id', '==', coupleId),
+    orderBy('date', 'desc'),
+    limit(100)
+  );
+  
+  return onSnapshot(q, (snap) => {
+    const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    callback(data);
+  }, (error) => {
+    console.error("Real-time moments error:", error);
+  });
+}
+
 export async function getMomentById(id) {
   const docRef = doc(db, 'moments', id);
   const snap = await getDoc(docRef);
@@ -74,6 +90,5 @@ export async function deleteMoment(id) {
 export async function toggleFavoriteMoment(id, isFavorite) {
   const docRef = doc(db, 'moments', id);
   await updateDoc(docRef, { is_favorite: isFavorite });
-  // Fix: Invalidate cache so the filtered lists (like "Favorites" tab) update immediately
   invalidateMomentsCache();
 }

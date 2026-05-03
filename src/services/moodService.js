@@ -1,5 +1,5 @@
 import { db } from '../lib/firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
 import { getCached, setCached } from '../lib/queryCache';
 import { getWIBDate } from '../lib/dateUtils';
 
@@ -45,7 +45,6 @@ export async function getAllMoodsToday(coupleId) {
   const cached = getCached(cacheKey);
   if (cached) return cached;
 
-  const { collection, query, where, getDocs } = await import('firebase/firestore');
   const q = query(
     collection(db, 'moods'),
     where('couple_id', '==', coupleId),
@@ -61,4 +60,24 @@ export async function getAllMoodsToday(coupleId) {
   
   setCached(cacheKey, moods, MOOD_TTL);
   return moods;
+}
+
+export function listenAllMoodsToday(coupleId, callback) {
+  const dateStr = getWIBDate();
+  const q = query(
+    collection(db, 'moods'),
+    where('couple_id', '==', coupleId),
+    where('date', '==', dateStr)
+  );
+  
+  return onSnapshot(q, (snap) => {
+    const moods = {};
+    snap.forEach(doc => {
+      const data = doc.data();
+      moods[data.user_id] = data.mood;
+    });
+    callback(moods);
+  }, (error) => {
+    console.error("Real-time moods error:", error);
+  });
 }

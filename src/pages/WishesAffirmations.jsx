@@ -3,7 +3,7 @@ import MainLayout from '../components/layout/MainLayout';
 import WishCard from '../components/ui/WishCard';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { getWishes, createWish } from '../services/wishService';
+import { createWish, listenWishes } from '../services/wishService';
 import { showSuccess, showError } from '../lib/alerts';
 import { WishCardSkeleton } from '../components/ui/Skeleton';
 import VirtualGrid from '../components/ui/VirtualGrid';
@@ -18,10 +18,14 @@ export default function WishesAffirmations() {
 
   useEffect(() => {
     if (!coupleId) return;
-    getWishes(coupleId)
-      .then(setWishes)
-      .catch((err) => console.error('Gagal memuat harapan:', err))
-      .finally(() => setLoading(false));
+    
+    // Real-time listener
+    const unsubscribe = listenWishes(coupleId, (data) => {
+      setWishes(data);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, [coupleId]);
 
   const handleSubmit = async (e) => {
@@ -30,8 +34,7 @@ export default function WishesAffirmations() {
 
     setSaving(true);
     try {
-      const wish = await createWish(coupleId, user.uid, newWish);
-      setWishes(prev => [wish, ...prev]);
+      await createWish(coupleId, user.uid, newWish);
       setNewWish('');
       showSuccess(t('wishes.success'));
     } catch (err) {

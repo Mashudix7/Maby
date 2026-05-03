@@ -1,5 +1,5 @@
 import { db } from '../lib/firebase';
-import { collection, query, where, getDocs, doc, getDoc, addDoc, deleteDoc, orderBy, limit } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc, addDoc, deleteDoc, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { updateStreakActivity } from './streakService';
 import { getCached, setCached, invalidatePrefix } from '../lib/queryCache';
 
@@ -15,7 +15,6 @@ export async function getWishes(coupleId, useCache = true) {
   }
 
   try {
-    // Get all couple members once to avoid per-document reads
     const membersQuery = query(collection(db, 'users'), where('couple_id', '==', coupleId));
     const membersSnap = await getDocs(membersQuery);
     const membersMap = {};
@@ -25,7 +24,7 @@ export async function getWishes(coupleId, useCache = true) {
       collection(db, 'wishes'),
       where('couple_id', '==', coupleId),
       orderBy('created_at', 'desc'),
-      limit(50) // Cap initial reads
+      limit(50)
     );
     const snap = await getDocs(q);
     const results = snap.docs.map(d => {
@@ -59,6 +58,22 @@ export function invalidateWishesCache() {
   invalidatePrefix(CACHE_KEY);
 }
 
+export function listenWishes(coupleId, callback) {
+  const q = query(
+    collection(db, 'wishes'),
+    where('couple_id', '==', coupleId),
+    orderBy('created_at', 'desc'),
+    limit(100)
+  );
+
+  return onSnapshot(q, (snap) => {
+    const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    callback(data);
+  }, (error) => {
+    console.error("Real-time wishes error:", error);
+  });
+}
+
 export async function createWish(coupleId, userId, text) {
   const docData = {
     couple_id: coupleId,
@@ -68,10 +83,7 @@ export async function createWish(coupleId, userId, text) {
   };
 
   const docRef = await addDoc(collection(db, 'wishes'), docData);
-  
-  // Trigger streak update
   updateStreakActivity(coupleId, userId).catch(err => console.error('Streak update failed:', err));
-
   invalidateWishesCache();
 
   const userSnap = await getDoc(doc(db, 'users', userId));
@@ -81,10 +93,4 @@ export async function createWish(coupleId, userId, text) {
 export async function deleteWish(id) {
   await deleteDoc(doc(db, 'wishes', id));
   invalidateWishesCache();
-}
-
-export async function getRandomWish(coupleId) {
-  const wishes = await getWishes(coupleId);
-  if (!wishes || wishes.length === 0) return null;
-  return wishes[Math.floor(Math.random() * wishes.length)];
 }

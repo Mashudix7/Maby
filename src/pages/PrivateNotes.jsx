@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import MainLayout from '../components/layout/MainLayout';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { getPrivateNotes, createPrivateNote, deletePrivateNote } from '../services/privateNoteService';
+import { createPrivateNote, deletePrivateNote, listenPrivateNotes } from '../services/privateNoteService';
 import { showConfirmDelete, showSuccess, showError } from '../lib/alerts';
 
 export default function PrivateNotes() {
@@ -15,9 +15,14 @@ export default function PrivateNotes() {
 
   useEffect(() => {
     if (!user) return;
-    getPrivateNotes(user.uid)
-      .then(setNotes)
-      .finally(() => setLoading(false));
+    
+    // Real-time listener
+    const unsubscribe = listenPrivateNotes(user.uid, (data) => {
+      setNotes(data);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, [user]);
 
   async function handleSubmit(e) {
@@ -25,8 +30,7 @@ export default function PrivateNotes() {
     if (!newNote.trim()) return;
     setSubmitting(true);
     try {
-      const note = await createPrivateNote(user.uid, newNote);
-      setNotes([note, ...notes]);
+      await createPrivateNote(user.uid, newNote);
       setNewNote('');
       await showSuccess(t, 'save');
     } catch (err) {
@@ -43,7 +47,6 @@ export default function PrivateNotes() {
     
     try {
       await deletePrivateNote(id);
-      setNotes(notes.filter(n => n.id !== id));
       await showSuccess(t, 'delete');
     } catch (err) {
       console.error(err);

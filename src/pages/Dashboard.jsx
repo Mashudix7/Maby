@@ -5,10 +5,10 @@ import MomentCard, { MomentCardSkeleton } from '../components/ui/MomentCard';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { getMoments } from '../services/momentService';
-import { getMoodToday, setMoodToday, getAllMoodsToday } from '../services/moodService';
-import { getWishes } from '../services/wishService';
-import { getStreak, getDailyActivity } from '../services/streakService';
+import { listenMoments } from '../services/momentService';
+import { setMoodToday, listenAllMoodsToday } from '../services/moodService';
+import { listenWishes } from '../services/wishService';
+import { listenStreak, listenDailyActivity } from '../services/streakService';
 import { requestNotificationPermission, listenForPartnerWishes } from '../services/notificationService';
 import { listenForNudges } from '../services/nudgeService';
 import { getWIBDate } from '../lib/dateUtils';
@@ -49,10 +49,6 @@ function RelationshipTimer() {
   useEffect(() => {
     const getNextTarget = () => {
       const now = new Date();
-      // Set to 12 AM WIB next day for "Daily Reset" or keep Feb 21 as Anniversary?
-      // User said "pasang jam nya untuk jam asia jakarta, direset setiap jam 12 malam"
-      // This refers to the countdown maybe? Or just a daily reset?
-      // Usually, countdowns are for events. I'll keep the Feb 21 as anniversary but adjust for WIB.
       let target = new Date(now.getFullYear(), 1, 21, 0, 0, 0); // Feb 21
       if (now.getTime() > target.getTime()) {
         target.setFullYear(now.getFullYear() + 1);
@@ -114,35 +110,32 @@ export default function Dashboard() {
   useEffect(() => {
     if (!coupleId || !user) return;
     
-    const fetchDashboardData = () => {
-      const today = getWIBDate();
-      Promise.all([
-        getMoments(coupleId),
-        getMoodToday(coupleId, user.uid),
-        getAllMoodsToday(coupleId),
-        getWishes(coupleId),
-        getStreak(coupleId),
-        getDailyActivity(coupleId, today),
-      ])
-        .then(([momentsData, moodData, allMoodsData, wishesData, streakResult, activityResult]) => {
-          setState(prev => ({
-            ...prev,
-            moments: momentsData.slice(0, 3),
-            currentMood: moodData,
-            allMoods: allMoodsData,
-            latestWish: wishesData?.[0] || null,
-            streakData: streakResult,
-            dailyActivity: activityResult,
-            loading: false,
-          }));
-        })
-        .catch((err) => {
-          console.error('Dashboard data fetch error:', err);
-          setState(prev => ({ ...prev, loading: false }));
-        });
-    };
+    const today = getWIBDate();
 
-    fetchDashboardData();
+    // Real-time listeners for everything
+    const unsubMoments = listenMoments(coupleId, (momentsData) => {
+      setState(prev => ({ ...prev, moments: momentsData.slice(0, 3), loading: false }));
+    });
+
+    const unsubWishes = listenWishes(coupleId, (wishesData) => {
+      setState(prev => ({ ...prev, latestWish: wishesData?.[0] || null }));
+    });
+
+    const unsubMoods = listenAllMoodsToday(coupleId, (moodsData) => {
+      setState(prev => ({ 
+        ...prev, 
+        allMoods: moodsData,
+        currentMood: moodsData[user.uid] || null 
+      }));
+    });
+
+    const unsubStreak = listenStreak(coupleId, (streakData) => {
+      setState(prev => ({ ...prev, streakData }));
+    });
+
+    const unsubActivity = listenDailyActivity(coupleId, today, (activityData) => {
+      setState(prev => ({ ...prev, dailyActivity: activityData }));
+    });
 
     // Reset at midnight WIB logic
     const now = new Date();
@@ -152,12 +145,17 @@ export default function Dashboard() {
     const msToMidnight = nextMidnight.getTime() - jakartaTime.getTime();
 
     const timer = setTimeout(() => {
-      fetchDashboardData();
-      // After first midnight, refresh every 24h
-      setInterval(fetchDashboardData, 24 * 60 * 60 * 1000);
+      window.location.reload(); // Hard reload at midnight to reset all WIB dates
     }, msToMidnight);
 
-    return () => clearTimeout(timer);
+    return () => {
+      unsubMoments();
+      unsubWishes();
+      unsubMoods();
+      unsubStreak();
+      unsubActivity();
+      clearTimeout(timer);
+    };
   }, [coupleId, user]);
 
   useEffect(() => {
@@ -173,13 +171,15 @@ export default function Dashboard() {
 
   const handleSetMood = useCallback(async (moodLabel) => {
     if (state.currentMood) return;
-    const moodEmoji = MOOD_OPTIONS.find(m => (language === 'id' ? m.label_id : m.label_en) === moodLabel)?.emoji;
     
+    // Mood emoji is updated by listener automatically, but we can do a local update for snappiness
+    const moodEmoji = MOOD_OPTIONS.find(m => (language === 'id' ? m.label_id : m.label_en) === moodLabel)?.emoji;
     setState(prev => ({ 
       ...prev, 
       currentMood: moodLabel,
       allMoods: { ...prev.allMoods, [user.uid]: moodEmoji }
     }));
+
     try {
       await setMoodToday(coupleId, user.uid, moodLabel);
     } catch (err) {

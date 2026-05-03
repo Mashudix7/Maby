@@ -79,16 +79,39 @@ export default function Login() {
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-on-surface-variant dark:text-zinc-400 ml-1">{t('login.who_are_you')}</label>
-              <select
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="glass-input cursor-pointer"
-              >
-                <option value="feby">Feby Zahara</option>
-                <option value="mashudi">Mashudi</option>
-              </select>
+            <div className="space-y-4">
+              <label className="text-xs font-semibold text-on-surface-variant dark:text-zinc-400 ml-1 block text-center uppercase tracking-widest">{t('login.who_are_you')}</label>
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                  type="button"
+                  onClick={() => setName('feby')}
+                  className={`flex flex-col items-center gap-3 p-4 rounded-2xl transition-all duration-300 border-2 ${
+                    name === 'feby' 
+                      ? 'border-primary bg-primary/5 ring-4 ring-primary/10 scale-105' 
+                      : 'border-transparent bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 opacity-70'
+                  }`}
+                >
+                  <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-primary/20 shadow-sm">
+                    <img src="/feby.jpg" alt="Feby" className="w-full h-full object-cover" onError={(e) => { e.target.src = 'https://ui-avatars.com/api/?name=Feby+Zahara&background=f43f5e&color=fff'; }} />
+                  </div>
+                  <span className={`text-sm font-serif font-bold ${name === 'feby' ? 'text-primary' : 'text-on-surface-variant dark:text-zinc-400'}`}>Feby Zahara</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setName('mashudi')}
+                  className={`flex flex-col items-center gap-3 p-4 rounded-2xl transition-all duration-300 border-2 ${
+                    name === 'mashudi' 
+                      ? 'border-primary bg-primary/5 ring-4 ring-primary/10 scale-105' 
+                      : 'border-transparent bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 opacity-70'
+                  }`}
+                >
+                  <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-primary/20 shadow-sm">
+                    <img src="/mashudi.jpg" alt="Mashudi" className="w-full h-full object-cover" onError={(e) => { e.target.src = 'https://ui-avatars.com/api/?name=Mashudi&background=0284c7&color=fff'; }} />
+                  </div>
+                  <span className={`text-sm font-serif font-bold ${name === 'mashudi' ? 'text-primary' : 'text-on-surface-variant dark:text-zinc-400'}`}>Mashudi</span>
+                </button>
+              </div>
             </div>
 
             <div className="space-y-1.5">

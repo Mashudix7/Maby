@@ -1,5 +1,5 @@
 import { db } from '../lib/firebase';
-import { collection, query, where, getDocs, doc, getDoc, addDoc, deleteDoc, orderBy } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc, addDoc, deleteDoc, orderBy, onSnapshot } from 'firebase/firestore';
 import { updateStreakActivity } from './streakService';
 
 export async function getPrivateNotes(userId) {
@@ -28,7 +28,6 @@ export async function createPrivateNote(userId, text) {
   };
   const docRef = await addDoc(collection(db, 'private_notes'), docData);
 
-  // Trigger streak update
   try {
     const userSnap = await getDoc(doc(db, 'users', userId));
     if (userSnap.exists()) {
@@ -42,6 +41,21 @@ export async function createPrivateNote(userId, text) {
   }
 
   return { id: docRef.id, ...docData };
+}
+
+export function listenPrivateNotes(userId, callback) {
+  const q = query(
+    collection(db, 'private_notes'),
+    where('user_id', '==', userId),
+    orderBy('created_at', 'desc')
+  );
+
+  return onSnapshot(q, (snap) => {
+    const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    callback(data);
+  }, (error) => {
+    console.error("Real-time private notes error:", error);
+  });
 }
 
 export async function deletePrivateNote(id) {
