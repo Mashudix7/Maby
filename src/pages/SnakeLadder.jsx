@@ -145,14 +145,14 @@ export default function SnakeLadder() {
             row.map((cellNum) => (
               <div 
                 key={cellNum}
-                className={`relative flex flex-col items-center justify-center rounded-2xl transition-all ${
+                className={`relative flex flex-col items-center justify-center rounded-2xl transition-all border ${
                   CHALLENGE_TILES.includes(cellNum) 
-                    ? 'bg-rose-500/10 text-rose-600' 
+                    ? 'bg-rose-500/20 border-rose-500/20 text-rose-600' 
                     : LADDERS[cellNum] 
-                      ? 'bg-indigo-500/10 text-indigo-600'
+                      ? 'bg-indigo-500/20 border-indigo-500/20 text-indigo-600'
                       : SNAKES[cellNum]
-                        ? 'bg-orange-500/10 text-orange-600'
-                        : 'bg-white/40 dark:bg-white/5 text-outline-variant/40'
+                        ? 'bg-orange-500/20 border-orange-500/20 text-orange-600'
+                        : 'bg-white/60 dark:bg-white/10 border-transparent text-outline-variant/40'
                 }`}
               >
                 {/* Cell Number - Top Left */}
