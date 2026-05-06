@@ -18,14 +18,14 @@ export default function SnakeLadder() {
   const [winner, setWinner] = useState(null);
   const [round, setRound] = useState(1);
 
-  // Pre-load audio objects with verified URLs from GitHub
+  // Pre-load audio objects with verified URLs from GitHub (Cache-busting)
   const gameSounds = useMemo(() => ({
     dice: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/dice.mp3'),
     move: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/drop.mp3'),
     ladder: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/ladder.mp3'),
     snake: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/snake.mp3'),
-    challenge: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/ladder.mp3'),
-    win: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/success.mp3')
+    challenge: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/ladder.mp3?v=2'),
+    win: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/success.mp3?v=2')
   }), []);
 
   const playSound = useCallback((type) => {
