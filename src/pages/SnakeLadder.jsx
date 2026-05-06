@@ -24,7 +24,7 @@ export default function SnakeLadder() {
     move: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/drop.mp3'),
     ladder: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/ladder.mp3'),
     snake: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/snake.mp3'),
-    challenge: new Audio('https://www.soundjay.com/misc/magic-chime-01.mp3'), // Keeping one stable SoundJay for variety or use https://raw.githubusercontent.com/ShubhamPaliwal03/Snaky-Climb/main/sounds/dice_roll-sound.mp3
+    challenge: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/success.mp3'),
     win: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/success.mp3')
   }), []);
 
