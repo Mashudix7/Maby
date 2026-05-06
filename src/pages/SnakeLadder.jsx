@@ -158,26 +158,21 @@ export default function SnakeLadder() {
                 {/* Cell Number - Top Left */}
                 <span className="absolute top-1 left-1.5 text-[8px] font-bold opacity-30">{cellNum}</span>
                 
-                {/* Snake/Ladder Targets - Bottom Right */}
-                {LADDERS[cellNum] && (
-                  <div className="absolute bottom-1 right-1 flex flex-col items-end opacity-60">
-                    <span className="material-symbols-outlined text-[12px]">north_east</span>
-                    <span className="text-[6px] font-bold">TO {LADDERS[cellNum]}</span>
-                  </div>
-                )}
-                {SNAKES[cellNum] && (
-                  <div className="absolute bottom-1 right-1 flex flex-col items-end opacity-60">
-                    <span className="material-symbols-outlined text-[12px]">south_west</span>
-                    <span className="text-[6px] font-bold">TO {SNAKES[cellNum]}</span>
-                  </div>
+                {/* Target Info - Bottom Right */}
+                {(LADDERS[cellNum] || SNAKES[cellNum]) && (
+                  <span className="absolute bottom-1 right-1.5 text-[6px] font-bold opacity-40">
+                    TO {LADDERS[cellNum] || SNAKES[cellNum]}
+                  </span>
                 )}
 
-                {/* Challenge Icon - Top Right */}
-                {CHALLENGE_TILES.includes(cellNum) && (
-                   <span className="material-symbols-outlined text-sm absolute top-1 right-1.5 opacity-20">favorite</span>
-                )}
+                {/* Main Icons - CENTERED */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  {LADDERS[cellNum] && <span className="material-symbols-outlined text-2xl opacity-20">north_east</span>}
+                  {SNAKES[cellNum] && <span className="material-symbols-outlined text-2xl opacity-20">south_west</span>}
+                  {CHALLENGE_TILES.includes(cellNum) && <span className="material-symbols-outlined text-2xl opacity-20">favorite</span>}
+                </div>
                 
-                {/* Players - CENTERED */}
+                {/* Players - CENTERED (On top of icons) */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <div className="flex -space-x-4">
                     {positions[1] === cellNum && (
