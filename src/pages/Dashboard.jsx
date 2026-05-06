@@ -238,6 +238,7 @@ export default function Dashboard() {
         <section className="grid grid-cols-1 md:grid-cols-12 gap-8">
           
           {/* Today's Memory */}
+          <div className="md:col-span-8 glass-panel rounded-2xl md:rounded-[2rem] p-4 md:p-8 flex flex-col relative overflow-hidden group min-h-[280px] md:min-h-[400px] border border-primary/5 will-change-transform">
             {moments[0]?.image_url ? (
               <div className="absolute inset-0 z-0">
                 <SmartImage
