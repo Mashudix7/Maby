@@ -217,7 +217,7 @@ export default function Dashboard() {
     <MainLayout activePage="/">
       <div className="max-w-[1140px] mx-auto flex flex-col gap-12 md:gap-20">
         {/* Hero Greeting */}
-        <div className="flex flex-col items-center text-center mt-2 px-4">
+        <div className="flex flex-col items-center text-center mt-[-1.5rem] px-4">
           <div className="w-full max-w-lg flex justify-between items-center mb-6">
             <span className="font-sans text-[10px] font-semibold tracking-widest uppercase text-primary/60">
               {formattedCurrentDate}
