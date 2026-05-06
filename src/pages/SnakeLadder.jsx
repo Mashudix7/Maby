@@ -5,6 +5,15 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { BOARD_SIZE, GRID_DIM, BOARD_LAYOUTS, CHALLENGES } from '../data/snakeLadder';
 
+const SOUND_URLS = {
+  dice: 'https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/dice.mp3',
+  move: 'https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/drop.mp3',
+  ladder: 'https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/ladder.mp3',
+  snake: 'https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/snake.mp3',
+  challenge: 'https://raw.githubusercontent.com/ShubhamPaliwal03/Snaky-Climb/main/sounds/ladder_climb-sound.mp3',
+  win: 'https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/success.mp3'
+};
+
 export default function SnakeLadder() {
   const { profile } = useAuth();
   const { t } = useLanguage();
@@ -18,24 +27,19 @@ export default function SnakeLadder() {
   const [winner, setWinner] = useState(null);
   const [round, setRound] = useState(1);
 
-  // Pre-load audio objects with verified URLs from GitHub (Cache-busting)
-  const gameSounds = useMemo(() => ({
-    dice: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/dice.mp3'),
-    move: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/drop.mp3'),
-    ladder: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/ladder.mp3'),
-    snake: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/snake.mp3'),
-    challenge: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/ladder.mp3?v=2'),
-    win: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/success.mp3?v=2')
-  }), []);
-
   const playSound = useCallback((type) => {
-    const audio = gameSounds[type];
-    if (audio) {
-      audio.currentTime = 0;
+    try {
+      console.log(`[Audio] Playing ${type}...`);
+      const url = SOUND_URLS[type];
+      if (!url) return;
+      
+      const audio = new Audio(`${url}?t=${Date.now()}`); 
       audio.volume = 1.0;
-      audio.play().catch(e => console.warn(`Audio ${type} play blocked or failed:`, e));
+      audio.play().catch(e => console.warn(`[Audio] ${type} failed:`, e));
+    } catch (err) {
+      console.error('[Audio] Error:', err);
     }
-  }, [gameSounds]);
+  }, []);
 
   // Use layout based on round
   const currentLayout = useMemo(() => {
