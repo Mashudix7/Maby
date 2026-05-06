@@ -18,19 +18,24 @@ export default function SnakeLadder() {
   const [winner, setWinner] = useState(null);
   const [round, setRound] = useState(1);
 
+  // Pre-load audio objects
+  const gameSounds = useMemo(() => ({
+    dice: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-dice-roll-pile-of-dice-561.mp3'),
+    move: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-interface-click-1126.mp3'),
+    ladder: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-climb-descend-fast-whoosh-1481.mp3'),
+    snake: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-falling-on-metal-roof-2556.mp3'),
+    challenge: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-magic-marimba-2820.mp3'),
+    win: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3')
+  }), []);
+
   const playSound = useCallback((type) => {
-    const sounds = {
-      dice: 'https://assets.mixkit.co/sfx/preview/mixkit-dice-roll-pile-of-dice-561.mp3',
-      move: 'https://assets.mixkit.co/sfx/preview/mixkit-interface-click-1126.mp3',
-      ladder: 'https://assets.mixkit.co/sfx/preview/mixkit-climb-descend-fast-whoosh-1481.mp3',
-      snake: 'https://assets.mixkit.co/sfx/preview/mixkit-falling-on-metal-roof-2556.mp3',
-      challenge: 'https://assets.mixkit.co/sfx/preview/mixkit-magic-marimba-2820.mp3',
-      win: 'https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3'
-    };
-    const audio = new Audio(sounds[type]);
-    audio.volume = 0.4;
-    audio.play().catch(e => console.log("Audio play blocked", e));
-  }, []);
+    const audio = gameSounds[type];
+    if (audio) {
+      audio.currentTime = 0;
+      audio.volume = 1.0;
+      audio.play().catch(e => console.warn(`Audio ${type} play blocked or failed:`, e));
+    }
+  }, [gameSounds]);
   
   // Use layout based on round
   const currentLayout = useMemo(() => {
