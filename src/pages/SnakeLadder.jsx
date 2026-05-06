@@ -18,14 +18,14 @@ export default function SnakeLadder() {
   const [winner, setWinner] = useState(null);
   const [round, setRound] = useState(1);
 
-  // Pre-load audio objects
+  // Pre-load audio objects with stable URLs
   const gameSounds = useMemo(() => ({
-    dice: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-dice-roll-pile-of-dice-561.mp3'),
-    move: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-interface-click-1126.mp3'),
-    ladder: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-climb-descend-fast-whoosh-1481.mp3'),
-    snake: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-falling-on-metal-roof-2556.mp3'),
-    challenge: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-magic-marimba-2820.mp3'),
-    win: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3')
+    dice: new Audio('https://www.soundjay.com/misc/sounds/dice-roll-1.mp3'),
+    move: new Audio('https://www.soundjay.com/communication/sounds/button-21.mp3'),
+    ladder: new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3'),
+    snake: new Audio('https://www.soundjay.com/misc/sounds/fail-trumpet-01.mp3'),
+    challenge: new Audio('https://www.soundjay.com/misc/sounds/magic-chime-01.mp3'),
+    win: new Audio('https://www.soundjay.com/misc/sounds/success-fanfare-trumpets-10.mp3')
   }), []);
 
   const playSound = useCallback((type) => {
