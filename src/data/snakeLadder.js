@@ -1,19 +1,27 @@
 export const BOARD_SIZE = 36; // 6x6
 export const GRID_DIM = 6;
 
-export const LADDERS = {
-  4: 14,
-  9: 20,
-  17: 27,
-  22: 32
-};
-
-export const SNAKES = {
-  15: 5,
-  24: 12,
-  31: 21,
-  34: 19
-};
+// Predefined layouts for different rounds
+export const BOARD_LAYOUTS = [
+  // Round 1 (Level 1)
+  {
+    ladders: { 4: 14, 9: 20, 17: 27, 22: 32 },
+    snakes: { 15: 5, 24: 12, 31: 21, 34: 19 },
+    challengeTiles: [2, 5, 8, 11, 13, 16, 18, 21, 23, 26, 29, 33]
+  },
+  // Round 2 (Level 2)
+  {
+    ladders: { 3: 13, 10: 21, 16: 26, 25: 35 },
+    snakes: { 14: 4, 19: 9, 28: 18, 32: 22 },
+    challengeTiles: [4, 7, 12, 15, 20, 23, 24, 27, 30, 31, 34]
+  },
+  // Round 3 (Level 3)
+  {
+    ladders: { 2: 12, 8: 18, 15: 25, 21: 31 },
+    snakes: { 13: 3, 20: 10, 27: 17, 33: 23 },
+    challengeTiles: [3, 6, 9, 14, 17, 19, 22, 26, 28, 30, 32]
+  }
+];
 
 export const CHALLENGES = [
   // Part 1
@@ -59,5 +67,3 @@ export const CHALLENGES = [
   { id: 39, text: "Tempelkan kepala kamu ke pasangan tanpa ngomong" },
   { id: 40, text: "Peluk pasangan kamu sambil bilang sesuatu pelan ke telinganya" }
 ];
-
-export const CHALLENGE_TILES = [2, 5, 8, 11, 13, 16, 18, 21, 23, 25, 26, 28, 29, 32, 33, 35];

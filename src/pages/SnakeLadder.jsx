@@ -3,7 +3,7 @@ import MainLayout from '../components/layout/MainLayout';
 import GlassCard from '../components/ui/GlassCard';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { BOARD_SIZE, GRID_DIM, LADDERS, SNAKES, CHALLENGES, CHALLENGE_TILES } from '../data/snakeLadder';
+import { BOARD_SIZE, GRID_DIM, BOARD_LAYOUTS, CHALLENGES } from '../data/snakeLadder';
 
 export default function SnakeLadder() {
   const { profile } = useAuth();
@@ -17,73 +17,12 @@ export default function SnakeLadder() {
   const [seenChallenges, setSeenChallenges] = useState([]);
   const [winner, setWinner] = useState(null);
   const [round, setRound] = useState(1);
-  const [boardConfig, setBoardConfig] = useState({
-    ladders: LADDERS,
-    snakes: SNAKES,
-    challengeTiles: CHALLENGE_TILES
-  });
-
-  useEffect(() => {
-    const generateRandomBoard = () => {
-      const occupied = new Set([1, BOARD_SIZE]);
-      const newLadders = {};
-      const newSnakes = {};
-      const newChallenges = [];
-
-      // Generate 3 Ladders
-      for (let i = 0; i < 3; i++) {
-        let start, end;
-        let attempts = 0;
-        do {
-          start = Math.floor(Math.random() * (BOARD_SIZE - 15)) + 2;
-          end = start + Math.floor(Math.random() * 10) + 5;
-          attempts++;
-        } while ((occupied.has(start) || occupied.has(end) || end >= BOARD_SIZE) && attempts < 100);
-        if (attempts < 100) {
-          newLadders[start] = end;
-          occupied.add(start);
-          occupied.add(end);
-        }
-      }
-
-      // Generate 3 Snakes
-      for (let i = 0; i < 3; i++) {
-        let start, end;
-        let attempts = 0;
-        do {
-          start = Math.floor(Math.random() * (BOARD_SIZE - 10)) + 10;
-          end = start - (Math.floor(Math.random() * 8) + 5);
-          attempts++;
-        } while ((occupied.has(start) || occupied.has(end) || end <= 1) && attempts < 100);
-        if (attempts < 100) {
-          newSnakes[start] = end;
-          occupied.add(start);
-          occupied.add(end);
-        }
-      }
-
-      // Generate 12 Challenges
-      for (let i = 0; i < 12; i++) {
-        let tile;
-        let attempts = 0;
-        do {
-          tile = Math.floor(Math.random() * (BOARD_SIZE - 2)) + 2;
-          attempts++;
-        } while ((occupied.has(tile) || newChallenges.includes(tile)) && attempts < 100);
-        if (attempts < 100) {
-          newChallenges.push(tile);
-        }
-      }
-
-      setBoardConfig({
-        ladders: newLadders,
-        snakes: newSnakes,
-        challengeTiles: newChallenges
-      });
-    };
-
-    generateRandomBoard();
-  }, []);
+  
+  // Use layout based on round
+  const currentLayout = useMemo(() => {
+    const layoutIndex = (round - 1) % BOARD_LAYOUTS.length;
+    return BOARD_LAYOUTS[layoutIndex];
+  }, [round]);
 
   const isFeby = profile?.display_name?.includes('Feby');
   const player1Info = { 
@@ -120,7 +59,6 @@ export default function SnakeLadder() {
   const getUnseenChallenge = useCallback(() => {
     const available = CHALLENGES.filter(c => !seenChallenges.includes(c.id));
     if (available.length === 0) {
-      // Reset if all seen
       setSeenChallenges([]);
       return CHALLENGES[Math.floor(Math.random() * CHALLENGES.length)];
     }
@@ -141,28 +79,27 @@ export default function SnakeLadder() {
 
     let finalPos = targetPos;
 
-    if (boardConfig.ladders[targetPos]) {
+    if (currentLayout.ladders[targetPos]) {
       await new Promise(r => setTimeout(r, 1000));
-      finalPos = boardConfig.ladders[targetPos];
+      finalPos = currentLayout.ladders[targetPos];
       setPositions(prev => ({ ...prev, [player]: finalPos }));
-    } else if (boardConfig.snakes[targetPos]) {
+    } else if (currentLayout.snakes[targetPos]) {
       await new Promise(r => setTimeout(r, 1000));
-      finalPos = boardConfig.snakes[targetPos];
+      finalPos = currentLayout.snakes[targetPos];
       setPositions(prev => ({ ...prev, [player]: finalPos }));
     }
 
     if (finalPos === BOARD_SIZE) {
       setWinner(player);
-    } else if (boardConfig.challengeTiles.includes(finalPos)) {
+    } else if (currentLayout.challengeTiles.includes(finalPos)) {
       const challenge = getUnseenChallenge();
       setActiveChallenge(challenge);
     } else {
-      if (player === 2) setRound(prev => prev + 1);
       setCurrentPlayer(player === 1 ? 2 : 1);
     }
     
     setIsMoving(false);
-  }, [positions, getUnseenChallenge, boardConfig]);
+  }, [positions, getUnseenChallenge, currentLayout]);
 
   const rollDice = () => {
     if (isRolling || isMoving || activeChallenge || winner) return;
@@ -178,8 +115,15 @@ export default function SnakeLadder() {
 
   const completeChallenge = () => {
     setActiveChallenge(null);
-    if (currentPlayer === 2) setRound(prev => prev + 1);
     setCurrentPlayer(currentPlayer === 1 ? 2 : 1);
+  };
+
+  const handleRestart = () => {
+    setRound(prev => prev + 1);
+    setPositions({ 1: 0, 2: 0 });
+    setWinner(null);
+    setCurrentPlayer(1);
+    setDiceResult(null);
   };
 
   return (
@@ -194,7 +138,7 @@ export default function SnakeLadder() {
         <div className="grid grid-cols-3 gap-2 mb-4">
            <div className="bg-white/40 dark:bg-white/5 rounded-2xl p-2 text-center border border-primary/5">
              <p className="text-[8px] font-bold uppercase text-outline mb-0.5">Round</p>
-             <p className="text-sm font-serif text-primary">#{round}</p>
+             <p className="text-sm font-serif text-primary font-bold">LEVEL {round}</p>
            </div>
            <div className="bg-white/40 dark:bg-white/5 rounded-2xl p-2 text-center border border-primary/5">
              <p className="text-[8px] font-bold uppercase text-outline mb-0.5">{player1Info.name}</p>
@@ -213,33 +157,36 @@ export default function SnakeLadder() {
               <div 
                 key={cellNum}
                 className={`relative flex flex-col items-center justify-center rounded-2xl transition-all border ${
-                  boardConfig.challengeTiles.includes(cellNum) 
+                  currentLayout.challengeTiles.includes(cellNum) 
                     ? 'bg-rose-500/20 border-rose-500/20 text-rose-600' 
-                    : boardConfig.ladders[cellNum] 
+                    : currentLayout.ladders[cellNum] 
                       ? 'bg-indigo-500/20 border-indigo-500/20 text-indigo-600'
-                      : boardConfig.snakes[cellNum]
+                      : currentLayout.snakes[cellNum]
                         ? 'bg-orange-500/20 border-orange-500/20 text-orange-600'
                         : cellNum === BOARD_SIZE
                           ? 'bg-primary text-white border-primary shadow-lg scale-105 z-10'
-                          : 'bg-white/60 dark:bg-white/10 border-transparent text-outline-variant/40'
+                          : cellNum === 1
+                            ? 'bg-emerald-500/20 border-emerald-500/20 text-emerald-600 font-bold'
+                            : 'bg-white/60 dark:bg-white/10 border-transparent text-outline-variant/40'
                 }`}
               >
                 {/* Cell Number - Top Left */}
                 <span className={`absolute top-1 left-1.5 text-[8px] font-bold ${cellNum === BOARD_SIZE ? 'text-white' : 'opacity-30'}`}>{cellNum}</span>
                 
                 {/* Target Info - Bottom Right */}
-                {(boardConfig.ladders[cellNum] || boardConfig.snakes[cellNum]) && (
+                {(currentLayout.ladders[cellNum] || currentLayout.snakes[cellNum]) && (
                   <span className="absolute bottom-1 right-1.5 text-[6px] font-bold opacity-60">
-                    TO {boardConfig.ladders[cellNum] || boardConfig.snakes[cellNum]}
+                    TO {currentLayout.ladders[cellNum] || currentLayout.snakes[cellNum]}
                   </span>
                 )}
 
                 {/* Main Icons - CENTERED */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  {boardConfig.ladders[cellNum] && <span className="material-symbols-outlined text-2xl opacity-60">north_east</span>}
-                  {boardConfig.snakes[cellNum] && <span className="material-symbols-outlined text-2xl opacity-60">south_west</span>}
-                  {boardConfig.challengeTiles.includes(cellNum) && <span className="material-symbols-outlined text-2xl opacity-60">favorite</span>}
+                  {currentLayout.ladders[cellNum] && <span className="material-symbols-outlined text-2xl opacity-60">north_east</span>}
+                  {currentLayout.snakes[cellNum] && <span className="material-symbols-outlined text-2xl opacity-60">south_west</span>}
+                  {currentLayout.challengeTiles.includes(cellNum) && <span className="material-symbols-outlined text-2xl opacity-60">favorite</span>}
                   {cellNum === BOARD_SIZE && <span className="material-symbols-outlined text-2xl animate-bounce">flag</span>}
+                  {cellNum === 1 && <span className="material-symbols-outlined text-2xl opacity-60">play_circle</span>}
                 </div>
                 
                 {/* Players - CENTERED (On top of icons) */}
@@ -332,10 +279,10 @@ export default function SnakeLadder() {
                 {winner === 1 ? player1Info.name : player2Info.name} mencapai garis finish duluan, tapi kalian berdua pemenangnya!
               </p>
               <button 
-                onClick={() => window.location.reload()}
+                onClick={handleRestart}
                 className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-sm hover:brightness-110 transition-all shadow-none"
               >
-                Main Lagi 🔁
+                Main Level Berikutnya 🚀
               </button>
             </div>
           </div>
