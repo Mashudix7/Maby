@@ -24,8 +24,8 @@ export default function SnakeLadder() {
     move: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/drop.mp3'),
     ladder: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/ladder.mp3'),
     snake: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/snake.mp3'),
-    challenge: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/success.mp3'),
-    win: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/ladder.mp3')
+    challenge: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/ladder.mp3'),
+    win: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/success.mp3')
   }), []);
 
   const playSound = useCallback((type) => {
