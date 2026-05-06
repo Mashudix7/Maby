@@ -16,7 +16,87 @@ import { requestNotificationPermission, listenForPartnerWishes } from '../servic
 import { listenForNudges } from '../services/nudgeService';
 import { getWIBDate } from '../lib/dateUtils';
 
-// ... (Mood options, StreakIndicator, RelationshipTimer stay the same)
+const MOOD_OPTIONS = [
+  { id: 'happy', emoji: '🥰', label_id: 'Bahagia', label_en: 'Happy' },
+  { id: 'peaceful', emoji: '😌', label_id: 'Damai', label_en: 'Peaceful' },
+  { id: 'missing', emoji: '🥺', label_id: 'Rindu', label_en: 'Missing' },
+];
+
+const StreakIndicator = memo(function StreakIndicator({ streak, activity }) {
+  const { t } = useLanguage();
+  const isCompleted = activity?.completed;
+
+  return (
+    <div 
+      title={isCompleted ? t('streak.completed') : t('streak.hint')}
+      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border transition-all duration-700 ${
+        isCompleted 
+          ? 'bg-orange-500/10 border-orange-500/30 text-orange-600 dark:text-orange-400 shadow-[0_0_15px_rgba(249,115,22,0.15)]' 
+          : 'bg-zinc-100 dark:bg-white/5 border-zinc-200 dark:border-white/10 text-zinc-400 dark:text-zinc-500'
+      }`}
+    >
+      <span className="material-symbols-outlined text-[20px]" style={isCompleted ? { fontVariationSettings: "'FILL' 1" } : undefined}>
+        local_fire_department
+      </span>
+      <div className="flex flex-col items-start leading-none">
+        <span className="text-sm font-serif font-bold">{streak} {t('streak.days')}</span>
+      </div>
+    </div>
+  );
+});
+
+const RelationshipTimer = memo(function RelationshipTimer() {
+  const { t } = useLanguage();
+  const [time, setTime] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+  const targetTime = useMemo(() => {
+    const now = new Date();
+    let target = new Date(now.getFullYear(), 1, 21, 0, 0, 0); // Feb 21
+    if (now.getTime() > target.getTime()) {
+      target.setFullYear(now.getFullYear() + 1);
+    }
+    return target.getTime();
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date().getTime();
+      const diff = targetTime - now;
+      
+      if (diff > 0) {
+        setTime({
+          days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((diff % (1000 * 60)) / 1000)
+        });
+      }
+    }, 1000);
+    
+    return () => clearInterval(interval);
+  }, [targetTime]);
+
+  return (
+    <div className="bg-white/40 dark:bg-white/5 p-4 md:p-6 rounded-2xl md:rounded-[2rem] flex justify-between text-center mt-6 border border-white/10">
+      <div className="flex flex-col flex-1">
+        <span className="text-xl sm:text-2xl md:text-4xl font-serif text-primary dark:text-rose-300">{time.days}</span>
+        <span className="text-[9px] sm:text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">{t('dashboard.days')}</span>
+      </div>
+      <div className="flex flex-col flex-1">
+        <span className="text-xl sm:text-2xl md:text-4xl font-serif text-primary dark:text-rose-300">{time.hours}</span>
+        <span className="text-[9px] sm:text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">{t('dashboard.hours')}</span>
+      </div>
+      <div className="flex flex-col flex-1">
+        <span className="text-xl sm:text-2xl md:text-4xl font-serif text-primary dark:text-rose-300">{time.minutes}</span>
+        <span className="text-[9px] sm:text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">{t('dashboard.minutes')}</span>
+      </div>
+      <div className="flex flex-col flex-1">
+        <span className="text-xl sm:text-2xl md:text-4xl font-serif text-primary dark:text-rose-300">{time.seconds}</span>
+        <span className="text-[9px] sm:text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">{t('dashboard.seconds')}</span>
+      </div>
+    </div>
+  );
+});
 
 export default function Dashboard() {
   const { profile, coupleId, user } = useAuth();
