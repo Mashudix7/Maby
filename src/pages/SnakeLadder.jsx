@@ -191,12 +191,12 @@ export default function SnakeLadder() {
                         : cellNum === BOARD_SIZE
                           ? 'bg-primary text-white border-primary shadow-lg scale-105 z-10'
                           : cellNum === 1
-                            ? 'bg-emerald-500/20 border-emerald-500/20 text-emerald-600 font-bold'
+                            ? 'bg-emerald-500 text-white border-emerald-500 shadow-lg scale-105 z-10'
                             : 'bg-white/60 dark:bg-white/10 border-transparent text-outline-variant/40'
                 }`}
               >
                 {/* Cell Number - Top Left */}
-                <span className={`absolute top-1 left-1.5 text-[8px] font-bold ${cellNum === BOARD_SIZE ? 'text-white' : 'opacity-30'}`}>{cellNum}</span>
+                <span className={`absolute top-1 left-1.5 text-[8px] font-bold ${[1, BOARD_SIZE].includes(cellNum) ? 'text-white' : 'opacity-30'}`}>{cellNum}</span>
                 
                 {/* Target Info - Bottom Right */}
                 {(currentLayout.ladders[cellNum] || currentLayout.snakes[cellNum]) && (
@@ -210,8 +210,7 @@ export default function SnakeLadder() {
                   {currentLayout.ladders[cellNum] && <span className="material-symbols-outlined text-2xl opacity-60">north_east</span>}
                   {currentLayout.snakes[cellNum] && <span className="material-symbols-outlined text-2xl opacity-60">south_west</span>}
                   {currentLayout.challengeTiles.includes(cellNum) && <span className="material-symbols-outlined text-2xl opacity-60">favorite</span>}
-                  {cellNum === BOARD_SIZE && <span className="material-symbols-outlined text-2xl animate-bounce">flag</span>}
-                  {cellNum === 1 && <span className="material-symbols-outlined text-2xl opacity-60">play_circle</span>}
+                  {(cellNum === BOARD_SIZE || cellNum === 1) && <span className="material-symbols-outlined text-2xl">flag</span>}
                 </div>
                 
                 {/* Players - CENTERED (On top of icons) */}
