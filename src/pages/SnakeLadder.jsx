@@ -30,37 +30,49 @@ export default function SnakeLadder() {
       const newSnakes = {};
       const newChallenges = [];
 
-      // Generate 5 Ladders
-      for (let i = 0; i < 5; i++) {
+      // Generate 3 Ladders
+      for (let i = 0; i < 3; i++) {
         let start, end;
+        let attempts = 0;
         do {
-          start = Math.floor(Math.random() * (BOARD_SIZE - 10)) + 2;
+          start = Math.floor(Math.random() * (BOARD_SIZE - 15)) + 2;
           end = start + Math.floor(Math.random() * 10) + 5;
-        } while (occupied.has(start) || occupied.has(end) || end >= BOARD_SIZE);
-        newLadders[start] = end;
-        occupied.add(start);
-        occupied.add(end);
+          attempts++;
+        } while ((occupied.has(start) || occupied.has(end) || end >= BOARD_SIZE) && attempts < 100);
+        if (attempts < 100) {
+          newLadders[start] = end;
+          occupied.add(start);
+          occupied.add(end);
+        }
       }
 
-      // Generate 5 Snakes
-      for (let i = 0; i < 5; i++) {
+      // Generate 3 Snakes
+      for (let i = 0; i < 3; i++) {
         let start, end;
+        let attempts = 0;
         do {
-          start = Math.floor(Math.random() * (BOARD_SIZE - 5)) + 10;
+          start = Math.floor(Math.random() * (BOARD_SIZE - 10)) + 10;
           end = start - (Math.floor(Math.random() * 8) + 5);
-        } while (occupied.has(start) || occupied.has(end) || end <= 1);
-        newSnakes[start] = end;
-        occupied.add(start);
-        occupied.add(end);
+          attempts++;
+        } while ((occupied.has(start) || occupied.has(end) || end <= 1) && attempts < 100);
+        if (attempts < 100) {
+          newSnakes[start] = end;
+          occupied.add(start);
+          occupied.add(end);
+        }
       }
 
-      // Generate ~16 Challenges
-      for (let i = 0; i < 16; i++) {
+      // Generate 12 Challenges
+      for (let i = 0; i < 12; i++) {
         let tile;
+        let attempts = 0;
         do {
           tile = Math.floor(Math.random() * (BOARD_SIZE - 2)) + 2;
-        } while (occupied.has(tile) || newChallenges.includes(tile));
-        newChallenges.push(tile);
+          attempts++;
+        } while ((occupied.has(tile) || newChallenges.includes(tile)) && attempts < 100);
+        if (attempts < 100) {
+          newChallenges.push(tile);
+        }
       }
 
       setBoardConfig({
