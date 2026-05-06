@@ -81,7 +81,7 @@ const RelationshipTimer = memo(function RelationshipTimer() {
       </div>
       <div className="flex flex-col flex-1">
         <span className="text-xl sm:text-2xl md:text-4xl font-serif text-primary dark:text-rose-300">{time.hours}</span>
-        <span className="text-[9px) sm:text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">{t('dashboard.hours')}</span>
+        <span className="text-[9px] sm:text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">{t('dashboard.hours')}</span>
       </div>
       <div className="flex flex-col flex-1">
         <span className="text-xl sm:text-2xl md:text-4xl font-serif text-primary dark:text-rose-300">{time.minutes}</span>
