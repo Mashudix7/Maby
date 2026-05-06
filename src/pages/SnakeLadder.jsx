@@ -14,6 +14,7 @@ export default function SnakeLadder() {
   const [isRolling, setIsRolling] = useState(false);
   const [isMoving, setIsMoving] = useState(false);
   const [activeChallenge, setActiveChallenge] = useState(null);
+  const [seenChallenges, setSeenChallenges] = useState([]);
   const [winner, setWinner] = useState(null);
   const [round, setRound] = useState(1);
 
@@ -49,6 +50,18 @@ export default function SnakeLadder() {
     return cells;
   }, []);
 
+  const getUnseenChallenge = useCallback(() => {
+    const available = CHALLENGES.filter(c => !seenChallenges.includes(c.id));
+    if (available.length === 0) {
+      // Reset if all seen
+      setSeenChallenges([]);
+      return CHALLENGES[Math.floor(Math.random() * CHALLENGES.length)];
+    }
+    const picked = available[Math.floor(Math.random() * available.length)];
+    setSeenChallenges(prev => [...prev, picked.id]);
+    return picked;
+  }, [seenChallenges]);
+
   const movePlayer = useCallback(async (player, steps) => {
     setIsMoving(true);
     let currentPos = positions[player];
@@ -74,15 +87,15 @@ export default function SnakeLadder() {
     if (finalPos === BOARD_SIZE) {
       setWinner(player);
     } else if (CHALLENGE_TILES.includes(finalPos)) {
-      const randomChallenge = CHALLENGES[Math.floor(Math.random() * CHALLENGES.length)];
-      setActiveChallenge(randomChallenge);
+      const challenge = getUnseenChallenge();
+      setActiveChallenge(challenge);
     } else {
       if (player === 2) setRound(prev => prev + 1);
       setCurrentPlayer(player === 1 ? 2 : 1);
     }
     
     setIsMoving(false);
-  }, [positions]);
+  }, [positions, getUnseenChallenge]);
 
   const rollDice = () => {
     if (isRolling || isMoving || activeChallenge || winner) return;
@@ -143,7 +156,7 @@ export default function SnakeLadder() {
                 }`}
               >
                 {/* Cell Number - Top Left */}
-                <span className="absolute top-1 left-1.5 text-[8px] font-bold opacity-60">{cellNum}</span>
+                <span className="absolute top-1 left-1.5 text-[8px] font-bold opacity-30">{cellNum}</span>
                 
                 {/* Snake/Ladder Targets - Bottom Right */}
                 {LADDERS[cellNum] && (
@@ -161,19 +174,19 @@ export default function SnakeLadder() {
 
                 {/* Challenge Icon - Top Right */}
                 {CHALLENGE_TILES.includes(cellNum) && (
-                   <span className="material-symbols-outlined text-sm absolute top-1 right-1.5 opacity-30">favorite</span>
+                   <span className="material-symbols-outlined text-sm absolute top-1 right-1.5 opacity-20">favorite</span>
                 )}
                 
-                {/* Players - Center */}
+                {/* Players - CENTERED */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <div className="flex -space-x-4">
                     {positions[1] === cellNum && (
-                      <div className={`w-7 h-7 rounded-full border-2 ${player1Info.color} bg-white overflow-hidden z-20 transition-all duration-300 animate-bounce`}>
+                      <div className={`w-8 h-8 rounded-full border-[3px] border-red-500 bg-white overflow-hidden z-20 transition-all duration-300 animate-bounce shadow-sm`}>
                         <img src={player1Info.avatar} className="w-full h-full object-cover" alt="" />
                       </div>
                     )}
                     {positions[2] === cellNum && (
-                      <div className={`w-7 h-7 rounded-full border-2 ${player2Info.color} bg-white overflow-hidden z-20 transition-all duration-300 animate-bounce`}>
+                      <div className={`w-8 h-8 rounded-full border-[3px] border-blue-600 bg-white overflow-hidden z-20 transition-all duration-300 animate-bounce shadow-sm`}>
                         <img src={player2Info.avatar} className="w-full h-full object-cover" alt="" />
                       </div>
                     )}
@@ -182,12 +195,6 @@ export default function SnakeLadder() {
               </div>
             ))
           )}
-
-          {/* Start Point Marker */}
-          <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-1 opacity-20">
-            {positions[1] === 0 && <div className={`w-1.5 h-1.5 rounded-full ${player1Info.bgColor}`} />}
-            {positions[2] === 0 && <div className={`w-1.5 h-1.5 rounded-full ${player2Info.bgColor}`} />}
-          </div>
         </div>
 
         {/* Controls */}
@@ -195,7 +202,7 @@ export default function SnakeLadder() {
           <div className="flex items-center gap-10">
             {/* Player 1 Stats */}
             <div className={`flex flex-col items-center gap-2 transition-all ${currentPlayer === 1 ? 'scale-110' : 'opacity-30 grayscale'}`}>
-              <div className={`w-14 h-14 rounded-2xl overflow-hidden border-2 ${currentPlayer === 1 ? player1Info.color : 'border-transparent'}`}>
+              <div className={`w-14 h-14 rounded-2xl overflow-hidden border-[3px] ${currentPlayer === 1 ? 'border-red-500' : 'border-transparent'}`}>
                 <img src={player1Info.avatar} className="w-full h-full object-cover" alt="" />
               </div>
               <span className="text-[10px] font-bold uppercase tracking-widest">{player1Info.name}</span>
@@ -221,7 +228,7 @@ export default function SnakeLadder() {
 
             {/* Player 2 Stats */}
             <div className={`flex flex-col items-center gap-2 transition-all ${currentPlayer === 2 ? 'scale-110' : 'opacity-30 grayscale'}`}>
-              <div className={`w-14 h-14 rounded-2xl overflow-hidden border-2 ${currentPlayer === 2 ? player2Info.color : 'border-transparent'}`}>
+              <div className={`w-14 h-14 rounded-2xl overflow-hidden border-[3px] ${currentPlayer === 2 ? 'border-blue-600' : 'border-transparent'}`}>
                 <img src={player2Info.avatar} className="w-full h-full object-cover" alt="" />
               </div>
               <span className="text-[10px] font-bold uppercase tracking-widest">{player2Info.name}</span>
@@ -229,15 +236,15 @@ export default function SnakeLadder() {
           </div>
         </div>
 
-        {/* Challenge Modal - Clean & Flat */}
+        {/* Challenge Modal */}
         {activeChallenge && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/70 backdrop-blur-sm">
             <div className="w-full max-w-sm bg-white dark:bg-[#1a1517] rounded-3xl p-8 text-center border border-white/10 shadow-none">
               <div className="w-16 h-16 bg-rose-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="material-symbols-outlined text-3xl text-rose-500">favorite</span>
               </div>
               <h3 className="font-serif text-2xl text-primary dark:text-[#ede0df] mb-4">Love Challenge!</h3>
-              <p className="text-on-surface dark:text-[#ede0df] mb-8 leading-relaxed italic text-lg">
+              <p className="text-on-surface dark:text-[#ede0df] mb-8 leading-relaxed italic text-xl">
                 "{activeChallenge.text}"
               </p>
               <button 
@@ -250,9 +257,9 @@ export default function SnakeLadder() {
           </div>
         )}
 
-        {/* Win Modal - Clean & Flat */}
+        {/* Win Modal */}
         {winner && (
-          <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-primary/10 backdrop-blur-sm">
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-primary/20 backdrop-blur-sm">
             <div className="w-full max-w-sm bg-white dark:bg-[#1a1517] rounded-3xl p-8 text-center border border-white/20 shadow-none">
               <div className="text-6xl mb-6">🏆</div>
               <h3 className="font-serif text-3xl text-primary dark:text-[#ede0df] mb-2">We Finished!</h3>
