@@ -309,6 +309,23 @@ export default function Dashboard() {
                     <span className="material-symbols-outlined ml-auto text-white/50 group-hover:text-white transition-colors">chevron_right</span>
                  </div>
               </Link>
+
+              {/* Love Snake & Ladder Banner */}
+              <Link to="/love-ladder" className="group relative h-20 md:h-22 rounded-2xl overflow-hidden shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98] border border-rose-400/10">
+                 <div className="absolute inset-0 bg-gradient-to-r from-rose-400/80 to-orange-400/80 dark:from-rose-900/40 dark:to-orange-800/40 backdrop-blur-sm" />
+                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
+                 
+                 <div className="relative h-full flex items-center p-4 md:p-5 gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-inner group-hover:rotate-12 transition-transform shrink-0">
+                      <span className="material-symbols-outlined text-xl text-white">grid_view</span>
+                    </div>
+                    <div className="flex flex-col text-left">
+                      <h3 className="font-serif text-base md:text-lg font-bold text-white leading-none">Love Ladder</h3>
+                      <p className="text-[8px] font-bold uppercase tracking-widest text-white/70 mt-1">Adventure Together</p>
+                    </div>
+                    <span className="material-symbols-outlined ml-auto text-white/50 group-hover:text-white transition-colors">chevron_right</span>
+                 </div>
+              </Link>
             </div>
 
             {/* Mood Tracker */}
