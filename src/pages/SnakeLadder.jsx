@@ -18,14 +18,14 @@ export default function SnakeLadder() {
   const [winner, setWinner] = useState(null);
   const [round, setRound] = useState(1);
 
-  // Pre-load audio objects with stable URLs
+  // Pre-load audio objects with stable URLs (Fixing 404)
   const gameSounds = useMemo(() => ({
-    dice: new Audio('https://www.soundjay.com/misc/sounds/dice-roll-1.mp3'),
-    move: new Audio('https://www.soundjay.com/communication/sounds/button-21.mp3'),
-    ladder: new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3'),
-    snake: new Audio('https://www.soundjay.com/misc/sounds/fail-trumpet-01.mp3'),
-    challenge: new Audio('https://www.soundjay.com/misc/sounds/magic-chime-01.mp3'),
-    win: new Audio('https://www.soundjay.com/misc/sounds/success-fanfare-trumpets-10.mp3')
+    dice: new Audio('https://www.soundjay.com/misc/dice-roll-1.mp3'),
+    move: new Audio('https://www.soundjay.com/buttons/button-16.mp3'),
+    ladder: new Audio('https://www.soundjay.com/misc/bell-ringing-04.mp3'),
+    snake: new Audio('https://www.soundjay.com/misc/fail-trumpet-01.mp3'),
+    challenge: new Audio('https://www.soundjay.com/misc/magic-chime-01.mp3'),
+    win: new Audio('https://www.soundjay.com/misc/success-fanfare-trumpets-10.mp3')
   }), []);
 
   const playSound = useCallback((type) => {
