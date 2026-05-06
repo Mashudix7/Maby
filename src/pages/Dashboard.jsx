@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import MainLayout from '../components/layout/MainLayout';
 import GlassCard from '../components/ui/GlassCard';
 import MomentCard, { MomentCardSkeleton } from '../components/ui/MomentCard';
@@ -19,7 +19,7 @@ const MOOD_OPTIONS = [
   { id: 'missing', emoji: '🥺', label_id: 'Rindu', label_en: 'Missing' },
 ];
 
-function StreakIndicator({ streak, activity }) {
+const StreakIndicator = memo(function StreakIndicator({ streak, activity }) {
   const { t } = useLanguage();
   const isCompleted = activity?.completed;
 
@@ -40,9 +40,9 @@ function StreakIndicator({ streak, activity }) {
       </div>
     </div>
   );
-}
+});
 
-function RelationshipTimer() {
+const RelationshipTimer = memo(function RelationshipTimer() {
   const { t } = useLanguage();
   const [time, setTime] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
@@ -80,7 +80,7 @@ function RelationshipTimer() {
       </div>
       <div className="flex flex-col flex-1">
         <span className="text-xl sm:text-2xl md:text-4xl font-serif text-primary dark:text-rose-300">{time.hours}</span>
-        <span className="text-[9px] sm:text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">{t('dashboard.hours')}</span>
+        <span className="text-[9px) sm:text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">{t('dashboard.hours')}</span>
       </div>
       <div className="flex flex-col flex-1">
         <span className="text-xl sm:text-2xl md:text-4xl font-serif text-primary dark:text-rose-300">{time.minutes}</span>
@@ -92,20 +92,20 @@ function RelationshipTimer() {
       </div>
     </div>
   );
-}
+});
 
 export default function Dashboard() {
   const { profile, coupleId, user } = useAuth();
   const { t, language } = useLanguage();
-  const [state, setState] = useState({
-    moments: [],
-    loading: true,
-    currentMood: null,
-    allMoods: {},
-    latestWish: null,
-    streakData: { total_streak: 0 },
-    dailyActivity: null,
-  });
+  
+  // Split states to reduce re-renders
+  const [moments, setMoments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentMood, setCurrentMood] = useState(null);
+  const [allMoods, setAllMoods] = useState({});
+  const [latestWish, setLatestWish] = useState(null);
+  const [streakData, setStreakData] = useState({ total_streak: 0 });
+  const [dailyActivity, setDailyActivity] = useState(null);
 
   useEffect(() => {
     if (!coupleId || !user) return;
@@ -114,27 +114,25 @@ export default function Dashboard() {
 
     // Real-time listeners for everything
     const unsubMoments = listenMoments(coupleId, (momentsData) => {
-      setState(prev => ({ ...prev, moments: momentsData.slice(0, 3), loading: false }));
+      setMoments(momentsData.slice(0, 3));
+      setLoading(false);
     });
 
     const unsubWishes = listenWishes(coupleId, (wishesData) => {
-      setState(prev => ({ ...prev, latestWish: wishesData?.[0] || null }));
+      setLatestWish(wishesData?.[0] || null);
     });
 
     const unsubMoods = listenAllMoodsToday(coupleId, (moodsData) => {
-      setState(prev => ({ 
-        ...prev, 
-        allMoods: moodsData,
-        currentMood: moodsData[user.uid] || null 
-      }));
+      setAllMoods(moodsData);
+      setCurrentMood(moodsData[user.uid] || null);
     });
 
-    const unsubStreak = listenStreak(coupleId, (streakData) => {
-      setState(prev => ({ ...prev, streakData }));
+    const unsubStreak = listenStreak(coupleId, (data) => {
+      setStreakData(data);
     });
 
-    const unsubActivity = listenDailyActivity(coupleId, today, (activityData) => {
-      setState(prev => ({ ...prev, dailyActivity: activityData }));
+    const unsubActivity = listenDailyActivity(coupleId, today, (data) => {
+      setDailyActivity(data);
     });
 
     // Reset at midnight WIB logic
@@ -145,7 +143,7 @@ export default function Dashboard() {
     const msToMidnight = nextMidnight.getTime() - jakartaTime.getTime();
 
     const timer = setTimeout(() => {
-      window.location.reload(); // Hard reload at midnight to reset all WIB dates
+      window.location.reload(); 
     }, msToMidnight);
 
     return () => {
@@ -170,21 +168,18 @@ export default function Dashboard() {
   }, [coupleId, user, t]);
 
   const handleSetMood = useCallback(async (moodId) => {
-    if (state.currentMood) return;
+    if (currentMood) return;
     
     // Optimistic update
-    setState(prev => ({ 
-      ...prev, 
-      currentMood: moodId,
-      allMoods: { ...prev.allMoods, [user.uid]: moodId }
-    }));
+    setCurrentMood(moodId);
+    setAllMoods(prev => ({ ...prev, [user.uid]: moodId }));
 
     try {
       await setMoodToday(coupleId, user.uid, moodId);
     } catch (err) {
       console.error('Gagal menyimpan mood', err);
     }
-  }, [state.currentMood, coupleId, user?.uid]);
+  }, [currentMood, coupleId, user?.uid]);
 
   const relationshipDuration = useMemo(() => {
     const start = new Date('2026-02-21');
@@ -211,7 +206,7 @@ export default function Dashboard() {
     );
   }, [language]);
 
-  const moodCount = Object.keys(state.allMoods).length;
+  const moodCount = Object.keys(allMoods).length;
 
   return (
     <MainLayout activePage="/">
@@ -223,7 +218,7 @@ export default function Dashboard() {
               {formattedCurrentDate}
             </span>
             <div className="flex items-center gap-2">
-              <StreakIndicator streak={state.streakData.total_streak} activity={state.dailyActivity} />
+              <StreakIndicator streak={streakData.total_streak} activity={dailyActivity} />
             </div>
           </div>
           <h1 className="font-serif text-3xl md:text-5xl text-on-surface dark:text-[#ede0df] mb-2 md:mb-4">
@@ -243,12 +238,12 @@ export default function Dashboard() {
           
           {/* Today's Memory */}
           <div className="md:col-span-8 glass-panel rounded-2xl md:rounded-[2rem] p-4 md:p-8 flex flex-col relative overflow-hidden group min-h-[280px] md:min-h-[400px] border border-primary/5 will-change-transform">
-            {state.moments[0]?.image_url ? (
+            {moments[0]?.image_url ? (
               <div className="absolute inset-0 z-0 transform-gpu">
                 <img
                   alt={t('dashboard.last_memory')}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-60 translate-z-0"
-                  src={state.moments[0].image_url}
+                  src={moments[0].image_url}
                   loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-surface-container-low/90 dark:from-[#1a1517]/90 via-surface-container-low/40 dark:via-[#1a1517]/40 to-transparent pointer-events-none" />
@@ -260,16 +255,16 @@ export default function Dashboard() {
               <div className="flex justify-between items-start">
                 <span className="inline-flex items-center px-4 py-2 rounded-full bg-white/70 dark:bg-white/10 text-primary dark:text-rose-300 font-sans text-xs font-semibold tracking-wide backdrop-blur-md">
                   <span className="material-symbols-outlined mr-2 text-[16px]">photo_library</span>
-                  {state.moments[0] ? t('dashboard.last_memory') : t('dashboard.no_memory')}
+                  {moments[0] ? t('dashboard.last_memory') : t('dashboard.no_memory')}
                 </span>
               </div>
               <div className="mt-auto">
                 <h2 className="font-serif text-xl md:text-3xl text-on-surface dark:text-[#ede0df] mb-2">
-                  {state.moments[0]?.title || t('dashboard.add_first')}
+                  {moments[0]?.title || t('dashboard.add_first')}
                 </h2>
-                {state.moments[0]?.story && (
+                {moments[0]?.story && (
                   <p className="font-sans text-base text-on-surface-variant dark:text-zinc-400 font-serif italic line-clamp-2">
-                    &quot;{state.moments[0].story.slice(0, 100)}...&quot;
+                    &quot;{moments[0].story.slice(0, 100)}...&quot;
                   </p>
                 )}
               </div>
@@ -327,15 +322,15 @@ export default function Dashboard() {
               
               <div className="flex gap-4 justify-center mb-6">
                 {MOOD_OPTIONS.map((mood) => {
-                  const isActive = state.currentMood === mood.id || state.currentMood === mood.label_id || state.currentMood === mood.label_en;
+                  const isActive = currentMood === mood.id || currentMood === mood.label_id || currentMood === mood.label_en;
                   return (
                   <button
                     key={mood.id}
                     onClick={() => handleSetMood(mood.id)}
-                    disabled={!!state.currentMood}
+                    disabled={!!currentMood}
                     className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-sm transition-all duration-300 hover:scale-110 active:scale-95 ${isActive
                         ? 'bg-primary text-white ring-4 ring-primary/20 scale-110'
-                        : state.currentMood 
+                        : currentMood 
                           ? 'opacity-40 grayscale cursor-not-allowed'
                           : 'bg-white/50 dark:bg-white/5 border border-white/40 dark:border-white/10 hover:border-primary/40'
                       }`}
@@ -347,22 +342,22 @@ export default function Dashboard() {
 
               {/* Individual Moods Status */}
               <div className="flex w-full gap-2 mt-2">
-                <div className={`flex-1 p-2 rounded-xl border transition-all ${state.allMoods[user?.uid] ? 'bg-primary/5 border-primary/20' : 'bg-zinc-100/50 dark:bg-white/5 border-zinc-200/50 dark:border-white/10 opacity-50'}`}>
+                <div className={`flex-1 p-2 rounded-xl border transition-all ${allMoods[user?.uid] ? 'bg-primary/5 border-primary/20' : 'bg-zinc-100/50 dark:bg-white/5 border-zinc-200/50 dark:border-white/10 opacity-50'}`}>
                   <span className="text-[10px] block font-bold uppercase tracking-tighter text-outline dark:text-zinc-500 mb-1">
                     {profile?.display_name?.split(' ')[0] || 'Kamu'}
                   </span>
                   <span className="text-xl">
-                    {MOOD_OPTIONS.find(m => m.id === state.allMoods[user?.uid] || m.label_id === state.allMoods[user?.uid] || m.label_en === state.allMoods[user?.uid])?.emoji || '—'}
+                    {MOOD_OPTIONS.find(m => m.id === allMoods[user?.uid] || m.label_id === allMoods[user?.uid] || m.label_en === allMoods[user?.uid])?.emoji || '—'}
                   </span>
                 </div>
-                <div className={`flex-1 p-2 rounded-xl border transition-all ${Object.keys(state.allMoods).find(id => id !== user?.uid) ? 'bg-primary/5 border-primary/20' : 'bg-zinc-100/50 dark:bg-white/5 border-zinc-200/50 dark:border-white/10 opacity-50'}`}>
+                <div className={`flex-1 p-2 rounded-xl border transition-all ${Object.keys(allMoods).find(id => id !== user?.uid) ? 'bg-primary/5 border-primary/20' : 'bg-zinc-100/50 dark:bg-white/5 border-zinc-200/50 dark:border-white/10 opacity-50'}`}>
                   <span className="text-[10px] block font-bold uppercase tracking-tighter text-outline dark:text-zinc-500 mb-1">
                     {profile?.display_name?.includes('Feby') ? 'Mashudi' : 'Feby Zahara'}
                   </span>
                   <span className="text-xl">
                     {(() => {
-                      const partnerId = Object.keys(state.allMoods).find(id => id !== user?.uid);
-                      const partnerMood = state.allMoods[partnerId];
+                      const partnerId = Object.keys(allMoods).find(id => id !== user?.uid);
+                      const partnerMood = allMoods[partnerId];
                       return MOOD_OPTIONS.find(m => m.id === partnerMood || m.label_id === partnerMood || m.label_en === partnerMood)?.emoji || '—';
                     })()}
                   </span>
@@ -370,7 +365,7 @@ export default function Dashboard() {
               </div>
               
               <p className="font-sans text-[10px] font-semibold text-outline dark:text-zinc-500 mt-4 italic">
-                {state.currentMood ? t('dashboard.mood_locked') : t('dashboard.mood_hint')}
+                {currentMood ? t('dashboard.mood_locked') : t('dashboard.mood_hint')}
               </p>
             </GlassCard>
 
@@ -403,20 +398,20 @@ export default function Dashboard() {
               {t('dashboard.see_all')} <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
             </Link>
           </div>
-          {state.loading ? (
+          {loading ? (
             <div className="flex overflow-x-auto gap-4 md:gap-6 pb-4 hide-scrollbar">
               <MomentCardSkeleton />
               <MomentCardSkeleton />
               <MomentCardSkeleton />
             </div>
-          ) : state.moments.length === 0 ? (
+          ) : moments.length === 0 ? (
             <div className="text-center py-8">
               <span className="material-symbols-outlined text-4xl text-outline-variant dark:text-zinc-700 mb-3 block">photo_camera</span>
               <p className="text-sm text-on-surface-variant dark:text-zinc-500 font-serif italic">{t('dashboard.no_moments')}</p>
             </div>
           ) : (
             <div className="flex overflow-x-auto gap-4 md:gap-6 pb-4 hide-scrollbar">
-              {state.moments.map((moment) => (
+              {moments.map((moment) => (
                 <MomentCard
                   key={moment.id}
                   id={moment.id}
