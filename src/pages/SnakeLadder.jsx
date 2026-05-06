@@ -17,6 +17,61 @@ export default function SnakeLadder() {
   const [seenChallenges, setSeenChallenges] = useState([]);
   const [winner, setWinner] = useState(null);
   const [round, setRound] = useState(1);
+  const [boardConfig, setBoardConfig] = useState({
+    ladders: LADDERS,
+    snakes: SNAKES,
+    challengeTiles: CHALLENGE_TILES
+  });
+
+  useEffect(() => {
+    const generateRandomBoard = () => {
+      const occupied = new Set([1, BOARD_SIZE]);
+      const newLadders = {};
+      const newSnakes = {};
+      const newChallenges = [];
+
+      // Generate 5 Ladders
+      for (let i = 0; i < 5; i++) {
+        let start, end;
+        do {
+          start = Math.floor(Math.random() * (BOARD_SIZE - 10)) + 2;
+          end = start + Math.floor(Math.random() * 10) + 5;
+        } while (occupied.has(start) || occupied.has(end) || end >= BOARD_SIZE);
+        newLadders[start] = end;
+        occupied.add(start);
+        occupied.add(end);
+      }
+
+      // Generate 5 Snakes
+      for (let i = 0; i < 5; i++) {
+        let start, end;
+        do {
+          start = Math.floor(Math.random() * (BOARD_SIZE - 5)) + 10;
+          end = start - (Math.floor(Math.random() * 8) + 5);
+        } while (occupied.has(start) || occupied.has(end) || end <= 1);
+        newSnakes[start] = end;
+        occupied.add(start);
+        occupied.add(end);
+      }
+
+      // Generate ~16 Challenges
+      for (let i = 0; i < 16; i++) {
+        let tile;
+        do {
+          tile = Math.floor(Math.random() * (BOARD_SIZE - 2)) + 2;
+        } while (occupied.has(tile) || newChallenges.includes(tile));
+        newChallenges.push(tile);
+      }
+
+      setBoardConfig({
+        ladders: newLadders,
+        snakes: newSnakes,
+        challengeTiles: newChallenges
+      });
+    };
+
+    generateRandomBoard();
+  }, []);
 
   const isFeby = profile?.display_name?.includes('Feby');
   const player1Info = { 
@@ -74,19 +129,19 @@ export default function SnakeLadder() {
 
     let finalPos = targetPos;
 
-    if (LADDERS[targetPos]) {
+    if (boardConfig.ladders[targetPos]) {
       await new Promise(r => setTimeout(r, 1000));
-      finalPos = LADDERS[targetPos];
+      finalPos = boardConfig.ladders[targetPos];
       setPositions(prev => ({ ...prev, [player]: finalPos }));
-    } else if (SNAKES[targetPos]) {
+    } else if (boardConfig.snakes[targetPos]) {
       await new Promise(r => setTimeout(r, 1000));
-      finalPos = SNAKES[targetPos];
+      finalPos = boardConfig.snakes[targetPos];
       setPositions(prev => ({ ...prev, [player]: finalPos }));
     }
 
     if (finalPos === BOARD_SIZE) {
       setWinner(player);
-    } else if (CHALLENGE_TILES.includes(finalPos)) {
+    } else if (boardConfig.challengeTiles.includes(finalPos)) {
       const challenge = getUnseenChallenge();
       setActiveChallenge(challenge);
     } else {
@@ -95,7 +150,7 @@ export default function SnakeLadder() {
     }
     
     setIsMoving(false);
-  }, [positions, getUnseenChallenge]);
+  }, [positions, getUnseenChallenge, boardConfig]);
 
   const rollDice = () => {
     if (isRolling || isMoving || activeChallenge || winner) return;
@@ -146,30 +201,33 @@ export default function SnakeLadder() {
               <div 
                 key={cellNum}
                 className={`relative flex flex-col items-center justify-center rounded-2xl transition-all border ${
-                  CHALLENGE_TILES.includes(cellNum) 
+                  boardConfig.challengeTiles.includes(cellNum) 
                     ? 'bg-rose-500/20 border-rose-500/20 text-rose-600' 
-                    : LADDERS[cellNum] 
+                    : boardConfig.ladders[cellNum] 
                       ? 'bg-indigo-500/20 border-indigo-500/20 text-indigo-600'
-                      : SNAKES[cellNum]
+                      : boardConfig.snakes[cellNum]
                         ? 'bg-orange-500/20 border-orange-500/20 text-orange-600'
-                        : 'bg-white/60 dark:bg-white/10 border-transparent text-outline-variant/40'
+                        : cellNum === BOARD_SIZE
+                          ? 'bg-primary text-white border-primary shadow-lg scale-105 z-10'
+                          : 'bg-white/60 dark:bg-white/10 border-transparent text-outline-variant/40'
                 }`}
               >
                 {/* Cell Number - Top Left */}
-                <span className="absolute top-1 left-1.5 text-[8px] font-bold opacity-30">{cellNum}</span>
+                <span className={`absolute top-1 left-1.5 text-[8px] font-bold ${cellNum === BOARD_SIZE ? 'text-white' : 'opacity-30'}`}>{cellNum}</span>
                 
                 {/* Target Info - Bottom Right */}
-                {(LADDERS[cellNum] || SNAKES[cellNum]) && (
-                  <span className="absolute bottom-1 right-1.5 text-[6px] font-bold opacity-40">
-                    TO {LADDERS[cellNum] || SNAKES[cellNum]}
+                {(boardConfig.ladders[cellNum] || boardConfig.snakes[cellNum]) && (
+                  <span className="absolute bottom-1 right-1.5 text-[6px] font-bold opacity-60">
+                    TO {boardConfig.ladders[cellNum] || boardConfig.snakes[cellNum]}
                   </span>
                 )}
 
                 {/* Main Icons - CENTERED */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  {LADDERS[cellNum] && <span className="material-symbols-outlined text-2xl opacity-20">north_east</span>}
-                  {SNAKES[cellNum] && <span className="material-symbols-outlined text-2xl opacity-20">south_west</span>}
-                  {CHALLENGE_TILES.includes(cellNum) && <span className="material-symbols-outlined text-2xl opacity-20">favorite</span>}
+                  {boardConfig.ladders[cellNum] && <span className="material-symbols-outlined text-2xl opacity-60">north_east</span>}
+                  {boardConfig.snakes[cellNum] && <span className="material-symbols-outlined text-2xl opacity-60">south_west</span>}
+                  {boardConfig.challengeTiles.includes(cellNum) && <span className="material-symbols-outlined text-2xl opacity-60">favorite</span>}
+                  {cellNum === BOARD_SIZE && <span className="material-symbols-outlined text-2xl animate-bounce">flag</span>}
                 </div>
                 
                 {/* Players - CENTERED (On top of icons) */}
