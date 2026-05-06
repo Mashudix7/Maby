@@ -20,7 +20,7 @@ export default function MainLayout({ children, activePage, className = '', fab }
 
       <OfflineBanner />
       <Navbar activePage={currentPage} />
-      <main className={`pt-28 md:pt-36 pb-28 md:pb-20 px-4 md:px-6 relative z-10 page-transition ${className}`} style={{ paddingTop: 'calc(7rem + env(safe-area-inset-top, 0px))', paddingBottom: 'calc(7rem + env(safe-area-inset-bottom, 0px))' }}>
+      <main className={`pt-24 md:pt-32 pb-28 md:pb-20 px-4 md:px-6 relative z-10 page-transition ${className}`} style={{ paddingTop: 'calc(5.5rem + env(safe-area-inset-top, 0px))', paddingBottom: 'calc(7rem + env(safe-area-inset-bottom, 0px))' }}>
         {children}
       </main>
       {fab}
