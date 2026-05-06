@@ -16,19 +16,27 @@ export const SNAKES = {
 };
 
 export const CHALLENGES = [
-  { id: 1, text: "Berikan pelukan hangat selama 10 detik 🤭", type: "sweet" },
-  { id: 2, text: "Bisikkan kata-kata paling romantis di telinga pasangan.", type: "sweet" },
-  { id: 3, text: "Pegang tangan pasanganmu dan jangan dilepas sampai giliran berikutnya.", type: "touch" },
-  { id: 4, text: "Sebutkan satu bagian tubuh pasangan yang paling kamu sukai.", type: "romantic" },
-  { id: 5, text: "Berikan ciuman di pipi atau kening dengan lembut.", type: "touch" },
-  { id: 6, text: "Ceritakan fantasi kencan paling liar/seru yang ingin kamu lakukan.", type: "romantic" },
-  { id: 7, text: "Gendong pasanganmu (kalau kuat) atau rangkul erat selama 15 detik.", type: "touch" },
-  { id: 8, text: "Tatap matanya dalam-dalam dan katakan 'Aku beruntung memilikimu'.", type: "sweet" },
-  { id: 9, text: "Pijat lembut leher atau punggung pasanganmu sebentar.", type: "touch" },
-  { id: 10, text: "Tunjukkan ekspresi paling manja di depan pasanganmu.", type: "fun" },
-  { id: 11, text: "Berikan satu rayuan gombal paling maut yang kamu tahu.", type: "fun" },
-  { id: 12, text: "Gigit kecil/cubit gemas pasanganmu (dengan lembut ya!).", type: "touch" }
+  { id: 1, text: "Peluk pasangan kamu erat selama 20 detik 🤭" },
+  { id: 2, text: "Cium pipi pasangan kamu 3x (kiri, kanan, tengah 😚)" },
+  { id: 3, text: "Tatap mata pasangan kamu dari dekat selama 15 detik 😳" },
+  { id: 4, text: "Pegang tangan pasangan kamu sambil saling mendekat selama 15 detik" },
+  { id: 5, text: "Peluk pasangan kamu dari belakang selama 15 detik" },
+  { id: 6, text: "Sandarkan kepala kamu di bahu pasangan selama 15 detik" },
+  { id: 7, text: "Cium tangan pasangan kamu lalu lihat matanya" },
+  { id: 8, text: "Pegang wajah pasangan kamu dengan lembut selama 10 detik" },
+  { id: 9, text: "Deketin wajah kamu ke pasangan sampai hampir sentuh (tahan 5 detik 😳)" },
+  { id: 10, text: "Peluk pasangan kamu sambil bilang sesuatu yang manis" },
+  { id: 11, text: "Duduk sangat dekat dengan pasangan selama 15 detik tanpa ngomong" },
+  { id: 12, text: "Sentuh tangan pasangan kamu dan mainkan jari-jarinya selama 10 detik" },
+  { id: 13, text: "Tarik pasangan kamu mendekat secara pelan 🤍" },
+  { id: 14, text: "Pegang tangan pasangan sambil tatap matanya dan senyum" },
+  { id: 15, text: "Cium kening pasangan kamu dengan lembut" },
+  { id: 16, text: "Peluk pasangan kamu sambil usap punggungnya pelan" },
+  { id: 17, text: "Dekatkan wajah kamu lalu senyum tanpa ngomong selama 10 detik" },
+  { id: 18, text: "Tempelkan dahi kamu ke pasangan selama 10 detik" },
+  { id: 19, text: "Pegang tangan pasangan lalu tarik dia sedikit mendekat" },
+  { id: 20, text: "Peluk pasangan kamu sebelum lanjut giliran berikutnya" }
 ];
 
-// More frequent challenge tiles
-export const CHALLENGE_TILES = [2, 5, 8, 11, 13, 16, 18, 21, 23, 26, 29, 33];
+// Significantly more challenge tiles (around 50% of the board)
+export const CHALLENGE_TILES = [2, 5, 8, 11, 13, 16, 18, 21, 23, 25, 26, 28, 29, 32, 33, 35];
