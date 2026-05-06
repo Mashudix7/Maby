@@ -1,13 +1,15 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import MainLayout from '../components/layout/MainLayout';
 import { TRUTH_OR_DARE_DATA } from '../data/truthOrDare';
 import GlassCard from '../components/ui/GlassCard';
 import { useAuth } from '../context/AuthContext';
+import { getGameHistory, saveSeenQuestion, resetGameHistory } from '../services/gameService';
 
 export default function TruthOrDare() {
-  const { profile } = useAuth();
+  const { profile, coupleId } = useAuth();
   const [mode, setMode] = useState('online'); // 'online' or 'offline'
   const [currentTask, setCurrentTask] = useState(null);
+  const [seenIds, setSeenIds] = useState([]);
   
   // Turn Picker State
   const [spinning, setSpinning] = useState(false);
@@ -18,17 +20,44 @@ export default function TruthOrDare() {
   const myInfo = { name: isFeby ? 'Feby Zahara' : 'Mashudi', avatar: isFeby ? '/feby.jpg' : '/mashudi.jpg' };
   const partnerInfo = { name: isFeby ? 'Mashudi' : 'Feby Zahara', avatar: isFeby ? '/mashudi.jpg' : '/feby.jpg' };
 
-  const handlePick = useCallback((type) => {
-    const options = TRUTH_OR_DARE_DATA[mode][type];
-    const randomIndex = Math.floor(Math.random() * options.length);
-    const task = options[randomIndex];
+  useEffect(() => {
+    if (coupleId) {
+      getGameHistory(coupleId, 'truth_or_dare').then(setSeenIds);
+    }
+  }, [coupleId]);
+
+  const handlePick = useCallback(async (type) => {
+    const allOptions = TRUTH_OR_DARE_DATA[mode][type];
+    let availableOptions = allOptions.filter(opt => !seenIds.includes(opt.id));
+    
+    // If all seen, reset for this type/mode? Or just alert?
+    // Let's auto-reset if empty
+    if (availableOptions.length === 0) {
+      if (window.confirm("Semua tantangan/pertanyaan sudah muncul. Reset riwayat?")) {
+        await resetGameHistory(coupleId, 'truth_or_dare');
+        setSeenIds([]);
+        availableOptions = allOptions;
+      } else {
+        return;
+      }
+    }
+
+    const randomIndex = Math.floor(Math.random() * availableOptions.length);
+    const task = availableOptions[randomIndex];
     
     setCurrentTask({
+      id: task.id,
       type,
       mode,
-      text: task
+      text: task.text
     });
-  }, [mode]);
+
+    // Save to history
+    if (coupleId) {
+      saveSeenQuestion(coupleId, 'truth_or_dare', task.id);
+      setSeenIds(prev => [...prev, task.id]);
+    }
+  }, [mode, seenIds, coupleId]);
 
   const spinTurn = () => {
     if (spinning) return;

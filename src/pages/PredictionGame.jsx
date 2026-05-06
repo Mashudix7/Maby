@@ -1,17 +1,19 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import MainLayout from '../components/layout/MainLayout';
 import { PREDICTION_QUESTIONS } from '../data/predictionGame';
 import GlassCard from '../components/ui/GlassCard';
 import { useAuth } from '../context/AuthContext';
+import { getGameHistory, saveSeenQuestion, resetGameHistory } from '../services/gameService';
 
 export default function PredictionGame() {
-  const { profile } = useAuth();
+  const { profile, coupleId } = useAuth();
   const [step, setStep] = useState('pickRole'); // pickRole, start, playerA, transition, playerB, result
   const [category, setCategory] = useState('all');
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [answerA, setAnswerA] = useState(null);
   const [answerB, setAnswerB] = useState(null);
   const [score, setScore] = useState(0);
+  const [seenIds, setSeenIds] = useState([]);
   
   // Roles
   const [roles, setRoles] = useState({
@@ -23,23 +25,49 @@ export default function PredictionGame() {
   const myInfo = { name: isFeby ? 'Feby Zahara' : 'Mashudi', avatar: isFeby ? '/feby.jpg' : '/mashudi.jpg' };
   const partnerInfo = { name: isFeby ? 'Mashudi' : 'Feby Zahara', avatar: isFeby ? '/mashudi.jpg' : '/feby.jpg' };
 
+  useEffect(() => {
+    if (coupleId) {
+      getGameHistory(coupleId, 'prediction_game').then(setSeenIds);
+    }
+  }, [coupleId]);
+
   const filteredQuestions = useMemo(() => {
-    if (category === 'all') return PREDICTION_QUESTIONS;
-    return PREDICTION_QUESTIONS.filter(q => q.category === category);
-  }, [category]);
+    const base = category === 'all' ? PREDICTION_QUESTIONS : PREDICTION_QUESTIONS.filter(q => q.category === category);
+    return base.filter(q => !seenIds.includes(q.id));
+  }, [category, seenIds]);
 
   const handlePickRole = (answerer, predictor) => {
     setRoles({ answerer, predictor });
     setStep('start');
   };
 
-  const startNewRound = useCallback(() => {
-    const randomIndex = Math.floor(Math.random() * filteredQuestions.length);
-    setCurrentQuestion(filteredQuestions[randomIndex]);
+  const startNewRound = useCallback(async () => {
+    let available = filteredQuestions;
+    
+    if (available.length === 0) {
+      if (window.confirm("Semua pertanyaan di kategori ini sudah muncul. Reset riwayat?")) {
+        await resetGameHistory(coupleId, 'prediction_game');
+        setSeenIds([]);
+        available = category === 'all' ? PREDICTION_QUESTIONS : PREDICTION_QUESTIONS.filter(q => q.category === category);
+      } else {
+        return;
+      }
+    }
+
+    const randomIndex = Math.floor(Math.random() * available.length);
+    const question = available[randomIndex];
+    setCurrentQuestion(question);
+    
+    // Save to history
+    if (coupleId) {
+      saveSeenQuestion(coupleId, 'prediction_game', question.id);
+      setSeenIds(prev => [...prev, question.id]);
+    }
+
     setAnswerA(null);
     setAnswerB(null);
     setStep('playerA');
-  }, [filteredQuestions]);
+  }, [filteredQuestions, coupleId, category]);
 
   const handleAnswerA = (option) => {
     setAnswerA(option);
