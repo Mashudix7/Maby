@@ -88,8 +88,12 @@ export default function WishesAffirmations() {
         &quot;{wish.text}&quot;
       </p>
       <div className="flex items-center gap-2 mt-auto">
-        <div className="w-8 h-8 rounded-full bg-primary-container dark:bg-primary-container/30 flex items-center justify-center text-primary text-sm font-serif shrink-0">
-          {(wish.profiles?.display_name || '?')[0].toUpperCase()}
+        <div className="w-8 h-8 rounded-full bg-primary-container dark:bg-primary-container/30 flex items-center justify-center text-primary text-sm font-serif shrink-0 overflow-hidden border border-primary/10">
+          {wish.profiles?.photo_url || wish.profiles?.photoURL ? (
+            <img src={wish.profiles.photo_url || wish.profiles.photoURL} className="w-full h-full object-cover" alt="" />
+          ) : (
+            (wish.profiles?.display_name || '?')[0].toUpperCase()
+          )}
         </div>
         <span className="text-xs font-semibold text-on-surface-variant dark:text-zinc-500 truncate">
           {wish.profiles?.display_name || t('wishes.anonymous')}

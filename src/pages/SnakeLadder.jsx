@@ -18,14 +18,14 @@ export default function SnakeLadder() {
   const [winner, setWinner] = useState(null);
   const [round, setRound] = useState(1);
 
-  // Pre-load audio objects with stable URLs (Fixing 404)
+  // Pre-load audio objects with verified URLs from GitHub
   const gameSounds = useMemo(() => ({
-    dice: new Audio('https://www.soundjay.com/misc/dice-roll-1.mp3'),
-    move: new Audio('https://www.soundjay.com/buttons/button-16.mp3'),
-    ladder: new Audio('https://www.soundjay.com/misc/bell-ringing-04.mp3'),
-    snake: new Audio('https://www.soundjay.com/misc/fail-trumpet-01.mp3'),
-    challenge: new Audio('https://www.soundjay.com/misc/magic-chime-01.mp3'),
-    win: new Audio('https://www.soundjay.com/misc/success-fanfare-trumpets-10.mp3')
+    dice: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/dice.mp3'),
+    move: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/drop.mp3'),
+    ladder: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/ladder.mp3'),
+    snake: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/snake.mp3'),
+    challenge: new Audio('https://www.soundjay.com/misc/magic-chime-01.mp3'), // Keeping one stable SoundJay for variety or use https://raw.githubusercontent.com/ShubhamPaliwal03/Snaky-Climb/main/sounds/dice_roll-sound.mp3
+    win: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/success.mp3')
   }), []);
 
   const playSound = useCallback((type) => {
