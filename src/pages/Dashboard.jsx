@@ -227,7 +227,7 @@ export default function Dashboard() {
             </div>
           </div>
           <h1 className="font-serif text-3xl md:text-5xl text-on-surface dark:text-[#ede0df] mb-2 md:mb-4">
-            {t('dashboard.hai')}, {profile?.display_name || t('dashboard.sayangku')} 👋
+            {t('dashboard.hai')}, {profile?.display_name || t('dashboard.sayangku')}
           </h1>
           <p className="font-sans text-sm md:text-base font-semibold text-primary dark:text-rose-400 mb-6">
             {relationshipDuration}
