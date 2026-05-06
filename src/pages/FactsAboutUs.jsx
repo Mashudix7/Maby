@@ -8,6 +8,7 @@ import { getFacts, upsertFact, FACT_CATEGORIES } from '../services/factService';
 import { db } from '../lib/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { showSuccess } from '../lib/alerts';
+import ScrollReveal from '../components/ui/ScrollReveal';
 
 export default function FactsAboutUs() {
   const { user, coupleId } = useAuth();
@@ -139,20 +140,27 @@ export default function FactsAboutUs() {
   return (
     <MainLayout activePage="/fakta">
       <div className="max-w-[1140px] mx-auto">
-        <div className="text-center mb-10 md:mb-16 space-y-4">
-          <h1 className="font-serif text-3xl md:text-5xl text-primary dark:text-rose-300">{t('facts.title')}</h1>
-          <p className="text-lg text-on-surface-variant dark:text-zinc-400 font-serif italic">{t('facts.subtitle')}</p>
-          <div className="flex justify-center pt-2">
-            <Link to="/rahasia" className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-zinc-900 dark:bg-black text-zinc-300 hover:text-white border border-zinc-700 dark:border-zinc-800 transition-colors shadow-sm">
-              <span className="material-symbols-outlined text-[18px]">lock</span>
-              <span className="text-sm font-semibold tracking-wide">{t('facts.private_space')}</span>
-            </Link>
+        <ScrollReveal delay={100} distance="30px">
+          <div className="text-center mb-10 md:mb-16 space-y-4">
+            <h1 className="font-serif text-3xl md:text-5xl text-primary dark:text-rose-300">{t('facts.title')}</h1>
+            <p className="text-lg text-on-surface-variant dark:text-zinc-400 font-serif italic">{t('facts.subtitle')}</p>
+            <div className="flex justify-center pt-2">
+              <Link to="/rahasia" className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-zinc-900 dark:bg-black text-zinc-300 hover:text-white border border-zinc-700 dark:border-zinc-800 transition-colors shadow-sm">
+                <span className="material-symbols-outlined text-[18px]">lock</span>
+                <span className="text-sm font-semibold tracking-wide">{t('facts.private_space')}</span>
+              </Link>
+            </div>
+            <div className="w-16 h-[1px] bg-gradient-to-r from-transparent via-primary-container to-transparent mx-auto mt-8" />
           </div>
-          <div className="w-16 h-[1px] bg-gradient-to-r from-transparent via-primary-container to-transparent mx-auto mt-8" />
-        </div>
+        </ScrollReveal>
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-          <ProfileSection profile={myProfile} facts={myFacts} isMe={true} />
-          <ProfileSection profile={partnerProfile} facts={partnerFacts} isMe={false} />
+          <ScrollReveal direction="left" distance="30px" delay={200}>
+            <ProfileSection profile={myProfile} facts={myFacts} isMe={true} />
+          </ScrollReveal>
+          <ScrollReveal direction="right" distance="30px" delay={300}>
+            <ProfileSection profile={partnerProfile} facts={partnerFacts} isMe={false} />
+          </ScrollReveal>
         </div>
       </div>
     </MainLayout>
