@@ -112,7 +112,7 @@ export default function SnakeLadder() {
     } else if (currentLayout.challengeTiles.includes(finalPos)) {
       playSound('challenge');
       const challenge = getUnseenChallenge();
-      setActiveChallenge(challenge);
+      setActiveChallenge({ ...challenge, player });
     } else {
       setCurrentPlayer(player === 1 ? 2 : 1);
     }
@@ -272,10 +272,20 @@ export default function SnakeLadder() {
         {activeChallenge && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/70 backdrop-blur-sm">
             <div className="w-full max-w-sm bg-white dark:bg-[#1a1517] rounded-3xl p-8 text-center border border-white/10 shadow-none">
-              <div className="w-16 h-16 bg-rose-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="material-symbols-outlined text-3xl text-rose-500">favorite</span>
+              <div className="relative w-20 h-20 mx-auto mb-6">
+                <div className={`w-full h-full rounded-full border-4 overflow-hidden ${activeChallenge.player === 1 ? 'border-red-500' : 'border-blue-600'}`}>
+                  <img src={activeChallenge.player === 1 ? player1Info.avatar : player2Info.avatar} className="w-full h-full object-cover" alt="" />
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-white dark:bg-[#1a1517] rounded-full flex items-center justify-center border-2 border-rose-500">
+                  <span className="material-symbols-outlined text-sm text-rose-500">favorite</span>
+                </div>
               </div>
-              <h3 className="font-serif text-2xl text-primary dark:text-[#ede0df] mb-4">Love Challenge!</h3>
+              
+              <h3 className="font-serif text-sm text-rose-500 font-bold uppercase tracking-widest mb-2">Love Challenge!</h3>
+              <p className="text-sm font-bold text-outline-variant mb-6 uppercase tracking-widest">
+                UNTUK: <span className={activeChallenge.player === 1 ? 'text-red-500' : 'text-blue-600'}>{activeChallenge.player === 1 ? player1Info.name : player2Info.name}</span>
+              </p>
+              
               <p className="text-on-surface dark:text-[#ede0df] mb-8 leading-relaxed italic text-xl">
                 "{activeChallenge.text}"
               </p>
