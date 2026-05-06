@@ -28,3 +28,28 @@ export function DashboardSkeleton() {
     </div>
   );
 }
+
+export function MomentGridSkeleton() {
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 animate-pulse">
+      {[...Array(8)].map((_, i) => (
+        <Skeleton key={i} className="aspect-square w-full" />
+      ))}
+    </div>
+  );
+}
+
+export function WishCardSkeleton() {
+  return (
+    <div className="p-4 bg-white/40 dark:bg-white/5 rounded-2xl border border-white/10 animate-pulse">
+      <div className="flex items-center gap-3 mb-4">
+        <Skeleton variant="circle" className="w-10 h-10" />
+        <div className="flex flex-col gap-2">
+          <Skeleton className="w-24 h-3" />
+          <Skeleton className="w-16 h-2" />
+        </div>
+      </div>
+      <Skeleton className="w-full h-16" />
+    </div>
+  );
+}
