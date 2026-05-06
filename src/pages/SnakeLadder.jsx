@@ -115,7 +115,6 @@ export default function SnakeLadder() {
       playSound('win');
       setWinner(player);
     } else if (currentLayout.challengeTiles.includes(finalPos)) {
-      playSound('challenge');
       const challenge = getUnseenChallenge();
       setActiveChallenge({ ...challenge, player });
     } else {
@@ -124,6 +123,13 @@ export default function SnakeLadder() {
 
     setIsMoving(false);
   }, [positions, getUnseenChallenge, currentLayout, playSound]);
+
+  // Play challenge sound when modal appears
+  useEffect(() => {
+    if (activeChallenge) {
+      playSound('challenge');
+    }
+  }, [activeChallenge, playSound]);
 
   const rollDice = () => {
     if (isRolling || isMoving || activeChallenge || winner) return;
