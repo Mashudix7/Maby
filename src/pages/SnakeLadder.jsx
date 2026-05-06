@@ -25,7 +25,7 @@ export default function SnakeLadder() {
     ladder: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/ladder.mp3'),
     snake: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/snake.mp3'),
     challenge: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/success.mp3'),
-    win: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/success.mp3')
+    win: new Audio('https://raw.githubusercontent.com/yashksaini/snakes-and-ladders-game/main/audio/ladder.mp3')
   }), []);
 
   const playSound = useCallback((type) => {
@@ -36,7 +36,7 @@ export default function SnakeLadder() {
       audio.play().catch(e => console.warn(`Audio ${type} play blocked or failed:`, e));
     }
   }, [gameSounds]);
-  
+
   // Use layout based on round
   const currentLayout = useMemo(() => {
     const layoutIndex = (round - 1) % BOARD_LAYOUTS.length;
@@ -44,17 +44,17 @@ export default function SnakeLadder() {
   }, [round]);
 
   const isFeby = profile?.display_name?.includes('Feby');
-  const player1Info = { 
-    name: isFeby ? 'Feby' : 'Mashudi', 
-    avatar: isFeby ? '/feby.jpg' : '/mashudi.jpg', 
-    color: 'border-red-500', 
-    bgColor: 'bg-red-500' 
+  const player1Info = {
+    name: isFeby ? 'Feby' : 'Mashudi',
+    avatar: isFeby ? '/feby.jpg' : '/mashudi.jpg',
+    color: 'border-red-500',
+    bgColor: 'bg-red-500'
   };
-  const player2Info = { 
-    name: isFeby ? 'Mashudi' : 'Feby', 
-    avatar: isFeby ? '/mashudi.jpg' : '/feby.jpg', 
-    color: 'border-blue-600', 
-    bgColor: 'bg-blue-600' 
+  const player2Info = {
+    name: isFeby ? 'Mashudi' : 'Feby',
+    avatar: isFeby ? '/mashudi.jpg' : '/feby.jpg',
+    color: 'border-blue-600',
+    bgColor: 'bg-blue-600'
   };
 
   const boardCells = useMemo(() => {
@@ -121,7 +121,7 @@ export default function SnakeLadder() {
     } else {
       setCurrentPlayer(player === 1 ? 2 : 1);
     }
-    
+
     setIsMoving(false);
   }, [positions, getUnseenChallenge, currentLayout, playSound]);
 
@@ -161,30 +161,29 @@ export default function SnakeLadder() {
 
         {/* Status Indicator Above Board */}
         <div className="grid grid-cols-3 gap-2 mb-4">
-           <div className="bg-white/40 dark:bg-white/5 rounded-2xl p-2 text-center border border-primary/5">
-             <p className="text-[8px] font-bold uppercase text-outline mb-0.5">Round</p>
-             <p className="text-sm font-serif text-primary font-bold">LEVEL {round}</p>
-           </div>
-           <div className="bg-white/40 dark:bg-white/5 rounded-2xl p-2 text-center border border-primary/5">
-             <p className="text-[8px] font-bold uppercase text-outline mb-0.5">{player1Info.name}</p>
-             <p className="text-sm font-serif text-red-500">Pos: {positions[1]}</p>
-           </div>
-           <div className="bg-white/40 dark:bg-white/5 rounded-2xl p-2 text-center border border-primary/5">
-             <p className="text-[8px] font-bold uppercase text-outline mb-0.5">{player2Info.name}</p>
-             <p className="text-sm font-serif text-blue-600">Pos: {positions[2]}</p>
-           </div>
+          <div className="bg-white/40 dark:bg-white/5 rounded-2xl p-2 text-center border border-primary/5">
+            <p className="text-[8px] font-bold uppercase text-outline mb-0.5">Round</p>
+            <p className="text-sm font-serif text-primary font-bold">LEVEL {round}</p>
+          </div>
+          <div className="bg-white/40 dark:bg-white/5 rounded-2xl p-2 text-center border border-primary/5">
+            <p className="text-[8px] font-bold uppercase text-outline mb-0.5">{player1Info.name}</p>
+            <p className="text-sm font-serif text-red-500">Pos: {positions[1]}</p>
+          </div>
+          <div className="bg-white/40 dark:bg-white/5 rounded-2xl p-2 text-center border border-primary/5">
+            <p className="text-[8px] font-bold uppercase text-outline mb-0.5">{player2Info.name}</p>
+            <p className="text-sm font-serif text-blue-600">Pos: {positions[2]}</p>
+          </div>
         </div>
 
         {/* Board */}
         <div className="aspect-square w-full grid grid-cols-6 gap-1 bg-white/30 dark:bg-white/5 rounded-[2.5rem] p-2 border border-primary/5 overflow-hidden mb-6 relative">
-          {boardCells.map((row) => 
+          {boardCells.map((row) =>
             row.map((cellNum) => (
-              <div 
+              <div
                 key={cellNum}
-                className={`relative flex flex-col items-center justify-center rounded-2xl transition-all border ${
-                  currentLayout.challengeTiles.includes(cellNum) 
-                    ? 'bg-rose-500/20 border-rose-500/20 text-rose-600' 
-                    : currentLayout.ladders[cellNum] 
+                className={`relative flex flex-col items-center justify-center rounded-2xl transition-all border ${currentLayout.challengeTiles.includes(cellNum)
+                    ? 'bg-rose-500/20 border-rose-500/20 text-rose-600'
+                    : currentLayout.ladders[cellNum]
                       ? 'bg-indigo-500/20 border-indigo-500/20 text-indigo-600'
                       : currentLayout.snakes[cellNum]
                         ? 'bg-orange-500/20 border-orange-500/20 text-orange-600'
@@ -193,11 +192,11 @@ export default function SnakeLadder() {
                           : cellNum === 1
                             ? 'bg-emerald-500 text-white border-emerald-500 shadow-lg scale-105 z-10'
                             : 'bg-white/60 dark:bg-white/10 border-transparent text-outline-variant/40'
-                }`}
+                  }`}
               >
                 {/* Cell Number - Top Left */}
                 <span className={`absolute top-1 left-1.5 text-[8px] font-bold ${[1, BOARD_SIZE].includes(cellNum) ? 'text-white' : 'opacity-30'}`}>{cellNum}</span>
-                
+
                 {/* Target Info - Bottom Right */}
                 {(currentLayout.ladders[cellNum] || currentLayout.snakes[cellNum]) && (
                   <span className="absolute bottom-1 right-1.5 text-[6px] font-bold opacity-60">
@@ -212,7 +211,7 @@ export default function SnakeLadder() {
                   {currentLayout.challengeTiles.includes(cellNum) && <span className="material-symbols-outlined text-2xl opacity-60">favorite</span>}
                   {(cellNum === BOARD_SIZE || cellNum === 1) && <span className="material-symbols-outlined text-2xl">flag</span>}
                 </div>
-                
+
                 {/* Players - CENTERED (On top of icons) */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <div className="flex -space-x-4">
@@ -246,20 +245,20 @@ export default function SnakeLadder() {
 
             {/* Dice Section */}
             <div className="flex flex-col items-center gap-4">
-               <button 
+              <button
                 onClick={rollDice}
                 disabled={isRolling || isMoving || !!winner || !!activeChallenge}
                 className={`w-20 h-20 rounded-[2.5rem] flex items-center justify-center transition-all ${isRolling ? 'animate-spin' : 'hover:scale-105 active:scale-95'} ${winner ? 'bg-zinc-100' : 'bg-primary text-white'}`}
-               >
-                 {isRolling ? (
-                   <span className="material-symbols-outlined text-4xl">casino</span>
-                 ) : (
-                   <span className="text-4xl font-serif">{diceResult || <span className="material-symbols-outlined text-4xl">casino</span>}</span>
-                 )}
-               </button>
-               <span className={`text-[10px] font-bold uppercase tracking-[0.2em] ${currentPlayer === 1 ? 'text-red-500' : 'text-blue-600'}`}>
-                 {currentPlayer === 1 ? `Giliran ${player1Info.name}` : `Giliran ${player2Info.name}`}
-               </span>
+              >
+                {isRolling ? (
+                  <span className="material-symbols-outlined text-4xl">casino</span>
+                ) : (
+                  <span className="text-4xl font-serif">{diceResult || <span className="material-symbols-outlined text-4xl">casino</span>}</span>
+                )}
+              </button>
+              <span className={`text-[10px] font-bold uppercase tracking-[0.2em] ${currentPlayer === 1 ? 'text-red-500' : 'text-blue-600'}`}>
+                {currentPlayer === 1 ? `Giliran ${player1Info.name}` : `Giliran ${player2Info.name}`}
+              </span>
             </div>
 
             {/* Player 2 Stats */}
@@ -284,16 +283,16 @@ export default function SnakeLadder() {
                   <span className="material-symbols-outlined text-sm text-rose-500">favorite</span>
                 </div>
               </div>
-              
+
               <h3 className="font-serif text-sm text-rose-500 font-bold uppercase tracking-widest mb-2">Love Challenge!</h3>
               <p className="text-sm font-bold text-outline-variant mb-6 uppercase tracking-widest">
                 UNTUK: <span className={activeChallenge.player === 1 ? 'text-red-500' : 'text-blue-600'}>{activeChallenge.player === 1 ? player1Info.name : player2Info.name}</span>
               </p>
-              
+
               <p className="text-on-surface dark:text-[#ede0df] mb-8 leading-relaxed italic text-xl">
                 "{activeChallenge.text}"
               </p>
-              <button 
+              <button
                 onClick={completeChallenge}
                 className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-sm hover:brightness-110 active:scale-95 transition-all shadow-none"
               >
@@ -312,7 +311,7 @@ export default function SnakeLadder() {
               <p className="text-on-surface-variant dark:text-zinc-400 mb-8 font-serif italic">
                 {winner === 1 ? player1Info.name : player2Info.name} mencapai garis finish duluan, tapi kalian berdua pemenangnya!
               </p>
-              <button 
+              <button
                 onClick={handleRestart}
                 className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-sm hover:brightness-110 transition-all shadow-none"
               >

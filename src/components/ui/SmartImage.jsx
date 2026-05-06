@@ -1,4 +1,4 @@
-import { useState, useEffect, memo } from 'react';
+import { useState, memo } from 'react';
 
 const SmartImage = memo(function SmartImage({ 
   src, 
@@ -9,14 +9,6 @@ const SmartImage = memo(function SmartImage({
 }) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(false);
-
-  useEffect(() => {
-    if (!src) return;
-    const img = new Image();
-    img.src = src;
-    img.onload = () => setIsLoaded(true);
-    img.onerror = () => setError(true);
-  }, [src]);
 
   return (
     <div className={`relative overflow-hidden ${aspectRatio} ${className} bg-zinc-100 dark:bg-white/5`}>
@@ -33,11 +25,13 @@ const SmartImage = memo(function SmartImage({
       )}
 
       {/* Actual Image */}
-      {src && !error && (
+      {src && (
         <img
           src={src}
           alt={alt}
           loading={loading}
+          onLoad={() => setIsLoaded(true)}
+          onError={() => setError(true)}
           className={`w-full h-full object-cover transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
         />
       )}

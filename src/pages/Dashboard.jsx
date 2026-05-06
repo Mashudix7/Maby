@@ -47,34 +47,35 @@ const RelationshipTimer = memo(function RelationshipTimer() {
   const { t } = useLanguage();
   const [time, setTime] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
-  useEffect(() => {
-    const getNextTarget = () => {
-      const now = new Date();
-      let target = new Date(now.getFullYear(), 1, 21, 0, 0, 0); // Feb 21
-      if (now.getTime() > target.getTime()) {
-        target.setFullYear(now.getFullYear() + 1);
-      }
-      return target.getTime();
-    };
+  const targetTime = useMemo(() => {
+    const now = new Date();
+    let target = new Date(now.getFullYear(), 1, 21, 0, 0, 0); // Feb 21
+    if (now.getTime() > target.getTime()) {
+      target.setFullYear(now.getFullYear() + 1);
+    }
+    return target.getTime();
+  }, []);
 
+  useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date().getTime();
-      const diff = getNextTarget() - now;
+      const diff = targetTime - now;
       
       if (diff > 0) {
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-        setTime({ days, hours, minutes, seconds });
+        setTime({
+          days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((diff % (1000 * 60)) / 1000)
+        });
       }
     }, 1000);
     
     return () => clearInterval(interval);
-  }, []);
+  }, [targetTime]);
 
   return (
-    <div className="glass-panel p-4 md:p-6 rounded-2xl md:rounded-[2rem] flex justify-between text-center mt-6">
+    <div className="bg-white/40 dark:bg-white/5 p-4 md:p-6 rounded-2xl md:rounded-[2rem] flex justify-between text-center mt-6 border border-white/10">
       <div className="flex flex-col flex-1">
         <span className="text-xl sm:text-2xl md:text-4xl font-serif text-primary dark:text-rose-300">{time.days}</span>
         <span className="text-[9px] sm:text-[10px] md:text-xs font-sans text-on-surface-variant dark:text-zinc-400 font-bold uppercase tracking-wider mt-1">{t('dashboard.days')}</span>
@@ -238,7 +239,7 @@ export default function Dashboard() {
         <section className="grid grid-cols-1 md:grid-cols-12 gap-8">
           
           {/* Today's Memory */}
-          <div className="md:col-span-8 glass-panel rounded-2xl md:rounded-[2rem] p-4 md:p-8 flex flex-col relative overflow-hidden group min-h-[280px] md:min-h-[400px] border border-primary/5 will-change-transform">
+          <div className="md:col-span-8 bg-zinc-100 dark:bg-white/5 rounded-2xl md:rounded-[2rem] p-4 md:p-8 flex flex-col relative overflow-hidden group min-h-[280px] md:min-h-[400px] border border-primary/5">
             {moments[0]?.image_url ? (
               <div className="absolute inset-0 z-0">
                 <SmartImage
@@ -278,11 +279,11 @@ export default function Dashboard() {
             <div className="flex flex-col gap-3 mb-2">
               {/* Truth or Dare Banner */}
               <Link to="/games" className="group relative h-20 md:h-22 rounded-2xl overflow-hidden shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98] border border-primary/10">
-                 <div className="absolute inset-0 bg-gradient-to-r from-primary/80 to-rose-500/80 dark:from-rose-900/40 dark:to-rose-800/40 backdrop-blur-sm" />
+                 <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-rose-500/90 dark:from-rose-900/60 dark:to-rose-800/60" />
                  <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
                  
                  <div className="relative h-full flex items-center p-4 md:p-5 gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-inner group-hover:rotate-12 transition-transform shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shadow-inner group-hover:rotate-12 transition-transform shrink-0">
                       <span className="material-symbols-outlined text-xl text-white">casino</span>
                     </div>
                     <div className="flex flex-col text-left">
@@ -295,11 +296,11 @@ export default function Dashboard() {
 
               {/* Prediction Game Banner */}
               <Link to="/prediction" className="group relative h-20 md:h-22 rounded-2xl overflow-hidden shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98] border border-indigo-500/10">
-                 <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/80 to-purple-500/80 dark:from-indigo-900/40 dark:to-purple-800/40 backdrop-blur-sm" />
+                 <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/90 to-purple-500/90 dark:from-indigo-900/60 dark:to-purple-800/60" />
                  <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
                  
                  <div className="relative h-full flex items-center p-4 md:p-5 gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-inner group-hover:-rotate-12 transition-transform shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shadow-inner group-hover:-rotate-12 transition-transform shrink-0">
                       <span className="material-symbols-outlined text-xl text-white">psychology</span>
                     </div>
                     <div className="flex flex-col text-left">
@@ -312,11 +313,11 @@ export default function Dashboard() {
 
               {/* Love Snake & Ladder Banner */}
               <Link to="/love-ladder" className="group relative h-20 md:h-22 rounded-2xl overflow-hidden shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98] border border-rose-400/10">
-                 <div className="absolute inset-0 bg-gradient-to-r from-rose-400/80 to-orange-400/80 dark:from-rose-900/40 dark:to-orange-800/40 backdrop-blur-sm" />
+                 <div className="absolute inset-0 bg-gradient-to-r from-rose-400/90 to-orange-400/90 dark:from-rose-900/60 dark:to-orange-800/60" />
                  <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
                  
                  <div className="relative h-full flex items-center p-4 md:p-5 gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-inner group-hover:rotate-12 transition-transform shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shadow-inner group-hover:rotate-12 transition-transform shrink-0">
                       <span className="material-symbols-outlined text-xl text-white">grid_view</span>
                     </div>
                     <div className="flex flex-col text-left">
@@ -389,13 +390,13 @@ export default function Dashboard() {
 
             {/* Action Boxes */}
             <div className="grid grid-cols-2 gap-4">
-              <Link to="/momen/baru" className="glass-panel p-4 md:p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-3 group/box hover:scale-105 transition-all duration-300 hover:border-primary/30 border border-primary/5">
+              <Link to="/momen/baru" className="bg-white/40 dark:bg-white/5 p-4 md:p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-3 group/box hover:scale-105 transition-all duration-300 hover:border-primary/30 border border-primary/5">
                 <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center shadow-[0_4px_12px_rgba(176,0,77,0.2)] group-hover/box:scale-110 transition-transform">
                   <span className="material-symbols-outlined text-2xl">add_a_photo</span>
                 </div>
                 <span className="font-serif text-sm font-semibold text-on-surface dark:text-[#ede0df]" dangerouslySetInnerHTML={{ __html: t('dashboard.new_moment').replace(' ', '<br/>') }} />
               </Link>
-              <Link to="/harapan" className="glass-panel p-4 md:p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-3 group/box hover:scale-105 transition-all duration-300 hover:border-primary/30 border border-primary/5">
+              <Link to="/harapan" className="bg-white/40 dark:bg-white/5 p-4 md:p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-3 group/box hover:scale-105 transition-all duration-300 hover:border-primary/30 border border-primary/5">
                 <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center shadow-[0_4px_12px_rgba(176,0,77,0.2)] group-hover/box:scale-110 transition-transform">
                   <span className="material-symbols-outlined text-2xl">favorite</span>
                 </div>
