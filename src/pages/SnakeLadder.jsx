@@ -17,6 +17,20 @@ export default function SnakeLadder() {
   const [seenChallenges, setSeenChallenges] = useState([]);
   const [winner, setWinner] = useState(null);
   const [round, setRound] = useState(1);
+
+  const playSound = useCallback((type) => {
+    const sounds = {
+      dice: 'https://assets.mixkit.co/sfx/preview/mixkit-dice-roll-pile-of-dice-561.mp3',
+      move: 'https://assets.mixkit.co/sfx/preview/mixkit-interface-click-1126.mp3',
+      ladder: 'https://assets.mixkit.co/sfx/preview/mixkit-climb-descend-fast-whoosh-1481.mp3',
+      snake: 'https://assets.mixkit.co/sfx/preview/mixkit-falling-on-metal-roof-2556.mp3',
+      challenge: 'https://assets.mixkit.co/sfx/preview/mixkit-magic-marimba-2820.mp3',
+      win: 'https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3'
+    };
+    const audio = new Audio(sounds[type]);
+    audio.volume = 0.4;
+    audio.play().catch(e => console.log("Audio play blocked", e));
+  }, []);
   
   // Use layout based on round
   const currentLayout = useMemo(() => {
@@ -74,24 +88,29 @@ export default function SnakeLadder() {
 
     for (let i = currentPos + 1; i <= targetPos; i++) {
       setPositions(prev => ({ ...prev, [player]: i }));
+      playSound('move');
       await new Promise(r => setTimeout(r, 400));
     }
 
     let finalPos = targetPos;
 
     if (currentLayout.ladders[targetPos]) {
-      await new Promise(r => setTimeout(r, 1000));
+      await new Promise(r => setTimeout(r, 800));
+      playSound('ladder');
       finalPos = currentLayout.ladders[targetPos];
       setPositions(prev => ({ ...prev, [player]: finalPos }));
     } else if (currentLayout.snakes[targetPos]) {
-      await new Promise(r => setTimeout(r, 1000));
+      await new Promise(r => setTimeout(r, 800));
+      playSound('snake');
       finalPos = currentLayout.snakes[targetPos];
       setPositions(prev => ({ ...prev, [player]: finalPos }));
     }
 
     if (finalPos === BOARD_SIZE) {
+      playSound('win');
       setWinner(player);
     } else if (currentLayout.challengeTiles.includes(finalPos)) {
+      playSound('challenge');
       const challenge = getUnseenChallenge();
       setActiveChallenge(challenge);
     } else {
@@ -99,11 +118,12 @@ export default function SnakeLadder() {
     }
     
     setIsMoving(false);
-  }, [positions, getUnseenChallenge, currentLayout]);
+  }, [positions, getUnseenChallenge, currentLayout, playSound]);
 
   const rollDice = () => {
     if (isRolling || isMoving || activeChallenge || winner) return;
     setIsRolling(true);
+    playSound('dice');
     setDiceResult(null);
     setTimeout(() => {
       const result = Math.floor(Math.random() * 6) + 1;
