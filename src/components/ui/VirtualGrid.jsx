@@ -45,6 +45,7 @@ export default function VirtualGrid({
           rowHeight={itemHeight + gap}
           width={containerWidth}
           style={{ overflowX: 'hidden' }}
+          cellProps={{}} // Added this to prevent crash in react-window v2.2.7
           cellComponent={({ columnIndex, rowIndex, style }) => {
             const index = rowIndex * columnCount + columnIndex;
             if (index >= items.length) return null;
@@ -53,10 +54,11 @@ export default function VirtualGrid({
               <div 
                 style={{
                   ...style,
-                  left: parseFloat(style.left) + gap / 2,
-                  top: parseFloat(style.top) + gap / 2,
-                  width: parseFloat(style.width) - gap,
-                  height: parseFloat(style.height) - gap,
+                  left: parseFloat(style.left) || 0,
+                  top: parseFloat(style.top) || 0,
+                  width: (parseFloat(style.width) || 0) - gap,
+                  height: (parseFloat(style.height) || 0) - gap,
+                  padding: `${gap / 2}px`
                 }}
               >
                 {renderItem(items[index], index)}
