@@ -11,7 +11,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { listenMoments } from '../services/momentService';
 import { setMoodToday, listenAllMoodsToday } from '../services/moodService';
 import { listenWishes } from '../services/wishService';
-import { listenStreak, listenDailyActivity } from '../services/streakService';
+import { listenStreak, listenDailyActivity, updateStreakActivity } from '../services/streakService';
 import { requestNotificationPermission, listenForPartnerWishes } from '../services/notificationService';
 import { listenForNudges } from '../services/nudgeService';
 import { getWIBDate } from '../lib/dateUtils';
@@ -127,6 +127,9 @@ export default function Dashboard() {
     const unsubMoods = listenAllMoodsToday(coupleId, (moodsData) => {
       setAllMoods(moodsData);
       setCurrentMood(moodsData[user.uid] || null);
+      if (Object.keys(moodsData).length === 2 && user?.uid) {
+        updateStreakActivity(coupleId, user.uid);
+      }
     });
 
     const unsubStreak = listenStreak(coupleId, (data) => {
