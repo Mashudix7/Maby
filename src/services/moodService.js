@@ -2,6 +2,7 @@ import { db } from '../lib/firebase';
 import { doc, getDoc, setDoc, collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
 import { getCached, setCached } from '../lib/queryCache';
 import { getWIBDate } from '../lib/dateUtils';
+import { updateStreakActivity } from './streakService';
 
 const MOOD_TTL = 10 * 60 * 1000; // 10 minutes
 
@@ -36,6 +37,13 @@ export async function setMoodToday(coupleId, userId, mood) {
   // Update cache immediately
   const cacheKey = `mood:${coupleId}:${userId}:${dateStr}`;
   setCached(cacheKey, mood, MOOD_TTL);
+
+  // Update streak activity
+  try {
+    updateStreakActivity(coupleId, userId).catch(err => console.error('Streak update failed:', err));
+  } catch (err) {
+    console.error('Failed to trigger streak update from mood:', err);
+  }
 }
 
 export async function getAllMoodsToday(coupleId) {

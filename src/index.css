@@ -132,9 +132,9 @@
 @layer components {
   .glass-panel {
     background-color: rgba(255, 255, 255, 0.7);
-    /* Optimized blur for better performance */
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    /* Optimized blur for better performance - reduced from 6px to 4px */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     border: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
     transition: background-color 0.2s, transform 0.2s;
@@ -274,7 +274,7 @@
 
 @layer utilities {
   .page-transition {
-    animation: slideFadeIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation: slideFadeIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     will-change: transform, opacity;
   }
 

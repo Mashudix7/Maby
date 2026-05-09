@@ -42,7 +42,7 @@ function RouteChangeListener() {
   const location = useLocation();
   useEffect(() => {
     nprogress.start();
-    const timer = setTimeout(() => nprogress.done(), 300);
+    const timer = setTimeout(() => nprogress.done(), 100); // Reduced from 300
     return () => clearTimeout(timer);
   }, [location]);
   return null;
