@@ -69,6 +69,7 @@ export default function StolenMoments() {
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
               src={moment.image_url}
               loading="lazy"
+              decoding="async"
             />
             {moment.location && (
               <span className="absolute top-3 right-3 inline-flex items-center gap-1 glass-panel px-3 py-1 rounded-full text-xs font-semibold text-on-surface-variant dark:text-zinc-300">

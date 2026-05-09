@@ -30,6 +30,7 @@ const SmartImage = memo(function SmartImage({
           src={src}
           alt={alt}
           loading={loading}
+          decoding="async"
           onLoad={() => setIsLoaded(true)}
           onError={() => setError(true)}
           className={`w-full h-full object-cover transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}

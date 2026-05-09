@@ -27,7 +27,7 @@ export default function ScrollReveal({
         transform: isVisible ? 'translate(0,0)' : getTransform(),
         transition: `opacity ${duration}ms cubic-bezier(0.4, 0, 0.2, 1), transform ${duration}ms cubic-bezier(0.4, 0, 0.2, 1)`,
         transitionDelay: `${delay}ms`,
-        willChange: 'opacity, transform'
+        willChange: isVisible ? 'auto' : 'opacity, transform'
       }}
     >
       {children}

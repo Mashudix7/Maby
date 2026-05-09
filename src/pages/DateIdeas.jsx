@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import MainLayout from '../components/layout/MainLayout';
 import FilterTabs from '../components/ui/FilterTabs';
 import DateIdeaCard from '../components/ui/DateIdeaCard';
+import VirtualGrid from '../components/ui/VirtualGrid';
 import { useLanguage } from '../context/LanguageContext';
 
 const IMG_PICNIC = 'https://lh3.googleusercontent.com/aida-public/AB6AXuDIyv5V2wPKy7E3QyI9C_ls2odks-UpR8P0iPTD3J97qCqFSnyOAfAiJVvba3bdLctUzAsUa6xyMzfnpUi8nXw-_QM2bdMvtZpFWbe-gOPFAn7RV7gDii9A0oKAn0Hy-0JV1QClXPGJ3tei9CPX7B4hpFGXxK3MIPpXD12GQP5pzxH3-e6cQ4p-vIQud5L-PVpie9_A7_EgmieEkpkkfKe8aeqjbYDh-kwv7HPQ9udu1m5_p-uUoZ88dEFi6zZXRj4VVCOEHPxO1A';
@@ -26,7 +27,6 @@ const ideas = [
     description_id: 'Skip restoran dan bikin berantakan di dapur. Bikin pasta dari nol ternyata gampang dan seru banget kalau berdua.',
     description_en: 'Skip the restaurant and make a mess in the kitchen. Making pasta from scratch is easy and fun together.',
     tags: [{ label_id: 'Indoor', label_en: 'Indoor', className: 'bg-primary-container/50 text-on-primary-container' }, { label: '$$', className: 'bg-surface-variant text-on-surface-variant' }],
-    className: 'lg:col-span-2',
     category: 'cozy'
   },
   {
@@ -73,6 +73,18 @@ export default function DateIdeas() {
     activeTab === 'all' || idea.category === activeTab
   );
 
+  const renderIdea = useCallback((idea) => (
+    <DateIdeaCard 
+      {...idea} 
+      title={language === 'id' ? idea.title_id : idea.title_en}
+      description={language === 'id' ? idea.description_id : idea.description_en}
+      tags={idea.tags.map(tag => ({
+        ...tag,
+        label: tag.label ? tag.label : (language === 'id' ? tag.label_id : tag.label_en)
+      }))}
+    />
+  ), [language]);
+
   return (
     <MainLayout activePage="/peta">
       <div className="max-w-[1140px] mx-auto">
@@ -94,20 +106,12 @@ export default function DateIdeas() {
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredIdeas.map((idea, i) => (
-            <DateIdeaCard 
-              key={i} 
-              {...idea} 
-              title={language === 'id' ? idea.title_id : idea.title_en}
-              description={language === 'id' ? idea.description_id : idea.description_en}
-              tags={idea.tags.map(tag => ({
-                ...tag,
-                label: tag.label ? tag.label : (language === 'id' ? tag.label_id : tag.label_en)
-              }))}
-            />
-          ))}
-        </div>
+        <VirtualGrid 
+          items={filteredIdeas}
+          renderItem={renderIdea}
+          itemHeight={450}
+          minColumnWidth={320}
+        />
       </div>
     </MainLayout>
   );

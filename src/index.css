@@ -131,14 +131,24 @@
 /* ===== COMPONENT UTILITIES ===== */
 @layer components {
   .glass-panel {
-    background-color: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 10px 30px rgba(74, 69, 69, 0.05);
-    transition: background-color 0.2s;
-    transform: translateZ(0); /* Force GPU */
-    contain: layout; /* Changed from content to allow overflow */
+    background-color: rgba(255, 255, 255, 0.7);
+    /* Optimized blur for better performance */
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    transition: background-color 0.2s, transform 0.2s;
+    transform: translateZ(0); /* Hardware Acceleration */
+    contain: layout;
+  }
+
+  /* Reduce complexity for low-end devices / battery savers */
+  @media (prefers-reduced-motion: reduce) {
+    .glass-panel {
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      background-color: rgba(255, 255, 255, 0.95);
+    }
   }
 
   .dark .glass-panel {
@@ -278,6 +288,15 @@
   .reveal.active {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+
+  .img-optim {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 300px;
+  }
+
+  .decoding-async {
+    /* Utility handled via JS attribute, but added here for documentation */
   }
 
   .skeleton {

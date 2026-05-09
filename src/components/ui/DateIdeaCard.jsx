@@ -10,6 +10,8 @@ export default function DateIdeaCard({ image, imageIcon, title, description, tag
             alt={title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
             src={image}
+            loading="lazy"
+            decoding="async"
           />
         ) : (
           <div className="w-full h-full bg-primary-container/20 flex items-center justify-center">

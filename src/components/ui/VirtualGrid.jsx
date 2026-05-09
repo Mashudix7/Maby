@@ -1,30 +1,71 @@
-import { memo } from 'react';
+import { memo, useMemo, useState, useEffect } from 'react';
+import { FixedSizeGrid as Grid } from 'react-window';
 
 /**
- * A responsive grid component (temporarily non-virtualized for troubleshooting).
+ * A responsive grid component that uses virtualization for high performance.
  */
 export default function VirtualGrid({
   items,
   renderItem,
   gap = 24,
   minColumnWidth = 300,
+  itemHeight = 400
 }) {
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  useEffect(() => {
+    const updateWidth = () => {
+      const el = document.getElementById('virtual-grid-container');
+      if (el) setContainerWidth(el.offsetWidth);
+    };
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
+
+  const { columnCount, columnWidth } = useMemo(() => {
+    if (containerWidth === 0) return { columnCount: 1, columnWidth: minColumnWidth };
+    const count = Math.max(1, Math.floor((containerWidth + gap) / (minColumnWidth + gap)));
+    const width = (containerWidth - (count - 1) * gap) / count;
+    return { columnCount: count, columnWidth: width };
+  }, [containerWidth, minColumnWidth, gap]);
+
+  const rowCount = Math.ceil(items.length / columnCount);
+
   if (!items || items.length === 0) return null;
 
   return (
-    <div 
-      className="grid gap-6 w-full"
-      style={{
-        gridTemplateColumns: `repeat(auto-fill, minmax(${minColumnWidth}px, 1fr))`,
-        gap: `${gap}px`
-      }}
-    >
-      {items.map((item, index) => (
-        <div key={item.id || index}>
-          {renderItem(item, index)}
-        </div>
-      ))}
+    <div id="virtual-grid-container" className="w-full min-h-[500px]">
+      {containerWidth > 0 && (
+        <Grid
+          columnCount={columnCount}
+          columnWidth={columnWidth + gap}
+          height={Math.min(window.innerHeight - 200, rowCount * (itemHeight + gap))} 
+          rowCount={rowCount}
+          rowHeight={itemHeight + gap}
+          width={containerWidth}
+          style={{ overflowX: 'hidden' }}
+        >
+          {({ columnIndex, rowIndex, style }) => {
+            const index = rowIndex * columnCount + columnIndex;
+            if (index >= items.length) return null;
+            
+            return (
+              <div 
+                style={{
+                  ...style,
+                  left: parseFloat(style.left) + gap / 2,
+                  top: parseFloat(style.top) + gap / 2,
+                  width: parseFloat(style.width) - gap,
+                  height: parseFloat(style.height) - gap,
+                }}
+              >
+                {renderItem(items[index], index)}
+              </div>
+            );
+          }}
+        </Grid>
+      )}
     </div>
   );
 }
-
