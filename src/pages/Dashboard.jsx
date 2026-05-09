@@ -245,34 +245,35 @@ export default function Dashboard() {
           {/* Today's Memory */}
           <div className="md:col-span-8">
             <ScrollReveal direction="left" delay={200}>
-              <div className="bg-zinc-100 dark:bg-white/5 rounded-2xl md:rounded-[2rem] p-4 md:p-8 flex flex-col relative overflow-hidden group min-h-[280px] md:min-h-[400px] border border-primary/5">
-                {moments[0]?.image_url ? (
-                  <div className="absolute inset-0 z-0">
-                    <SmartImage
-                      src={moments[0].image_url}
-                      alt={t('dashboard.last_memory')}
-                      aspectRatio="h-full"
-                      className="opacity-60"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-surface-container-low/90 dark:from-[#1a1517]/90 via-surface-container-low/40 dark:via-[#1a1517]/40 to-transparent pointer-events-none" />
-                  </div>
-                ) : (
-                  <div className="absolute inset-0 z-0 soft-gradient opacity-30 pointer-events-none" />
-                )}
-                <div className="relative z-10 flex flex-col h-full justify-between">
-                  <div className="flex justify-between items-start">
+              <div className="bg-zinc-100 dark:bg-white/5 rounded-2xl md:rounded-[2rem] p-4 md:p-6 flex flex-col relative overflow-hidden group border border-primary/5 h-full min-h-[400px]">
+                <div className="relative z-10 flex flex-col h-full">
+                  <div className="flex justify-between items-center mb-4">
                     <span className="inline-flex items-center px-4 py-2 rounded-full bg-white/70 dark:bg-white/10 text-primary dark:text-rose-300 font-sans text-xs font-semibold tracking-wide backdrop-blur-md">
                       <span className="material-symbols-outlined mr-2 text-[16px]">photo_library</span>
                       {moments[0] ? t('dashboard.last_memory') : t('dashboard.no_memory')}
                     </span>
                   </div>
-                  <div className="mt-auto">
-                    <h2 className="font-serif text-xl md:text-3xl text-on-surface dark:text-[#ede0df] mb-2">
+                  
+                  {moments[0]?.image_url ? (
+                    <div className="relative w-full aspect-[16/9] md:aspect-video rounded-2xl overflow-hidden mb-6 shadow-sm">
+                      <SmartImage
+                        src={moments[0].image_url}
+                        alt={t('dashboard.last_memory')}
+                        aspectRatio="h-full"
+                        className="w-full h-full"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-full aspect-[16/9] bg-primary-container/10 rounded-2xl mb-6 soft-gradient opacity-30" />
+                  )}
+
+                  <div className="px-1 flex flex-col">
+                    <h2 className="font-serif text-2xl md:text-3xl text-on-surface dark:text-[#ede0df] mb-3 leading-tight">
                       {moments[0]?.title || t('dashboard.add_first')}
                     </h2>
                     {moments[0]?.story && (
-                      <p className="font-sans text-base text-on-surface-variant dark:text-zinc-400 font-serif italic line-clamp-2">
-                        &quot;{moments[0].story.slice(0, 100)}...&quot;
+                      <p className="font-sans text-base text-on-surface-variant dark:text-zinc-400 font-serif italic leading-relaxed">
+                        &quot;{moments[0].story}&quot;
                       </p>
                     )}
                   </div>
@@ -439,4 +440,3 @@ export default function Dashboard() {
     </MainLayout>
   );
 }
-
