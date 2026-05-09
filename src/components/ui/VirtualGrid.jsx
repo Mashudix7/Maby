@@ -1,5 +1,5 @@
 import { memo, useMemo, useState, useEffect } from 'react';
-import { FixedSizeGrid as Grid } from 'react-window';
+import { Grid } from 'react-window';
 
 /**
  * A responsive grid component that uses virtualization for high performance.
@@ -45,8 +45,7 @@ export default function VirtualGrid({
           rowHeight={itemHeight + gap}
           width={containerWidth}
           style={{ overflowX: 'hidden' }}
-        >
-          {({ columnIndex, rowIndex, style }) => {
+          cellComponent={({ columnIndex, rowIndex, style }) => {
             const index = rowIndex * columnCount + columnIndex;
             if (index >= items.length) return null;
             
@@ -64,7 +63,7 @@ export default function VirtualGrid({
               </div>
             );
           }}
-        </Grid>
+        />
       )}
     </div>
   );
