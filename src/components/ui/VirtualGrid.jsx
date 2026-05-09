@@ -8,8 +8,8 @@ import { Grid } from 'react-window';
 export default function VirtualGrid({
   items,
   renderItem,
-  gap = 20, // Slightly reduced for better mobile fit
-  minColumnWidth = 300,
+  gap = 16, // Reduced gap for better mobile fit
+  minColumnWidth = 280, // Reduced to fit smaller screens (like 320px with padding)
   itemHeight = 400
 }) {
   const [containerWidth, setContainerWidth] = useState(0);
@@ -17,30 +17,39 @@ export default function VirtualGrid({
   useEffect(() => {
     const updateWidth = () => {
       const el = document.getElementById('virtual-grid-container');
-      if (el) setContainerWidth(el.offsetWidth);
+      if (el) {
+        // Use clientWidth to exclude scrollbars/borders
+        setContainerWidth(el.clientWidth);
+      }
     };
+    
     updateWidth();
-    // Use a small delay to ensure DOM is ready
-    const timer = setTimeout(updateWidth, 100);
+    // Use a small delay to ensure DOM is ready and layout has settled
+    const timer = setTimeout(updateWidth, 150);
+    
+    // ResizeObserver is more reliable than 'resize' event for specific elements
+    const observer = new ResizeObserver(updateWidth);
+    const el = document.getElementById('virtual-grid-container');
+    if (el) observer.observe(el);
+
     window.addEventListener('resize', updateWidth);
     return () => {
       window.removeEventListener('resize', updateWidth);
+      observer.disconnect();
       clearTimeout(timer);
     };
   }, []);
 
   const { columnCount, columnWidth } = useMemo(() => {
-    if (containerWidth === 0) return { columnCount: 1, columnWidth: minColumnWidth };
-    // Calculate how many columns can fit including their gaps
+    if (containerWidth === 0) return { columnCount: 1, columnWidth: 280 };
+    // Calculate how many columns can fit
     const count = Math.max(1, Math.floor((containerWidth + gap) / (minColumnWidth + gap)));
-    // Total width of one "slot" (card + gap)
     const slotWidth = containerWidth / count;
     return { columnCount: count, columnWidth: slotWidth };
   }, [containerWidth, minColumnWidth, gap]);
 
   const rowCount = Math.ceil(items.length / columnCount);
 
-  // Memoize the Cell component to prevent re-creation on every render
   const Cell = useCallback(({ columnIndex, rowIndex, style }) => {
     const index = rowIndex * columnCount + columnIndex;
     if (index >= items.length) return null;
@@ -49,12 +58,11 @@ export default function VirtualGrid({
       <div 
         style={{
           ...style,
-          // Use padding to create the gap, ensuring no cropping occurs at edges
           padding: `${gap / 2}px`,
           boxSizing: 'border-box'
         }}
       >
-        <div className="w-full h-full">
+        <div className="w-full h-full overflow-hidden">
           {renderItem(items[index], index)}
         </div>
       </div>
@@ -64,7 +72,7 @@ export default function VirtualGrid({
   if (!items || items.length === 0) return null;
 
   return (
-    <div id="virtual-grid-container" className="w-full min-h-[500px] overflow-hidden">
+    <div id="virtual-grid-container" className="w-full min-h-[500px] overflow-x-hidden box-border">
       {containerWidth > 0 && (
         <Grid
           columnCount={columnCount}
