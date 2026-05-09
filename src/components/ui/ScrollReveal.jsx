@@ -5,9 +5,9 @@ export default function ScrollReveal({
   className = '', 
   delay = 0,
   direction = 'up', // 'up', 'down', 'left', 'right', 'none'
-  duration = 400, // Reduced from 700
-  distance = '15px', // Reduced from 20px
-  threshold = 0.05 // Reduced from 0.1 for faster triggering
+  duration = 300, // Reduced from 400 for snappier feel
+  distance = '10px', // Reduced from 15px
+  threshold = 0.01 // Triggers as soon as 1% of the element is visible
 }) {
   const [ref, isVisible] = useIntersectionObserver({ threshold });
 

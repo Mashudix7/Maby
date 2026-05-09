@@ -60,11 +60,12 @@ export default function VirtualGrid({
         <Grid
           columnCount={columnCount}
           columnWidth={columnWidth + gap}
-          height={Math.min(window.innerHeight - 200, rowCount * (itemHeight + gap))} 
+          height={Math.min(window.innerHeight - 150, rowCount * (itemHeight + gap))} 
           rowCount={rowCount}
           rowHeight={itemHeight + gap}
           width={containerWidth}
           style={{ overflowX: 'hidden' }}
+          overscanRowCount={3} // Pre-render 3 extra rows for smoother scrolling
           cellProps={{}} 
           cellComponent={Cell}
         />

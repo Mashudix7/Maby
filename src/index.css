@@ -113,18 +113,10 @@
     color: var(--color-on-primary-container);
   }
 
+  /* Custom scrollbar removed as requested to remove the pink line */
   ::-webkit-scrollbar {
-    width: 8px;
-  }
-  ::-webkit-scrollbar-track {
-    background: var(--color-background);
-  }
-  ::-webkit-scrollbar-thumb {
-    background: var(--color-primary-container);
-    border-radius: 10px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--color-primary-fixed-dim);
+    width: 0px;
+    background: transparent;
   }
 }
 
@@ -296,14 +288,14 @@
 
   .reveal {
     opacity: 0;
-    transform: translateY(20px) scale(0.98);
-    transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    transform: translateY(10px); /* Reduced for faster feel */
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out; /* Much faster animation */
     will-change: opacity, transform;
   }
 
   .reveal.active {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 
   .img-optim {
