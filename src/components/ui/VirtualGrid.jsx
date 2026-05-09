@@ -3,11 +3,12 @@ import { Grid } from 'react-window';
 
 /**
  * A responsive grid component that uses virtualization for high performance.
+ * Optimized to prevent card cropping and handle gaps correctly.
  */
 export default function VirtualGrid({
   items,
   renderItem,
-  gap = 24,
+  gap = 20, // Slightly reduced for better mobile fit
   minColumnWidth = 300,
   itemHeight = 400
 }) {
@@ -19,15 +20,22 @@ export default function VirtualGrid({
       if (el) setContainerWidth(el.offsetWidth);
     };
     updateWidth();
+    // Use a small delay to ensure DOM is ready
+    const timer = setTimeout(updateWidth, 100);
     window.addEventListener('resize', updateWidth);
-    return () => window.removeEventListener('resize', updateWidth);
+    return () => {
+      window.removeEventListener('resize', updateWidth);
+      clearTimeout(timer);
+    };
   }, []);
 
   const { columnCount, columnWidth } = useMemo(() => {
     if (containerWidth === 0) return { columnCount: 1, columnWidth: minColumnWidth };
+    // Calculate how many columns can fit including their gaps
     const count = Math.max(1, Math.floor((containerWidth + gap) / (minColumnWidth + gap)));
-    const width = (containerWidth - (count - 1) * gap) / count;
-    return { columnCount: count, columnWidth: width };
+    // Total width of one "slot" (card + gap)
+    const slotWidth = containerWidth / count;
+    return { columnCount: count, columnWidth: slotWidth };
   }, [containerWidth, minColumnWidth, gap]);
 
   const rowCount = Math.ceil(items.length / columnCount);
@@ -41,13 +49,14 @@ export default function VirtualGrid({
       <div 
         style={{
           ...style,
-          left: (parseFloat(style.left) || 0) + gap / 2,
-          top: (parseFloat(style.top) || 0) + gap / 2,
-          width: (parseFloat(style.width) || 0) - gap,
-          height: (parseFloat(style.height) || 0) - gap,
+          // Use padding to create the gap, ensuring no cropping occurs at edges
+          padding: `${gap / 2}px`,
+          boxSizing: 'border-box'
         }}
       >
-        {renderItem(items[index], index)}
+        <div className="w-full h-full">
+          {renderItem(items[index], index)}
+        </div>
       </div>
     );
   }, [items, renderItem, columnCount, gap]);
@@ -55,17 +64,17 @@ export default function VirtualGrid({
   if (!items || items.length === 0) return null;
 
   return (
-    <div id="virtual-grid-container" className="w-full min-h-[500px]">
+    <div id="virtual-grid-container" className="w-full min-h-[500px] overflow-hidden">
       {containerWidth > 0 && (
         <Grid
           columnCount={columnCount}
-          columnWidth={columnWidth + gap}
+          columnWidth={columnWidth}
           height={Math.min(window.innerHeight - 150, rowCount * (itemHeight + gap))} 
           rowCount={rowCount}
           rowHeight={itemHeight + gap}
           width={containerWidth}
           style={{ overflowX: 'hidden' }}
-          overscanRowCount={3} // Pre-render 3 extra rows for smoother scrolling
+          overscanRowCount={3}
           cellProps={{}} 
           cellComponent={Cell}
         />
