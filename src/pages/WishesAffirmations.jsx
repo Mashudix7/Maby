@@ -6,7 +6,6 @@ import { useLanguage } from '../context/LanguageContext';
 import { createWish, listenWishes } from '../services/wishService';
 import { showSuccess, showError } from '../lib/alerts';
 import { WishCardSkeleton } from '../components/ui/Skeleton';
-import VirtualGrid from '../components/ui/VirtualGrid';
 import ScrollReveal from '../components/ui/ScrollReveal';
 import { db } from '../lib/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
@@ -83,31 +82,6 @@ export default function WishesAffirmations() {
     }
   }, [visibleCount, wishes.length]);
 
-  const renderWish = useCallback((wish) => (
-    <ScrollReveal direction="up" distance="10px" threshold={0.01}>
-      <WishCard key={wish.id} className="flex flex-col justify-between h-full group hover:scale-[1.02] transition-all duration-300 will-change-transform contain-paint">
-        <p className="font-serif text-base text-on-surface-variant dark:text-zinc-300 italic leading-relaxed mb-3 line-clamp-3">
-          &quot;{wish.text}&quot;
-        </p>
-        <div className="flex items-center gap-2 mt-auto">
-          <div className="w-7 h-7 rounded-full bg-primary-container dark:bg-primary-container/30 flex items-center justify-center text-primary text-[10px] font-serif shrink-0 overflow-hidden border border-primary/10">
-            {wish.profiles?.photo_url || wish.profiles?.photoURL ? (
-              <img src={wish.profiles.photo_url || wish.profiles.photoURL} className="w-full h-full object-cover" alt="" />
-            ) : (
-              (wish.profiles?.display_name || '?')[0].toUpperCase()
-            )}
-          </div>
-          <span className="text-[10px] font-semibold text-on-surface-variant dark:text-zinc-500 truncate">
-            {wish.profiles?.display_name || t('wishes.anonymous')}
-          </span>
-          <span className="text-[10px] text-outline dark:text-zinc-600 ml-auto shrink-0">
-            {new Date(wish.created_at).toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'short' })}
-          </span>
-        </div>
-      </WishCard>
-    </ScrollReveal>
-  ), [language, t]);
-
   return (
     <MainLayout activePage="/harapan">
       <div className="max-w-[1140px] mx-auto pb-20">
@@ -146,7 +120,7 @@ export default function WishesAffirmations() {
           </form>
         </ScrollReveal>
 
-        {/* Wishes Grid */}
+        {/* Wishes Grid - Using Normal Grid for better height consistency */}
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
             {[...Array(6)].map((_, i) => <WishCardSkeleton key={i} />)}
@@ -158,19 +132,40 @@ export default function WishesAffirmations() {
           </div>
         ) : (
           <div className="flex flex-col gap-6">
-            <VirtualGrid
-              items={wishesWithProfiles}
-              itemHeight={150}
-              gap={12}
-              minColumnWidth={320}
-              renderItem={renderWish}
-            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+              {wishesWithProfiles.map((wish) => (
+                <ScrollReveal key={wish.id} direction="up" distance="10px" threshold={0.01}>
+                  <WishCard className="flex flex-col h-full group hover:scale-[1.01] transition-all duration-300">
+                    <p className="font-serif text-base text-on-surface-variant dark:text-zinc-300 italic leading-relaxed mb-4">
+                      &quot;{wish.text}&quot;
+                    </p>
+                    <div className="flex items-center gap-2 mt-auto pt-2">
+                      <div className="w-7 h-7 rounded-full bg-primary-container dark:bg-primary-container/30 flex items-center justify-center text-primary text-[10px] font-serif shrink-0 overflow-hidden border border-primary/10">
+                        {wish.profiles?.photo_url || wish.profiles?.photoURL ? (
+                          <img src={wish.profiles.photo_url || wish.profiles.photoURL} className="w-full h-full object-cover" alt="" />
+                        ) : (
+                          (wish.profiles?.display_name || '?')[0].toUpperCase()
+                        )}
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-[10px] font-bold text-on-surface-variant dark:text-zinc-400 truncate leading-none mb-0.5">
+                          {wish.profiles?.display_name || t('wishes.anonymous')}
+                        </span>
+                        <span className="text-[9px] text-outline dark:text-zinc-600 leading-none">
+                          {new Date(wish.created_at).toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'short' })}
+                        </span>
+                      </div>
+                    </div>
+                  </WishCard>
+                </ScrollReveal>
+              ))}
+            </div>
             
             {visibleCount < wishes.length && (
-              <div className="flex justify-center mt-4">
+              <div className="flex justify-center mt-6">
                 <button
                   onClick={loadMore}
-                  className="px-6 py-2.5 bg-white/50 dark:bg-white/5 border border-primary/20 rounded-full text-primary dark:text-rose-300 font-bold text-xs hover:bg-primary hover:text-white transition-all"
+                  className="px-8 py-3 bg-white/40 dark:bg-white/5 border border-primary/10 rounded-full text-primary dark:text-rose-300 font-bold text-xs hover:bg-primary hover:text-white transition-all shadow-sm"
                 >
                   Lihat Lebih Banyak
                 </button>
