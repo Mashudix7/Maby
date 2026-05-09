@@ -1,5 +1,5 @@
 import { db } from '../lib/firebase';
-import { doc, getDoc, setDoc, updateDoc, increment, collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, increment, collection, query, where, getDocs, onSnapshot, runTransaction } from 'firebase/firestore';
 import { getCached, setCached, invalidatePrefix } from '../lib/queryCache';
 import { getWIBDate } from '../lib/dateUtils';
 
@@ -62,6 +62,10 @@ export function listenDailyActivity(coupleId, date, callback) {
   });
 }
 
+/**
+ * Updates streak activity using a transaction to prevent race conditions.
+ * Ensures that if both users update at the same time, the streak is correctly incremented.
+ */
 export const updateStreakActivity = async (coupleId, userId) => {
   try {
     if (!coupleId || !userId) return;
@@ -70,51 +74,61 @@ export const updateStreakActivity = async (coupleId, userId) => {
     const activityRef = doc(db, 'streaks', coupleId, 'daily_activity', today);
     const streakRef = doc(db, 'streaks', coupleId);
 
+    // Get members to identify user1 vs user2
     const q = query(collection(db, 'users'), where('couple_id', '==', coupleId));
     const membersSnap = await getDocs(q);
     const members = membersSnap.docs.map(d => d.id).sort();
     
     const userIndex = members.indexOf(userId);
     if (userIndex === -1) return;
-
     const fieldToUpdate = userIndex === 0 ? 'user1_active' : 'user2_active';
 
-    const activitySnap = await getDoc(activityRef);
-    let activityData = activitySnap.exists() ? activitySnap.data() : { user1_active: false, user2_active: false, completed: false };
+    // Use transaction for atomic updates
+    await runTransaction(db, async (transaction) => {
+      const activitySnap = await transaction.get(activityRef);
+      let activityData = activitySnap.exists() 
+        ? activitySnap.data() 
+        : { user1_active: false, user2_active: false, completed: false };
 
-    if (activityData[fieldToUpdate]) return;
+      // If already active, no need to update
+      if (activityData[fieldToUpdate] && activityData.completed) return;
 
-    activityData[fieldToUpdate] = true;
-    const isNowCompleted = activityData.user1_active && activityData.user2_active;
-    
-    if (isNowCompleted && !activityData.completed) {
-      activityData.completed = true;
+      // Update current user's activity
+      activityData[fieldToUpdate] = true;
       
-      const streakSnap = await getDoc(streakRef);
-      if (streakSnap.exists()) {
-        const streakData = streakSnap.data();
-        if (streakData.last_increment_date !== today) {
-          await updateDoc(streakRef, {
-            total_streak: increment(1),
+      // Check if both are now active
+      const isNowCompleted = activityData.user1_active && activityData.user2_active;
+      
+      if (isNowCompleted && !activityData.completed) {
+        activityData.completed = true;
+        
+        const streakSnap = await transaction.get(streakRef);
+        if (streakSnap.exists()) {
+          const streakData = streakSnap.data();
+          // Only increment if not already incremented today
+          if (streakData.last_increment_date !== today) {
+            transaction.update(streakRef, {
+              total_streak: increment(1),
+              last_increment_date: today,
+              last_activity_at: new Date().toISOString()
+            });
+          }
+        } else {
+          transaction.set(streakRef, {
+            total_streak: 1,
             last_increment_date: today,
             last_activity_at: new Date().toISOString()
           });
         }
-      } else {
-        await setDoc(streakRef, {
-          total_streak: 1,
-          last_increment_date: today,
-          last_activity_at: new Date().toISOString()
-        });
       }
-    }
 
-    await setDoc(activityRef, activityData, { merge: true });
+      // Save activity data
+      transaction.set(activityRef, activityData, { merge: true });
+    });
+
     invalidatePrefix('streak:');
     invalidatePrefix('activity:');
-
-    return activityData;
   } catch (error) {
-    console.error('Error updating streak activity:', error);
+    console.error('Error updating streak activity in transaction:', error);
   }
 };
