@@ -1,4 +1,4 @@
-import { memo, useMemo, useState, useEffect } from 'react';
+import { memo, useMemo, useState, useEffect, useCallback } from 'react';
 import { Grid } from 'react-window';
 
 /**
@@ -32,6 +32,26 @@ export default function VirtualGrid({
 
   const rowCount = Math.ceil(items.length / columnCount);
 
+  // Memoize the Cell component to prevent re-creation on every render
+  const Cell = useCallback(({ columnIndex, rowIndex, style }) => {
+    const index = rowIndex * columnCount + columnIndex;
+    if (index >= items.length) return null;
+    
+    return (
+      <div 
+        style={{
+          ...style,
+          left: (parseFloat(style.left) || 0) + gap / 2,
+          top: (parseFloat(style.top) || 0) + gap / 2,
+          width: (parseFloat(style.width) || 0) - gap,
+          height: (parseFloat(style.height) || 0) - gap,
+        }}
+      >
+        {renderItem(items[index], index)}
+      </div>
+    );
+  }, [items, renderItem, columnCount, gap]);
+
   if (!items || items.length === 0) return null;
 
   return (
@@ -45,26 +65,8 @@ export default function VirtualGrid({
           rowHeight={itemHeight + gap}
           width={containerWidth}
           style={{ overflowX: 'hidden' }}
-          cellProps={{}} // Added this to prevent crash in react-window v2.2.7
-          cellComponent={({ columnIndex, rowIndex, style }) => {
-            const index = rowIndex * columnCount + columnIndex;
-            if (index >= items.length) return null;
-            
-            return (
-              <div 
-                style={{
-                  ...style,
-                  left: parseFloat(style.left) || 0,
-                  top: parseFloat(style.top) || 0,
-                  width: (parseFloat(style.width) || 0) - gap,
-                  height: (parseFloat(style.height) || 0) - gap,
-                  padding: `${gap / 2}px`
-                }}
-              >
-                {renderItem(items[index], index)}
-              </div>
-            );
-          }}
+          cellProps={{}} 
+          cellComponent={Cell}
         />
       )}
     </div>
